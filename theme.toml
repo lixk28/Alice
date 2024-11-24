@@ -1,0 +1,9 @@
+name = "Alice"
+license = "LGPLv3"
+licenselink = "https://github.com/lixk28/Alice/blob/main/LICENSE"
+description = "MistY's OWN Hugo Theme"
+homepage = "https://github.com/lixk28/Alice"
+min_version = "0.20"
+
+[author]
+  name = "Xuekun Li"

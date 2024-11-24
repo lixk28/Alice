@@ -1,0 +1,413 @@
+@import "fonts.css";
+@import "code.css";
+@import "header.css";
+@import "footer.css";
+@import "paginator.css";
+@import "home.css";
+@import "post.css";
+@import "toc.css";
+@import "prext.css";
+@import "related.css";
+@import "img.css";
+@import "table.css";
+@import "tabs.css";
+@import "details.css";
+@import "admonition.css";
+@import "sidenote.css";
+@import "secret.css";
+@import "mark.css";
+
+* {
+    box-sizing: border-box;
+}
+
+/*
+ * reference:
+ * https://stackoverflow.com/questions/6654958/make-body-have-100-of-the-browser-height
+ * https://stackoverflow.com/questions/643879/css-to-make-html-page-footer-stay-at-bottom-of-the-page-with-a-minimum-height-b
+ */
+html {
+    height: 100%;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    /* overflow-wrap: break-word; */
+
+    /* https://stackoverflow.com/questions/3058866/how-to-force-a-line-break-in-a-long-word-in-a-div/18706058#18706058 */
+    -ms-word-break: break-all;
+    word-break: break-all;
+    /* Non standard for webkit */
+    word-break: break-word;
+
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    min-height: 100%;
+    margin: 0;
+    font-family: var(--sans-font);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    color: var(--font-color);
+    background: var(--bgcolor);
+}
+
+:root {
+    --mono-font: "IBM Plex Mono";
+    --serif-font: "IBM Plex Serif";
+    --sans-font: "Lora";
+
+    --font-size-tiny: 0.8rem;
+    --font-size-small: 0.9rem;
+    --font-size-normal: 1rem;
+    --font-size-big: 1.1rem;
+    --font-size-large: 1.2rem;
+
+    --font-size: 1rem;
+    --h1-font-size: 1.5rem;
+    --h2-font-size: 1.4rem;
+    --h3-font-size: 1.3rem;
+    --h4-font-size: 1.2rem;
+
+    --svg-stroke-color: black;
+
+    --svg-stroke-width-thin: 1;
+    --svg-stroke-width-normal: 2;
+    --svg-stroke-width-thick: 3;
+
+    --svg-size-small: 0.8em;
+    --svg-size-normal: 1em;
+    --svg-size-large: 1.2em;
+
+    --transition-duration-lightning: 100ms;
+    --transition-duration-fast: 150ms;
+    --transition-duration-normal: 200ms;
+    --transition-duration-slow: 250ms;
+    --transition-duration-turtle: 300ms;
+
+    --mono-font-size: 1rem;
+    --line-height: 1.6rem;
+    --code-block-line-height: 1.4rem;
+    --paginator-font-size: 1.4rem;
+}
+
+:root {
+    --apple-blue: #007AFF;
+    --bgcolor: AliceBlue;
+    --font-color: Black;
+    --link-color: RoyalBlue;
+    --link-active-color: Blue;
+    --rule-color: Gray;
+    --menu-icon-color: DarkBlue;
+    --post-card-border-color: SlateGray;
+    --post-card-shadow-color: LightSlateGray;
+    /* --code-color: Black; */
+    --code-bgcolor: White;
+    --code-border-color: LightGray;
+    --quote-color: DimGray;
+    --quote-bgcolor: Whitesmoke;
+    --quote-left-border-color: DarkGray;
+    --quote-border-color: Gainsboro;
+    --figure-caption-color: DimGray;
+    --toc-heading-color: Dodgerblue;
+    --toc-heading-active-color: var(--font-color);
+    --toc-underline-color: Dodgerblue;
+    --toc-highlight-color: Lavender;
+    --code-block-bgcolor: White;
+    --code-block-border-color: Gainsboro;
+}
+
+/* @media (prefers-color-scheme: dark) {
+    :root {
+        --bgcolor: DimGray;
+        --font-color: Whitesmoke;
+        --link-color: PowderBlue;
+        --rule-color: LightGray;
+        --code-bgcolor: Gray;
+        --quote-color: Silver;
+        --quote-bgcolor: DimGray;
+        --quote-left-border-color: Lavender;
+        --quote-border-color: Silver;
+        --figure-caption-color: LightGray;
+        --toc-link-color: PaleTurquoise;
+        --toc-active-color: Violet;
+        --toc-inactive-color: var(--link-color);
+        --code-block-bgcolor: Gray;
+        --code-block-border-color: Silver;
+    }
+} */
+
+
+/* @media screen and (max-width: 320px) {
+    :root {
+        --font-size: 15px;
+        --mono-font-size: 13px;
+    }
+}
+
+@media screen and (min-width: 320px) and (max-width: 600px) {
+    :root {
+        --font-size: 16px;
+        --mono-font-size: 14px;
+    }
+}
+
+@media screen and (min-width: 600px) and (max-width: 960px) {
+    :root {
+        --font-size: 17px;
+        --mono-font-size: 15px;
+    }
+}
+
+@media screen and (min-width: 960px) and (max-width: 1280px) {
+    :root {
+        --font-size: 18px;
+        --mono-font-size: 16px;
+    }
+}
+
+@media screen and (min-width: 1280px) and (max-width: 1600px) {
+    :root {
+        --font-size: 19px;
+        --mono-font-size: 17px;
+    }
+}
+
+@media screen and (min-width: 1600px) and (max-width: 1920px) {
+    :root {
+        --font-size: 20px;
+        --mono-font-size: 18px;
+    }
+} */
+
+/* select only top level ul */
+*:not(li) > ul {
+    margin-block-start: 0.8em;
+}
+
+ul {
+    padding-inline-start: 2em;
+}
+
+/* small screen width with nested list looks bad */
+@media screen and (max-width: 600px) {
+    *:not(li) > ul {
+        padding-inline-start: 1.5em;
+    }
+    ul {
+        padding-inline-start: 1em;
+    }
+}
+
+ol {
+    margin-left: .8em;
+}
+
+ol li::marker {
+    font-weight: bold;
+}
+
+/* footnotes */
+div.footnotes > ol {
+    margin-top: .8em;
+}
+div.footnotes p {
+    margin: .4em 0;
+}
+
+hr.rule {
+    height: 2px;
+    border-width: 0;
+    color: var(--rule-color);
+    background-color: var(--rule-color);
+}
+
+input {
+    accent-color: var(--link-color);
+}
+
+/* svg icons */
+svg {
+    stroke: var(--svg-stroke-color);
+    stroke-width: var(--svg-stroke-width-normal);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    width: var(--svg-size-normal);
+    height: var(--svg-size-normal);
+    fill: none;
+}
+
+svg.copyleft-icon {
+    position: relative;
+    top: 2px;
+    stroke: none;
+    fill: black;
+    width: var(--svg-size-normal);
+    height: var(--svg-size-normal);
+}
+
+/* anchors */
+a {
+    color: var(--link-color);
+    word-break: break-word; /* some urls are so long */
+    text-decoration: none !important;
+    /* border-bottom: .1rem solid var(--link-color); */
+    box-shadow: inset 0 -0.1em 0 var(--link-color);
+    transition: 0.2s ease;
+}
+a:hover {
+    color: var(--link-active-color);
+    /* border-bottom: .1rem solid var(--link-active-color); */
+    box-shadow: inset 0 -0.15em 0 var(--link-active-color);
+}
+
+svg.external-anchor-icon {
+    stroke: var(--link-color);
+    stroke-width: 2;
+    width: 1em;
+    height: 1em;
+    position: relative;
+    top: .2em;
+    margin-left: .2em;
+    transition: 0.2s ease;
+}
+a:hover svg.external-anchor-icon {
+    stroke: var(--link-active-color);
+}
+
+main h1 {
+    font-family: var(--serif-font);
+    font-size: var(--h1-font-size);
+}
+main h2 {
+    font-family: var(--serif-font);
+    font-size: var(--h2-font-size);
+}
+main h3 {
+    font-family: var(--serif-font);
+    font-size: var(--h3-font-size);
+}
+main h4 {
+    font-family: var(--serif-font);
+    font-size: var(--h4-font-size);
+}
+
+/**
+ * NOTE: To make heading respect the top header height, we could use scroll-margin-top here,
+ * but it has not been implemented in ladybird. The workaround is to add a placeholder pseudo-elements
+ * before the headings to create the vertical margin so that headings will not be covered by header.
+ */
+article h2::before,
+article h3::before,
+article h4::before {
+    display: block;
+    content: "";
+    margin-top: -4rem;
+    height: 4rem;
+    visibility: hidden;
+}
+
+p.post-info {
+    font-family: var(--serif-font);
+    line-height: 2rem;
+}
+
+/* heading pilcrow */
+a.heading-pilcrow {
+    padding-top: var(--header-height);
+    color: var(--font-color);
+    box-shadow: none;
+    transition: 0.2s;
+}
+a.heading-pilcrow:hover {
+    color: var(--link-color);
+}
+
+.content p {
+    margin: .8em 0;
+}
+
+.content li:not(:last-child), .about-content li:not(:last-child) {
+    margin: .2em 0;
+}
+
+/* blockquote */
+blockquote {
+    color: var(--quote-color);
+    background-color: var(--quote-bgcolor);
+    margin: .4em 0;
+    padding: .2em .4em .2em 1.2em;
+    border-left: 8px solid var(--quote-left-border-color);
+    border-right: 1px solid var(--quote-border-color);
+    border-top: 1px solid var(--quote-border-color);
+    border-bottom: 1px solid var(--quote-border-color);
+}
+
+/* post item in Posts/Categories/Tags */
+li.post-item {
+    font-family: var(--serif-font);
+    margin-bottom: .4em;
+}
+
+/* collapsible details for each series */
+details.series {
+    font-family: var(--serif-font);
+    padding-left: 1.2em;
+    margin: 1em 0;
+}
+
+details.series > summary {
+    list-style: none;
+    list-style-type: none;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+details.series > summary::before {
+    content: "\2217";
+    font-weight: bold;
+    margin-right: .5em;
+}
+
+details.series summary::after {
+    /* content: "\27A4"; */
+    content: "\25B6";
+    color: var(--link-color);
+    display: inline-block;
+    margin-left: 1ch;
+    transition: 0.15s;
+}
+
+details.series[open] summary::after {
+    transform: rotate(90deg);
+}
+
+details.series > ul {
+    margin: .8em 0 1.6em .8em;
+}
+
+.series-item:not(:last-child) {
+    margin-bottom: .4em;
+}
+
+/* categories */
+ul.categories {
+    font-family: var(--serif-font);
+}
+ul.categories > li {
+    margin-bottom: .5em;
+}
+
+/* tags */
+p.tags {
+    font-family: var(--serif-font);
+    line-height: 3.2em;
+}
+p.tags > span {
+    white-space: nowrap;
+}

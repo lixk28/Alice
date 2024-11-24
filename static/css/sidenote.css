@@ -1,0 +1,58 @@
+:root {
+    --sidenote-label-border-width: 4px;
+    --sidenote-label-border-style: dashed;
+    --sidenote-content-border-width: 4px;
+    --sidenote-content-border-style: solid;
+    --sidenote-border-color: DeepSkyBlue;
+    --sidenote-border-color-hover: Blue;
+    --sidenote-shadow-color-hover: SlateGray;
+    --sidenote-shadow-radius-hover: var(--font-size);
+    --sidenote-color-hover: Navy;
+}
+
+input.sidenote-checkbox {
+    display: none;
+}
+
+label.sidenote-label {
+    border: var(--sidenote-label-border-width) var(--sidenote-label-border-style) var(--sidenote-border-color);
+    padding-left: .2em;
+    padding-right: .2em;
+    transition: all 0.15s ease-in-out;
+}
+
+span.sidenote-content {
+    display: block;
+    position: absolute;
+    right: 0;
+    width: var(--post-sidenote-proportion);
+    margin-top: calc(0em - var(--line-height));
+    padding: .2em .2em .2em .4em;
+    /* background-color: white; */
+    border-top: var(--sidenote-content-border-width) var(--sidenote-content-border-style) var(--sidenote-border-color);
+    border-bottom: var(--sidenote-content-border-width) var(--sidenote-content-border-style) var(--sidenote-border-color);
+
+    transition: all 0.15s ease-in-out;
+}
+
+svg.sidenote-pin-icon {
+    stroke-width: 2;
+    stroke: var(--font-color);
+    width: var(--font-size);
+    height: var(--font-size);
+    float: left;
+    margin-right: .4em;
+}
+
+span.sidenote:hover > label.sidenote-label {
+    color: var(--sidenote-color-hover);
+    border-color: var(--sidenote-border-color-hover);
+    box-shadow: 0 0 var(--sidenote-shadow-radius-hover) var(--sidenote-shadow-color-hover);
+}
+span.sidenote:hover > span.sidenote-content {
+    color: var(--sidenote-color-hover);
+    border-color: var(--sidenote-border-color-hover);
+    box-shadow: 0 0 var(--sidenote-shadow-radius-hover) var(--sidenote-shadow-color-hover);
+    /* box-shadow: 0 8px 8px -6px slategray,
+                0 -8px 8px -6px slategray; */
+}

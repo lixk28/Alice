@@ -1,0 +1,65 @@
+{{- /* shortcodes must invoke the freaking .Inner */ -}}
+{{- if .Inner -}}{{- end -}}
+
+{{- if not (.Page.Scratch.Get "tabPanelIndex") -}}
+    {{- .Page.Scratch.Set "tabPanelIndex" 0 -}}
+{{- end -}}
+
+{{- $tabPanelIndex := .Page.Scratch.Get "tabPanelIndex" -}}
+{{- $tabPanelId := printf "tab-panel-%d" $tabPanelIndex -}}
+
+{{- $tabGroup := .Get "group" | default ($tabPanelIndex | string) -}}
+{{- $tabChoice := .Get "choice" | default 1 | add -1 -}}
+
+<div
+    id="{{ $tabPanelId }}"
+    class="tab-panel"
+    data-tab-group="{{ $tabGroup }}"
+>
+    <nav class="tab-nav">
+    {{- range $tabIndex, $tab := .Scratch.Get "tabs" -}}
+        {{- $selected := eq $tabIndex $tabChoice -}}
+        {{- $tabId := printf "p%dt%d" $tabPanelIndex $tabIndex -}}
+        <input
+            type="radio"
+            id="{{ $tabId }}"
+            name="{{ printf `%s-title` $tabPanelId }}"
+            class="tab-title-radio"
+            data-tab-group="{{ $tabGroup }}"
+            data-tab-index="{{ $tabIndex }}" {{ if $selected }}checked{{ end }}/>
+        <label
+            for="{{ $tabId }}"
+            class="tab-title"
+            data-tab-group="{{ $tabGroup }}"
+            data-tab-index="{{ $tabIndex }}"
+            onclick="switchTab('{{ $tabGroup }}', '{{ $tabIndex }}');
+                     persistTabChoices('{{ $tabGroup }}', '{{ $tabIndex }}', 'sessionStorage');">
+            {{- $tab.Title | markdownify -}}
+        </label>
+    {{- end -}}
+    </nav>
+    <div class="tab-content-container">
+    {{- range $tabIndex, $tab := .Scratch.Get "tabs" -}}
+        {{- $selected := eq $tabIndex $tabChoice -}}
+        {{- $tabId := printf "p%dt%d" $tabPanelIndex $tabIndex -}}
+        <input
+            type="radio"
+            id="{{ $tabId }}"
+            name="{{ printf `%s-content` $tabPanelId }}"
+            class="tab-content-radio"
+            data-tab-group="{{ $tabGroup }}"
+            data-tab-index="{{ $tabIndex }}" {{ if $selected }}checked{{ end }}/>
+        <div
+            id="{{ $tabId }}"
+            class="tab-content"
+            data-tab-group="{{ $tabGroup }}"
+            data-tab-index="{{ $tabIndex }}"
+        >
+            {{- $tab.Content | markdownify -}}
+        </div>
+    {{- end -}}
+    </div>
+</div>
+
+{{- .Page.Scratch.Add "tabPanelIndex" 1 -}}
+{{- .Scratch.Delete "tabs" -}}

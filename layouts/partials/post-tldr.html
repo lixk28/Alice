@@ -1,0 +1,9 @@
+{{- if .Params.tldr -}}
+    {{- $title := .Params.tldr.title | default "TL;DR." -}}
+    {{- $content := .Params.tldr.content | default .Params.description | default "" -}}
+    {{- if $content -}}
+    <p class="post-tldr">
+        <b>{{ $title | markdownify }}</b>&ensp;{{- $content | markdownify -}}
+    </p>
+    {{- end -}}
+{{- end -}}

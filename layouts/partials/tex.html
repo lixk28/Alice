@@ -1,0 +1,13 @@
+{{- $texEngine := default "katex" (lower .Params.tex.engine) -}}
+
+{{- if .Params.tex.algorithm -}}
+    <script src="{{ "js/renderAlgorithm.js" | relURL }}"></script>
+    {{- partial "tex/pseudocode.html" . -}}
+    {{- partial (printf "tex/%s.html" $texEngine) . -}}
+{{- else if .Params.tex.math -}}
+    {{- partial (printf "tex/%s.html" $texEngine) . -}}
+{{- end -}}
+
+{{- if .Params.tex.tikz -}}
+    {{- partial "tex/tikz.html" . -}}
+{{- end -}}

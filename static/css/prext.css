@@ -1,0 +1,80 @@
+/* previous and next post at the bottom of each post */
+
+:root {
+    --prext-card-proportion: 80%;
+}
+
+div.post-prext {
+    /* border: 1px solid black; */
+    /* display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around; */
+    margin: 2em 0
+}
+
+a.post-prev,
+a.post-next {
+    position: relative;
+    bottom: 0;
+
+    width: var(--prext-card-proportion);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    padding: 1ch;
+    border-radius: .4em;
+    /* border: 1px solid gray; */
+    box-shadow: 0em 0em .2em var(--post-card-shadow-color);
+
+    transition: box-shadow 0.15s, bottom 0.15s;
+}
+
+a.post-prev {
+    margin-bottom: 1em;
+    margin-right: auto;
+}
+a.post-next {
+    margin-top: 1em;
+    margin-left: auto;
+}
+
+a.post-prev:hover,
+a.post-next:hover {
+    color: var(--link-color);
+    box-shadow: 0 0 .4em var(--post-card-shadow-color);
+    bottom: 0.05em;
+}
+
+p.post-prev-title,
+p.post-next-title {
+    font-family: var(--serif-font);
+    font-size: var(--font-size);
+    font-weight: bold;
+}
+
+p.post-prev-title {
+    margin-left: 1ch;
+}
+p.post-next-title {
+    margin-right: 1ch;
+}
+
+svg.post-prev-icon,
+svg.post-next-icon {
+    stroke: var(--link-color);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    width: 2rem;
+    height: 2rem;
+}
+
+svg.post-prev-icon {
+    margin-right: auto;
+}
+svg.post-next-icon {
+    margin-left: auto;
+}

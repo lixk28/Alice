@@ -1,0 +1,27 @@
+:root {
+    --ice-mark-font-size: var(--font-size);
+    --ice-mark-font-weight: normal;
+    --ice-mark-color: Black;
+    --ice-mark-background-color: Cyan;
+}
+
+mark.ice-mark {
+    font-size: var(--ice-mark-font-size);
+    font-weight: var(--ice-mark-font-weight);
+    color: var(--ice-mark-color);
+    background-color: var(--ice-mark-background-color);
+    /* text-shadow: 1px 1px 2px Blue; */
+}
+
+mark.ice-mark code {
+    background-color: var(--ice-mark-background-color) ! important;
+    border-color: var(--ice-mark-color) ! important;
+}
+
+mark.ice-mark a {
+    color: var(--ice-mark-color) ! important;
+    box-shadow: inset 0 -0.1em 0 var(--ice-mark-color) ! important;
+}
+mark.ice-mark a svg.external-link-icon {
+    stroke: var(--ice-mark-color) ! important;
+}

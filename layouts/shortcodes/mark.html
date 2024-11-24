@@ -1,0 +1,15 @@
+{{- $color := .Get "color" | default "" -}}
+{{- $backgroundColor := .Get "backgroundColor" | default "" -}}
+{{- $scale := .Get "scale" | default 1 | string -}}
+{{- $weight := .Get "weight" | default "normal" -}}
+
+{{- $markCSS := printf `
+    color: %s !important;
+    background-color: %s !important;
+    font-size: %sem !important;
+    font-weight: %s !important;
+` $color $backgroundColor $scale $weight -}}
+
+{{- $markContent := .Inner | chomp | markdownify -}}
+
+<mark class="ice-mark" style="{{ $markCSS | safeCSS }}">{{ $markContent }}</mark>

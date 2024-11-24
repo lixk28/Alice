@@ -1,0 +1,22 @@
+<div class="post-card">
+	{{- $thumbnail := default .Params.thumbnail | default "" -}}
+	{{- with .Page.Resources.GetMatch $thumbnail -}}
+    <div class="post-thumb-container">
+		<a class="post-thumb-anchor" href="{{ .RelPermalink }}">
+        <img class="post-thumb" src="{{ .RelPermalink }}" loading="lazy"/>
+		</a>
+	</div>
+	{{- end -}}
+	<div class="post-card-content">
+        <h3 class="post-title">
+            <a href="{{ .RelPermalink }}">{{ .Title | markdownify | safeHTML }}</a>
+        </h3>
+        {{- partial "post-meta.html" (dict
+			"page" .
+			"metaItemTag" "div"
+			"metaItemSep" ""
+		) -}}
+		{{- partial "post-tldr.html" . -}}
+		<a class="post-read-more" href="{{ .Permalink }}">Read more >>></a>
+	</div>
+</div>

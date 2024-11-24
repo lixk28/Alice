@@ -1,0 +1,30 @@
+{{- /* https://discourse.gohugo.io/t/explanation-of-rendering-order/6162 */ -}}
+
+{{- $isInsideTabPanel := and .Parent (eq .Parent.Name "tabpanel")  -}}
+
+{{- if $isInsideTabPanel -}}
+{{- /* tab inside tab panel */ -}}
+
+{{- $index := .Ordinal -}}
+{{- $title := .Get "title" | default (.Get 0) | default (printf "Tab%d" (add $index 1)) -}}
+
+{{- $panelScratch := .Parent.Scratch -}}
+{{- if not ($panelScratch.Get "tabs") -}}
+    {{- $panelScratch.Set "tabs" slice -}}
+{{- end -}}
+
+{{- $panelScratch.Add "tabs" (dict
+    "Title" $title
+    "Content" .Inner
+) -}}
+
+{{- else -}}
+{{- /* a single tab */ -}}
+
+{{- $title := .Get "title" | default (.Get 0) | default "" -}}
+<div class="tab">
+    <div class="tab-title">{{ $title }}</div>
+    <div class="tab-content">{{ .Inner | chomp | markdownify }}</div>
+</div>
+
+{{- end -}}

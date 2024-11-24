@@ -1,0 +1,84 @@
+:root {
+    --details-background-color: White;
+    --details-border-color: Black;
+    --details-summary-font-size: 1.2em;
+    --details-summary-icon-size: 1.4em;
+    --details-summary-marker-size: 1.2em;
+}
+
+details.ice-details {
+    background-color: var(--details-background-color);
+    border: 1px solid var(--details-border-color);
+    padding: 1ch;
+    margin: 1em 0;
+}
+
+summary.ice-summary {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    list-style: none;
+    list-style-type: none;
+    pointer-events: none;
+    margin-bottom: .2em;
+}
+summary.ice-summary::-webkit-details-marker { display: none; }
+summary.ice-summary::marker { display: none; }
+
+details.ice-details.collapsible > summary.ice-summary {
+    pointer-events: all;
+    cursor: pointer;
+}
+
+
+span.ice-summary-content {
+    font-size: var(--details-summary-font-size);
+}
+
+
+span.ice-summary-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+span.ice-summary-icon-wrapper > svg {
+    stroke-width: 2;
+    stroke: var(--font-color);
+    height: var(--details-summary-icon-size);
+    width: var(--details-summary-icon-size);
+    margin-right: 1ch;
+}
+
+
+span.ice-summary-marker-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+span.ice-summary-marker-wrapper.begin {
+    margin-right: 1ch;
+}
+span.ice-summary-marker-wrapper.middle {
+    margin-left: 1ch;
+}
+span.ice-summary-marker-wrapper.end {
+    margin-left: auto;
+    margin-right: 1ch;
+}
+
+span.ice-summary-marker-wrapper > svg {
+    stroke-width: 2;
+    stroke: var(--font-color);
+    height: var(--details-summary-marker-size);
+    width: var(--details-summary-marker-size);
+}
+
+span.ice-summary-marker-wrapper > * {
+    transition: 0.15s linear;
+}
+details.ice-details[open] > summary.ice-summary > span.ice-summary-marker-wrapper.clockwise > * {
+    transform: rotate(90deg);
+}
+details.ice-details[open] > summary.ice-summary > span.ice-summary-marker-wrapper.counter-clockwise > * {
+    transform: rotate(-90deg);
+}

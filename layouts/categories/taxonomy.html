@@ -1,0 +1,10 @@
+{{ define "main" }}
+<main>
+    {{ with .Title }}<h1>{{ . }}</h1>{{ end }}
+    <ul class="categories">
+        {{ range .Site.Taxonomies.categories }}
+        <li><a href="{{ .Page.RelPermalink }}">[{{ .Page.Title }}]</a> ({{ .Count }})</li>
+        {{ end }}
+    </ul>
+</main>
+{{ end }}

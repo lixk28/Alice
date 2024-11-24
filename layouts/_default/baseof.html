@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode | default "en-us" }}">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="author" content="{{ .Site.Params.author }}">
+	<meta name="description" content="{{- trim (.Params.Description | default .Site.Params.description) `\n` -}}">
+	<meta name="keywords" content="{{ delimit (.Params.Keywords | default .Site.Params.keywords) `, ` }}">
+	<meta name="robots" content="noimageindex">
+	<title>{{ .Title }}</title>
+	<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+	{{- range .Site.Params.customCSS -}}
+		<link rel="stylesheet" href="{{ . | relURL }}?rnd={{ now.Unix }}">
+	{{- end -}}
+	{{- if .Params.codeblock.highlight -}}
+		<link rel="stylesheet" href="{{ "css/syntax.css" | relURL }}">
+	{{- end -}}
+	{{- if .Params.codeblock.cursed -}}
+		<script src="{{ "js/copyCodeBlock.js" | relURL }}"></script>
+	{{- end -}}
+	{{- if and (isset .Params "toc") .Params.toc.snake -}}
+		<script src="{{ "js/snakeTOC.js" | relURL }}"></script>
+	{{- end -}}
+	{{- if .Params.tab -}}
+		{{- if .Params.tab.cursed -}}
+		<script src="{{ "js/switchTab.js" | relURL }}"></script>
+		{{- end -}}
+	{{- end -}}
+	{{- if .Params.lightbox -}}
+		{{- partial "lightbox.html" -}}
+	{{- end -}}
+	{{- if .Params.tex -}}
+		{{- partial "tex.html" . -}}
+	{{- end -}}
+	{{- if .Params.mermaid -}}
+		{{- partial "mermaid.html" -}}
+	{{- end -}}
+	{{- with .OutputFormats.Get "RSS" -}}
+		{{ printf `<link rel="%s" type="%s" href="%s" title="%s">` .Rel .MediaType.Type .RelPermalink $.Site.Title | safeHTML }}
+	{{- end -}}
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#655bd5">
+	<meta name="msapplication-TileColor" content="#655bd5">
+</head>
+<body>
+	{{- partial "header" . -}}
+	{{- block "main" . -}}{{- end -}}
+	{{- partial "footer" . -}}
+</body>
+</html>

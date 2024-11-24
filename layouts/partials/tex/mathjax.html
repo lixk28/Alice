@@ -1,0 +1,21 @@
+<script defer>
+MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        processEscapes: true,
+        processEnvironments: true
+    },
+    startup: {
+        ready: () => {
+            MathJax.startup.defaultReady();
+            {{- if .Params.tex.algorithm -}}
+            renderAlgorithm();
+            {{- end -}}
+        }
+    }
+}
+</script>
+<script defer crossorigin="anonymous"
+    src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml-full.min.js">
+</script>

@@ -1,0 +1,10 @@
+{{ define "main" }}
+<main>
+    <h2><{{ .Title }}></h2>
+    <ul class="post-list">
+        {{- range .Pages.Reverse -}}
+        <li class="post-item"><a href="{{ .Permalink }}">{{ .Title | markdownify }}</a></li>
+        {{- end -}}
+    </ul>
+</main>
+{{ end }}

@@ -1,0 +1,135 @@
+# Alice parameters
+[params]
+    title = "Your cool site"
+    author = "You"
+    description = "used for SEO"
+    mainSections = ["posts"]
+    keywords = []
+    dateFmt = "2006-01-02"
+    license = "All the contents are licensed under <a rel='license' href='http://creativecommons.org/licenses/by-nc/4.0/' target='_blank'>CC BY-NC 4.0</a> if not particularly specified."
+
+    [params.header]
+        blogo = "HugoAliceLogo.webp"
+        title = "Your cool site"
+        tagline = "Your kickass tagline"
+
+    [params.footer]
+        # display hugo
+        showHugo = true
+        # display theme
+        showTheme = true
+        # creation date
+        since = ""
+        copyright = ""
+        license = ""
+
+    [params.home]
+        [params.home.pagination]
+            count = 5
+
+        [params.home.sidebar]
+            [[params.home.sidebar.items]]
+                id = "recent-updates"
+                title = "Recent Updates"
+                weight = 1
+                count = 5
+
+    [params.codeblock]
+        maxLinesOfCode = 64
+
+    [params.tex]
+        # mathjax or katex
+        engine = 'mathjax'
+        inlineBeginDelimiter = ''
+        inlineEndDelimiter = ''
+        blockBeginDelimiter = ''
+        blockEndDelimiter = ''
+
+    [params.imgproc]
+        enable = false
+        maxWidth = 1280
+        maxHeight = 1280
+        format = 'webp'
+        # 0-100
+        quality = 75
+
+    [params.lightbox]
+        # fancybox or glightbox
+        vendor = 'fancybox'
+
+    [params.comment]
+        # the only choice
+        vendor = 'waline'
+
+
+# Hugo parameters with Alice default initialization
+[markup]
+    defaultMarkdownHandler = "goldmark"
+    [markup.goldmark.renderer]
+        unsafe = true
+    [markup.highlight]
+        anchorLineNos = false
+        codeFences = true
+        guessSyntax = true
+        hl_Lines = ''
+        hl_inline = false
+        lineAnchors = ''
+        lineNoStart = 1
+        lineNos = false
+        lineNumbersInTable = true
+        noClasses = false
+        noHl = false
+        tabWidth = 4
+    [markup.tableOfContents]
+        startLevel = 2
+        endLevel = 4
+        ordered = false
+    [markup.goldmark]
+        [markup.goldmark.extensions.typographer]
+            emDash = '&HorizontalLine;&HorizontalLine;'
+            leftDoubleQuote = '"'
+            rightDoubleQuote = '"'
+            leftSingleQuote = "'"
+            rightSingleQuote = "'"
+
+[menu]
+    [[menu.main]]
+        identifier = "home"
+        name = "Home"
+        url = "/"
+        weight = 1
+
+    [[menu.main]]
+        identifier = "posts"
+        name = "Posts"
+        url = "/posts/"
+        weight = 2
+
+    [[menu.main]]
+        identifier = "categories"
+        name = "Categories"
+        url = "/categories/"
+        weight = 3
+
+    [[menu.main]]
+        identifier = "tags"
+        name = "Tags"
+        url = "/tags/"
+        weight = 4
+
+    [[menu.main]]
+        identifier = "about"
+        name = "About"
+        url = "/about/"
+        weight = 5
+
+    [[menu.main]]
+        identifier = "rss"
+        name = "RSS"
+        url = "/index.xml"
+        weight = 6
+
+[sitemap]
+    changefreq = 'weekly'
+    filename = 'sitemap.xml'
+    priority = 0.5

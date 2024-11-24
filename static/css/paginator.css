@@ -1,0 +1,31 @@
+div.paginator {
+    font-size: var(--paginator-font-size);
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+a.paginator-curr,
+a.paginator-curr:hover {
+    cursor: default !important;
+    pointer-events: none !important;
+    font-weight: bold !important;
+    color: var(--font-color) !important;
+    box-shadow: inset 0 -0.15rem 0 var(--font-color) !important;
+    transition: none !important;
+}
+
+a[class^=paginator][iconized] {
+    /* border: 1px solid black; */
+    display: inline-block;
+    box-shadow: none !important;
+    transition: none !important;
+}
+
+svg[class^=paginator] {
+    /* border: 1px solid black; */
+    stroke: var(--link-color);
+    vertical-align: bottom;
+    width: 1.6rem;
+    height: 1.6rem;
+}

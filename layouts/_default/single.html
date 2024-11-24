@@ -1,0 +1,53 @@
+{{- define "main" -}}
+<main class="post">
+	<aside id="sidetoc">
+		{{- if .Params.toc.show -}}
+		<h3 id="toc-title">{{ .Title | markdownify | safeHTML }}</h3>
+		<div id="toc-hunting-land">
+			{{ .TableOfContents }}
+			<svg id="toc-snake" xmlns="http://www.w3.org/2000/svg" version="1.1">
+				<polyline />
+			</svg>
+		</div>
+		{{- end -}}
+	</aside>
+	<article>
+		{{- if .Params.featuredimage -}}
+		<figure class="featured-image">
+			{{- $link := "" -}}
+			{{- $src := .Params.featuredimage.src -}}
+			{{- if $src -}}
+				{{- if eq .Params.type "series" -}}
+					{{- $link = path.Join .Parent.RelPermalink $src -}}
+				{{- else -}}
+					{{- $link = (.Page.Resources.GetMatch $src).RelPermalink -}}
+				{{- end -}}
+			{{- end -}}
+			<a href="{{ $link }}" data-fancybox="featured-image">
+			<img class="featured-image" src="{{ $link }}" alt="{{ with .Params.featuredimage.title }}.{{ else }}featured-image{{ end }}"/>
+			</a>
+			{{- with .Params.featuredimage.title -}}
+			<figcaption>{{ . | markdownify }}</figcaption>
+			{{- end -}}
+		</figure>
+		{{- end -}}
+		<div class="post-preamble">
+			<h1 class="post-title"># {{ .Title | markdownify | safeHTML }}</h1>
+			{{ partial "post-meta.html" (dict
+				"page" .
+				"metaItemTag" `span`
+				"metaItemSep" `&emsp;<b>&VerticalLine;</b>&emsp;`
+			)}}
+			{{ partial "post-tldr.html" . }}
+		</div>
+		<div class="post-content">
+			{{ .Content }}
+		</div>
+		<div class="post-epilogue">
+			{{- partial "post-prext.html" . -}}
+			{{- partial "post-related.html" . -}}
+			{{- /* TODO: Comments? */ -}}
+		</div>
+	</article>
+</main>
+{{- end -}}

@@ -1,0 +1,10 @@
+{{- define "main" -}}
+<main>
+    {{ with .Title -}}<h1>{{ . }}</h1>{{- end }}
+    {{- $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
+    {{- range $pages.GroupByPublishDate "2006" }}
+        <h3>{{ .Key }}</h3>
+        {{ partial "post-list.html" . }}
+    {{ end -}}
+</main>
+{{- end -}}

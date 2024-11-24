@@ -1,0 +1,2 @@
+{{- $lightboxVendor := default "fancybox" (lower .Params.lightbox.vendor) -}}
+{{- partial (printf "lightbox/%s.html" $lightboxVendor) . -}}

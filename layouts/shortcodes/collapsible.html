@@ -1,0 +1,23 @@
+{{- $class := .Get "class" -}}
+{{- $title := .Get "title" -}}
+{{- $collapsible := .Get "collapsible" -}}
+{{- $open := .Get "open" -}}
+{{- $icon := .Get "icon" -}}
+{{- $marker := .Get "marker" -}}
+{{- $markerPosition := .Get "markerPosition" -}}
+{{- $markerRotation := .Get "markerRotation" -}}
+
+{{- $params := dict
+    "context" .
+    "inner" .Inner
+    "class" $class
+    "summary" $title
+    "collapsible" $collapsible
+    "open" $open
+    "icon" $icon
+    "marker" $marker
+    "markerPosition" $markerPosition
+    "markerRotation" $markerRotation
+-}}
+
+{{- partial "details.html" $params -}}

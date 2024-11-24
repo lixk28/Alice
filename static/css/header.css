@@ -1,0 +1,228 @@
+:root {
+    --header-height: 3rem;
+    --title-font-size: 1.2rem;
+    --tagline-font-size: 0.9rem;
+    --menu-font-size: 1.2rem;
+    --menu-separator: '\2003';  /* &emsp; */
+}
+
+@media screen and (max-width: 1080px) {
+    :root {
+        --menu-separator: '\2002';  /* &ensp; */
+    }
+}
+
+@media screen and (max-width: 1440px) {
+    :root {
+        --header-height: 2.5rem;
+        --title-font-size: 1rem;
+        --tagline-font-size: 0.8rem;
+        --menu-font-size: 1rem;
+    }
+}
+
+@media screen and (max-width: 720px) {
+    :root {
+        --hamburger-menu-icon-size: 1.5rem;
+        --dropdown-toc-icon-size: 1.5rem;
+    }
+}
+
+header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    z-index: 999;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    font-family: var(--serif-font);
+}
+
+/* header background color and bottom shadow */
+div#header-bg {
+    /**
+     * the header bg is stacked on top of hamburger menu,
+     * so that the bottom shadow is visible
+     */
+    z-index: -1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bgcolor);
+    box-shadow: 0 2px 8px var(--post-card-shadow-color);
+}
+
+/* blogo */
+div#blogo {
+    float: left;
+}
+img#blogo {
+    margin: 0 auto;
+    max-width: 144px;
+    max-height: var(--header-height);
+    height: auto;
+    object-fit: contain;
+}
+
+/* bio (title and tagline) */
+div#bio {
+    /* only shrinks menu */
+    flex-shrink: 0;
+
+    float: left;
+    max-height: var(--header-height);
+    margin: 0 1em 0 1ch;
+}
+h1#title {
+    font-family: var(--serif-font);
+    font-size: var(--title-font-size);
+    line-height: var(--title-font-size);
+    margin: 0;
+    padding: 0;
+}
+h3#tagline {
+    font-family: var(--serif-font);
+    font-size: var(--tagline-font-size);
+    line-height: var(--tagline-font-size);
+    margin: 1ch 0 0 0;
+    padding: 0;
+}
+
+/* menu */
+nav#menu {
+    /* only shrinks menu */
+    flex-shrink: 1;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow-x: auto;
+
+    height: 100%;
+    font-family: var(--serif-font);
+    font-size: var(--menu-font-size);
+
+    /* align to the right */
+    margin-left: auto;
+    margin-right: 1em;
+}
+
+/* reference: https://bhch.github.io/posts/2021/04/centring-flex-items-and-allowing-overflow-scroll */
+nav#menu:first-child {
+    margin-left: auto;
+}
+nav#menu:last-child {
+    margin-left: auto;
+}
+
+/* menu items */
+span[class^=menu] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+/* and their icons */
+svg[class^=menu] {
+    stroke: var(--menu-icon-color);
+    width: var(--menu-font-size);
+    height: var(--menu-font-size);
+}
+
+/* white spaces of separators */
+span.menu-separator::before {
+    content: var(--menu-separator);
+}
+span.menu-separator::after {
+    content: var(--menu-separator);
+}
+
+/* hamburger menu on the right of header */
+input#hamburger-btn {
+    display: none;
+}
+
+label#hamburger-btn-icon-wrapper {
+    margin-left: auto;
+    margin-right: 1ch;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+svg#hamburger-btn-icon {
+    stroke: Black;
+    width: var(--hamburger-menu-icon-size);
+    height: var(--hamburger-menu-icon-size);
+}
+
+nav#hamburger-menu {
+    /**
+     * hamburger menu is stacked beneath the header,
+     * so that the bottom shadow of header is visible
+     */
+    z-index: -2;
+    position: fixed;
+    top: var(--header-height);
+    right: -40%;
+    width: 40%;
+    margin: 0;
+    padding: 1ch;
+
+    display: none;
+    flex-direction: column;
+    align-items: start;
+    justify-content: left;
+
+    overflow-y: auto;
+
+    background-color: var(--bgcolor);
+    border-left: 1px solid slategray;
+    border-bottom: 1px solid slategray;
+    border-bottom-left-radius: .2em;
+
+    transition: all 0.2s ease;
+}
+
+input#hamburger-btn:checked + nav#hamburger-menu {
+    transform: translateX(-100%);
+    transition: all 0.2s ease;
+
+    box-shadow: 0 0 .3em slategray;
+}
+
+div.hamburger-menu-item {
+    margin: 1ch 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+@media screen and (max-width: 720px) {
+    header {
+        justify-content: space-between;
+    }
+
+    div#bio {
+        margin: 0 0 0 1ch;
+    }
+
+    nav#menu {
+        display: none;
+    }
+
+    nav#hamburger-menu {
+        display: flex;
+    }
+
+    label#hamburger-btn-icon-wrapper {
+        display: flex;
+    }
+}

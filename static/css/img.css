@@ -1,0 +1,34 @@
+/* figure shortcode and image markdown */
+img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+}
+
+figure {
+    /* display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto; */
+    display: table;
+    margin: 1em auto;
+    max-width: 100%;
+    height: auto;
+}
+
+figcaption {
+    color: var(--figure-caption-color);
+    font-size: var(--font-size-tiny);
+    line-height: 2em;
+    margin-top: .6em;
+    text-align: center;
+}
+
+/* for featured image */
+figure.featured-image {
+    display: block;
+}
+img.featured-image {
+    width: 100%;
+}

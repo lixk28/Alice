@@ -1,0 +1,159 @@
+/* dropdown toc on the left of header, designed for mobile */
+input#droptoc-btn {
+    display: none;
+}
+
+label#droptoc-btn-icon-wrapper {
+    margin-left: 1ch;
+    margin-right: auto;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+svg#droptoc-btn-icon {
+    stroke: Black;
+    width: var(--dropdown-toc-icon-size);
+    height: var(--dropdown-toc-icon-size);
+}
+
+aside#droptoc {
+    /**
+     * dropdown toc is stacked beneath the header,
+     * so that the bottom shadow of header is visible
+     */
+    z-index: -2;
+    position: fixed;
+    top: var(--header-height);
+    left: calc(-60%);
+    width: 60%;
+    margin: 0;
+    padding: 0;
+
+    display: none;
+    flex-direction: column;
+    align-items: start;
+    justify-content: left;
+
+    background-color: aliceblue;
+    border-right: 1px solid slategray;
+    transition: all 0.2s ease;
+}
+
+input#droptoc-btn:checked ~ aside#droptoc {
+    transform: translateX(100%);
+    transition: all 0.2s ease;
+    box-shadow: 0 0 .3em slategray;
+}
+
+
+/* side toc on the left of article, designed for desktop */
+aside#sidetoc {
+    /**
+     * the side toc is in a flex container,
+     * align itself to the start of cross axis,
+     * so that sticky will work
+     */
+    align-self: flex-start;
+    position: sticky;
+    top: var(--header-height);
+    width: var(--post-sidetoc-proportion);
+    font-family: var(--serif-font);
+    font-size: var(--font-size-small);
+    padding-right: 1ch;
+
+    overflow-y: auto;
+}
+h3#toc-title {
+    font-size: var(--font-size-big);
+    margin-left: 1ch;
+}
+aside#sidetoc a {
+    color: var(--toc-heading-color) !important;
+    box-shadow: inset 0 -0.1rem 0 var(--toc-underline-color) !important;
+    transition: all .15s cubic-bezier(0.33, 0.66, 0.66, 1) !important;
+}
+aside#sidetoc a:hover {
+    color: var(--link-heading-color) !important;
+    border-radius: 0.1rem !important;
+    box-shadow: 0 0 0 0.2rem var(--toc-highlight-color), inset 0 -2rem var(--toc-highlight-color) !important;
+}
+aside#sidetoc li.active a {
+    color: var(--link-heading-color) !important;
+    border-radius: 0.1rem !important;
+    box-shadow: 0 0 0 0.2rem var(--toc-highlight-color), inset 0 -2rem var(--toc-highlight-color) !important;
+}
+
+
+/* TOC */
+nav#TableOfContents {
+    max-height: 80vh;
+    /* padding-left: 1.4em; */
+}
+
+nav#TableOfContents ul {
+    list-style: none !important;
+    padding-left: 1em !important;
+    margin: 0 !important;
+}
+
+nav#TableOfContents > ul {
+    padding: 0 0 0 1em !important;
+    margin: 0 !important;
+}
+
+nav#TableOfContents li {
+    margin: .2em 0;
+}
+
+nav#TableOfContents li a {
+    display: block !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    color: dimgray !important;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+nav#TableOfContents li.visible > a {
+    color: royalblue !important;
+    transform: translate(.15em) !important;
+}
+
+/* snakeTOC 🐍🐍🐍 */
+svg#toc-snake {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+
+    /* Show snake even if it overflows in current visible toc */
+    overflow: visible;
+
+    stroke: navy;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+svg#toc-snake > polyline {
+    transition: all 0.2s linear;
+}
+
+
+@media screen and (max-width: 720px) {
+    /* show drop toc */
+    aside#droptoc {
+        display: flex;
+    }
+    label#droptoc-btn-icon-wrapper {
+        display: flex;
+    }
+
+    /* hide side toc */
+    aside#sidetoc {
+        display: none;
+    }
+}

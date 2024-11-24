@@ -1,0 +1,10 @@
+{{ define "main" }}
+<main>
+    {{- with .Title -}}<h1>{{ . }}</h1>{{- end -}}
+    <p class="tags">
+    {{- range .Site.Taxonomies.tags -}}
+        <span><a href="{{ .Page.Permalink }}">#{{ .Page.Title }}</a> ({{ .Count }})</span>&emsp;
+    {{- end -}}
+    </p>
+</main>
+{{ end }}

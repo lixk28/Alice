@@ -1,0 +1,51 @@
+{{- $class := .class | default "" -}}
+{{- $summary := .summary | default "" -}}
+
+{{- $collapsible := .collapsible | lower | default "yes" -}}
+{{- $collapsible = or (eq $collapsible "yes") (eq $collapsible "true") -}}
+
+{{/* always open when it is not collapsible */}}
+{{- $open := "yes" -}}
+{{- if $collapsible -}}
+    {{- $open = .open | lower | default "no" -}}
+{{- end -}}
+{{- $open = or (eq $open "yes") (eq $open "true") }}
+
+{{- $icon := .icon | default "" }}
+
+<!-- {{- $marker := .marker | default `<svg viewBox="-0.5 0 7 7" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>play [#1003]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-347.000000, -3766.000000)" fill="#000000"> <g id="icons" transform="translate(56.000000, 160.000000)"> <path d="M296.494737,3608.57322 L292.500752,3606.14219 C291.83208,3605.73542 291,3606.25002 291,3607.06891 L291,3611.93095 C291,3612.7509 291.83208,3613.26444 292.500752,3612.85767 L296.494737,3610.42771 C297.168421,3610.01774 297.168421,3608.98319 296.494737,3608.57322" id="play-[#1003]"> </path> </g> </g> </g> </g></svg>` }} -->
+<!-- {{- $marker := .marker | default `<svg viewBox="-0.5 0 8 8" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>play [#1001]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-427.000000, -3765.000000)" fill="#000000"> <g id="icons" transform="translate(56.000000, 160.000000)"> <polygon id="play-[#1001]" points="371 3605 371 3613 378 3609"> </polygon> </g> </g> </g> </g></svg>` -}} -->
+{{- $marker := .marker | default `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 4.98951C5 4.01835 5 3.53277 5.20249 3.2651C5.37889 3.03191 5.64852 2.88761 5.9404 2.87018C6.27544 2.85017 6.67946 3.11953 7.48752 3.65823L18.0031 10.6686C18.6708 11.1137 19.0046 11.3363 19.1209 11.6168C19.2227 11.8621 19.2227 12.1377 19.1209 12.383C19.0046 12.6635 18.6708 12.886 18.0031 13.3312L7.48752 20.3415C6.67946 20.8802 6.27544 21.1496 5.9404 21.1296C5.64852 21.1122 5.37889 20.9679 5.20249 20.7347C5 20.467 5 19.9814 5 19.0103V4.98951Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>` -}}
+<!-- {{ print $marker }} -->
+
+{{- $markerPosition := .markerPosition | lower | default "end" -}}
+{{- if or (eq $markerPosition "end") (eq $markerPosition "right") -}}
+    {{- $markerPosition = "end" -}}
+{{- else if or (eq $markerPosition "begin") (eq $markerPosition "start") (eq $markerPosition "left") -}}
+    {{- $markerPosition = "begin" -}}
+{{- else if eq $markerPosition "middle" -}}
+    {{- $markerPosition = "middle" -}}
+{{- end -}}
+
+{{- $markerRotation := .markerRotation | default "clockwise" -}}
+{{- if and (ne $markerRotation "clockwise") (ne $markerRotation "counter-clockwise") -}}
+    {{- errorf `The markerRotation argument in %s shortcode must be either "clockwise" or "counter-clockwise"! See %s` .Name .Position -}}
+{{- end -}}
+
+{{- $markerElement := printf `<span class="ice-summary-marker-wrapper %s %s">%s</span>` $markerPosition $markerRotation $marker -}}
+
+<details class="ice-details {{ with $class }}{{ . }}{{ end }} {{ if $collapsible }}collapsible{{ end }}" {{ if $open }}open{{ end }}>
+    <summary class="ice-summary">
+        {{- if and $collapsible (eq $markerPosition "begin") -}}
+            {{- $markerElement | safeHTML -}}
+        {{- end -}}
+
+        {{- with $icon -}}<span class="ice-summary-icon-wrapper">{{- . | safeHTML -}}</span>{{- end -}}
+        {{- with $summary -}}<span class="ice-summary-content">{{- . | markdownify -}}</span>{{- end -}}
+
+        {{- if and $collapsible (or (eq $markerPosition "middle") (eq $markerPosition "end")) -}}
+            {{- $markerElement | safeHTML -}}
+        {{- end -}}
+    </summary>
+    <div class="ice-details-content">{{- trim .inner "\n" | markdownify -}}</div>
+</details>

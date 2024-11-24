@@ -1,0 +1,142 @@
+/* inline code */
+/* NOTE: chroma highlighter contains <code> elements, we don't want to override their attributes */
+code:not(.chroma *) {
+    font-family: var(--mono-font);
+    font-size: var(--mono-font-size);
+    padding: 0 4px;
+    background-color: var(--code-bgcolor);
+    border-radius: 4px;
+    border: 2px solid var(--code-border-color);
+    /* box-shadow: inset 0 0 4px var(--code-border-color); */
+}
+
+/* inline code in headings */
+h1 code, h2 code, h3 code, h4 code {
+    background-color: inherit !important;
+    font-size: inherit !important;
+}
+
+/* code block titles */
+div.code-block-title {
+    display: inline-block;
+    padding: 0 .8em;
+    color: var(--font-color);
+    background-color: var(--code-bgcolor);
+    border: 2px solid var(--rule-color);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom: 0;
+    border-color: var(--rule-color);
+}
+
+/* inline code within code block title */
+div.code-block-title code {
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: inherit !important;
+    background-color: inherit !important;
+    border-radius: inherit !important;
+}
+
+/* code block copy button */
+div.chroma,
+div.highlight > pre.chroma {
+    position: relative !important;
+}
+
+div.code-block-copy-btn {
+    cursor: pointer;
+    display: block;
+    position: sticky;
+    overflow: visible;
+    top: 0;
+    left: 100%;
+    margin: 0;
+    padding: 0;
+    width: 0;
+    height: 0;
+}
+
+div.code-block-copy-icon-wrapper {
+    display: block;
+    position: absolute;
+    top: 1ch;
+    right: 1ch;
+    padding: .5ch;
+    width: 4ch;
+    height: 4ch;
+    background-color: GhostWhite;
+    border-radius: 20%;
+    border: 1px solid LightGray;
+    -webkit-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+}
+div.code-block-copy-icon-wrapper:hover {
+    background-color: White;
+}
+
+svg.code-block-copy-icon {
+    visibility: visible;
+    width: 3ch;
+    height: 3ch;
+}
+
+svg.code-block-check-icon {
+    visibility: hidden;
+    position: absolute;
+    top: .5ch;
+    left: .5ch;
+    height: 3ch;
+    width: 3ch;
+}
+
+/* chroma highlight div */
+div.highlight {
+    padding: .4em 0;
+}
+
+/* chroma line number and code block */
+pre.chroma {
+    line-height: initial !important;
+}
+pre.chroma > code {
+    font-family: var(--mono-font);
+    font-size: var(--mono-font-size);
+    line-height: var(--code-block-line-height);
+}
+
+/* code blocks with linenos=true ... */
+div.highlight > div.chroma {
+    overflow-x: auto;
+    border: 1px solid var(--code-block-border-color);
+}
+div.highlight > div.chroma pre.chroma {
+    margin: 1ch 0;
+}
+
+/* code blocks with linenos=false ... */
+div.highlight > pre.chroma {
+    overflow-x: auto;
+    border: 1px solid var(--code-block-border-color);
+    margin: 0;
+    padding: 1ch 1ch 1ch 0;
+}
+div.highlight > pre.chroma > code > span {
+    padding-left: 1em;
+}
+div.highlight > pre.chroma div.code-block-copy-icon-wrapper {
+    top: 0;
+    right: 0;
+}
+
+/* highlighted lines are not full width in code block with linenos=true... */
+div.chroma table.lntable td.lntd:last-child {
+    width: 100%;
+}
+
+/* override display style of highlighted code line in chroma... */
+div.chroma .hl {
+    display: block !important;
+}

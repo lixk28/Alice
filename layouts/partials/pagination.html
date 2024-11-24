@@ -1,0 +1,80 @@
+{{ if gt $.Paginator.TotalPages 1 }}
+<div class="paginator-container">
+    <div class="paginator">
+    {{ $paginator := .Paginator }}
+
+    {{ $adjacent_links := 1 }}
+    {{ $max_links := (add (mul $adjacent_links 2) 1) }}
+    {{ $lower_limit := (add $adjacent_links 1) }}
+    {{ $upper_limit := (sub $paginator.TotalPages $adjacent_links) }}
+
+    <!-- Go to first page -->
+    {{- if ne $paginator.PageNumber 1 -}}
+    <a class="paginator-first" iconized href="{{ $paginator.First.URL }}"><svg class="paginator-first-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M18 17L13 12L18 7M11 17L6 12L11 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></a>&emsp;
+    {{- end -}}
+
+    <!-- Go to previouspage -->
+    {{- if $paginator.HasPrev -}}
+    <a class="paginator-prev" iconized href="{{ $paginator.Prev.URL }}"><svg class="paginator-prev-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 18L9 12L15 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></a>&emsp;
+    {{- end -}}
+
+    <span class="paginator-curr">{{ $paginator.PageNumber }}</span>
+    <span class="paginator-of">&nbsp;of&nbsp;</span>
+    <span class="paginator-total">{{ $paginator.TotalPages }}</span>
+
+    <!-- First page (if current page is greater than allowed limit) -->
+    <!-- {{- if gt $paginator.TotalPages $max_links -}}
+    {{- if ge $paginator.PageNumber $max_links -}}
+    <a class="paginator-first" numbering href="{{ $paginator.First.URL }}">1</a>
+    <svg class="paginator-dots" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+    {{- end -}}
+    {{- end -}} -->
+
+    <!-- Iterate the pager to show pages within ruleset -->
+    <!-- {{ range $paginator.Pagers }}
+    {{ $.Scratch.Set "page_number_flag" false }} -->
+
+    <!-- Identify if the current page is within the ruleset to be shown (or not) -->
+    <!-- {{ if gt $paginator.TotalPages $max_links }}
+    {{ if le $paginator.PageNumber $lower_limit }}
+    {{ if le .PageNumber $max_links }}
+    {{ $.Scratch.Set "page_number_flag" true }}
+    {{ end }}
+    {{ else if ge $paginator.PageNumber $upper_limit }}
+    {{ if gt .PageNumber (sub $paginator.TotalPages $max_links) }}
+    {{ $.Scratch.Set "page_number_flag" true }}
+    {{ end }}
+    {{ else }}
+    {{ if and ( ge .PageNumber (sub $paginator.PageNumber $adjacent_links) ) ( le .PageNumber (add $paginator.PageNumber $adjacent_links) ) }}
+    {{ $.Scratch.Set "page_number_flag" true }}
+    {{ end }}
+    {{ end }}
+    {{ else }}
+    {{ $.Scratch.Set "page_number_flag" true }}
+    {{ end }} -->
+
+    <!-- {{ if eq ($.Scratch.Get "page_number_flag") true }}
+    <a class="paginator{{ if eq . $paginator }}-curr{{ end }}" href="{{ .URL }}">{{ .PageNumber }}</a>
+    {{ end }}
+    {{ end }} -->
+
+    <!-- Show the last page index -->
+    <!-- {{- if gt $paginator.TotalPages $max_links -}}
+    {{- if le $paginator.PageNumber (sub $paginator.TotalPages (sub $max_links 1)) -}}
+    <svg class="paginator-dots" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+    <a class="paginator-last" numbering href="{{ $paginator.Last.URL }}">{{ $paginator.TotalPages }}</a>
+    {{- end -}}
+    {{- end -}} -->
+
+    <!-- Go to next page -->
+    {{- if $paginator.HasNext -}}
+    &emsp;<a class="paginator-next" iconized href="{{ $paginator.Next.URL }}"><svg class="paginator-next-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 18L15 12L9 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></a>
+    {{- end -}}
+
+    <!-- Go to last page -->
+    {{- if ne $paginator.PageNumber $paginator.TotalPages -}}
+    &emsp;<a class="paginator-last" iconized href="{{ $paginator.Last.URL }}"><svg class="paginator-last-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 17L11 12L6 7M13 17L18 12L13 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></a>
+    {{- end -}}
+    </div>
+</div>
+{{ end }}

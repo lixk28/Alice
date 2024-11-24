@@ -1,0 +1,13 @@
+footer {
+    clear: both;
+    display: block;
+    font-family: var(--serif-font);
+    float: none;
+    padding: 1ch;
+    box-shadow: 0 -2px 8px var(--post-card-shadow-color);
+}
+
+footer p {
+    margin-top: 0;
+    margin-bottom: 0;
+}

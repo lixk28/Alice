@@ -1,0 +1,150 @@
+:root {
+    --home-content-proportion: 50%;
+}
+
+@media screen and (max-width: 720px) {
+    :root {
+        --home-content-proportion: 100%;
+    }
+}
+
+/* div.home-content {
+    margin: 0 auto;
+    max-width: var(--home-content-proportion);
+} */
+
+div.home-content {
+    display: flex;
+    flex-direction: row;
+}
+
+div.home-post-gallery {
+    flex-grow: 0;     /* do not grow   - initial value: 0 */
+    flex-shrink: 0;   /* do not shrink - initial value: 1 */
+    /* flex-basis: 25em; */
+    width: var(--home-content-proportion);
+}
+
+div.home-sidebar {
+    display: flex;
+    flex-direction: column;
+    margin-left: 2em;
+}
+
+fieldset.home-sidebar-item {
+    border-radius: .2em;
+    border: solid 1px slategray;
+    box-shadow: inset 0 0 .3em slategray;
+}
+
+legend.home-sidebar-item-title {
+    font-family: var(--serif-font);
+    font-size: var(--h4-font-size);
+    font-weight: bold;
+
+    color: navy;
+    background-color: ghostwhite;
+
+    border-radius: .1em;
+    border-left: solid navy .4em;
+    border-top: solid navy 2px;
+    border-bottom: solid navy .1em;
+    border-right: solid navy .2em;
+    padding: .2em .4em;
+}
+
+fieldset#recent-updates > div.home-sidebar-item-content > ul {
+    margin: .4em .4em .4em 0;
+}
+
+/* TODO: sidebar mobile ... */
+
+/* summary card for each post */
+div.post-card {
+    font-family: var(--serif-font);
+    margin: 1.6em 0;
+    /* padding-left: 1ch; */
+    border: 2px solid var(--post-card-border-color);
+    box-shadow: 2px 2px 8px var(--post-card-shadow-color);
+    border-radius: .8em;
+    /* hide thumbnail tl and tr corners... */
+    overflow: hidden;
+}
+div.post-card-deck > div.post-card:first-child {
+    margin-top: 1ch;
+}
+div.post-card-deck > div.post-card:last-child {
+    margin-bottom: 2em;
+}
+
+img.post-thumb {
+    margin: 0 auto;
+    width: 100%;
+    height: auto;
+    min-height: 20vh;
+    max-height: 50vh;
+    object-fit: cover;
+    border-style: none;
+}
+
+/* postcard content on the right of thumbnail */
+div.post-card-content {
+    margin: .4em .4em 1em .8em;
+}
+
+div.post-meta {
+    margin: .4em 0 .8em 0;
+}
+div.post-meta-item {
+    margin: .2em 0;
+}
+
+svg.post-date-icon,
+svg.post-lastmod-date-icon,
+svg.post-categories-icon,
+svg.post-tags-icon {
+    position: relative;
+    top: .2em;
+    stroke: navy;
+    width: var(--svg-size-large);
+    height: var(--svg-size-large);
+}
+
+h3.post-title {
+    margin: .4em 0 .8em 0;
+    line-height: 1.6em;
+}
+p.post-tldr {
+    margin: .8em 0;
+}
+a.post-read-more {
+    font-size: 1.2em;
+}
+
+
+@media screen and (max-width: 720px) {
+    div.post-card {
+        flex-direction: column;
+    }
+
+    figure.post-thumb {
+        max-width: 100%;
+        margin: 1ch 1ch 0 1ch;
+    }
+    figure.post-thumb > img {
+        width: 100%;
+        max-height: initial;
+    }
+
+    div.post-meta {
+        width: 100%;
+    }
+
+    div.home-content {
+        flex-direction: column;
+    }
+
+    div.home-sidebar {
+        margin: 2em 0 1em 0;
+    }
+}
