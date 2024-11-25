@@ -6,14 +6,14 @@
     --details-summary-marker-size: 1.2em;
 }
 
-details.ice-details {
+details.ai-details {
     background-color: var(--details-background-color);
     border: 1px solid var(--details-border-color);
     padding: 1ch;
     margin: 1em 0;
 }
 
-summary.ice-summary {
+summary.ai-summary {
     display: flex;
     align-items: center;
     justify-content: start;
@@ -22,26 +22,26 @@ summary.ice-summary {
     pointer-events: none;
     margin-bottom: .2em;
 }
-summary.ice-summary::-webkit-details-marker { display: none; }
-summary.ice-summary::marker { display: none; }
+summary.ai-summary::-webkit-details-marker { display: none; }
+summary.ai-summary::marker { display: none; }
 
-details.ice-details.collapsible > summary.ice-summary {
+details.ai-details.collapsible > summary.ai-summary {
     pointer-events: all;
     cursor: pointer;
 }
 
 
-span.ice-summary-content {
+span.ai-summary-content {
     font-size: var(--details-summary-font-size);
 }
 
 
-span.ice-summary-icon-wrapper {
+span.ai-summary-icon-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-span.ice-summary-icon-wrapper > svg {
+span.ai-summary-icon-wrapper > svg {
     stroke-width: 2;
     stroke: var(--font-color);
     height: var(--details-summary-icon-size);
@@ -50,35 +50,35 @@ span.ice-summary-icon-wrapper > svg {
 }
 
 
-span.ice-summary-marker-wrapper {
+span.ai-summary-marker-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-span.ice-summary-marker-wrapper.begin {
+span.ai-summary-marker-wrapper.begin {
     margin-right: 1ch;
 }
-span.ice-summary-marker-wrapper.middle {
+span.ai-summary-marker-wrapper.middle {
     margin-left: 1ch;
 }
-span.ice-summary-marker-wrapper.end {
+span.ai-summary-marker-wrapper.end {
     margin-left: auto;
     margin-right: 1ch;
 }
 
-span.ice-summary-marker-wrapper > svg {
+span.ai-summary-marker-wrapper > svg {
     stroke-width: 2;
     stroke: var(--font-color);
     height: var(--details-summary-marker-size);
     width: var(--details-summary-marker-size);
 }
 
-span.ice-summary-marker-wrapper > * {
+span.ai-summary-marker-wrapper > * {
     transition: 0.15s linear;
 }
-details.ice-details[open] > summary.ice-summary > span.ice-summary-marker-wrapper.clockwise > * {
+details.ai-details[open] > summary.ai-summary > span.ai-summary-marker-wrapper.clockwise > * {
     transform: rotate(90deg);
 }
-details.ice-details[open] > summary.ice-summary > span.ice-summary-marker-wrapper.counter-clockwise > * {
+details.ai-details[open] > summary.ai-summary > span.ai-summary-marker-wrapper.counter-clockwise > * {
     transform: rotate(-90deg);
 }

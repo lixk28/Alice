@@ -32,20 +32,20 @@
     {{- errorf `The markerRotation argument in %s shortcode must be either "clockwise" or "counter-clockwise"! See %s` .Name .Position -}}
 {{- end -}}
 
-{{- $markerElement := printf `<span class="ice-summary-marker-wrapper %s %s">%s</span>` $markerPosition $markerRotation $marker -}}
+{{- $markerElement := printf `<span class="ai-summary-marker-wrapper %s %s">%s</span>` $markerPosition $markerRotation $marker -}}
 
-<details class="ice-details {{ with $class }}{{ . }}{{ end }} {{ if $collapsible }}collapsible{{ end }}" {{ if $open }}open{{ end }}>
-    <summary class="ice-summary">
+<details class="ai-details {{ with $class }}{{ . }}{{ end }} {{ if $collapsible }}collapsible{{ end }}" {{ if $open }}open{{ end }}>
+    <summary class="ai-summary">
         {{- if and $collapsible (eq $markerPosition "begin") -}}
             {{- $markerElement | safeHTML -}}
         {{- end -}}
 
-        {{- with $icon -}}<span class="ice-summary-icon-wrapper">{{- . | safeHTML -}}</span>{{- end -}}
-        {{- with $summary -}}<span class="ice-summary-content">{{- . | markdownify -}}</span>{{- end -}}
+        {{- with $icon -}}<span class="ai-summary-icon-wrapper">{{- . | safeHTML -}}</span>{{- end -}}
+        {{- with $summary -}}<span class="ai-summary-content">{{- . | markdownify -}}</span>{{- end -}}
 
         {{- if and $collapsible (or (eq $markerPosition "middle") (eq $markerPosition "end")) -}}
             {{- $markerElement | safeHTML -}}
         {{- end -}}
     </summary>
-    <div class="ice-details-content">{{- trim .inner "\n" | markdownify -}}</div>
+    <div class="ai-details-content">{{- trim .inner "\n" | markdownify -}}</div>
 </details>
