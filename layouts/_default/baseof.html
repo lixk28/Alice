@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="author" content="{{ .Site.Params.author }}">
-	<meta name="description" content="{{- trim (.Params.Description | default .Site.Params.description) `\n` -}}">
-	<meta name="keywords" content="{{ delimit (.Params.Keywords | default .Site.Params.keywords) `, ` }}">
+	<meta name="author" content="{{ .Params.Author | default .Site.Params.SEO.author | chomp }}">
+	<meta name="description" content="{{ .Params.Description | default .Site.Params.SEO.description | chomp }}">
+	<meta name="keywords" content="{{ delimit (.Params.Keywords | default .Site.Params.SEO.keywords) `, ` }}">
 	<meta name="robots" content="noimageindex">
-	<title>{{ .Title }}</title>
+	<title>{{ .Title | default .Site.Params.SEO.title | chomp }}</title>
 	<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 	{{- range .Site.Params.customCSS -}}
 		<link rel="stylesheet" href="{{ . | relURL }}?rnd={{ now.Unix }}">
