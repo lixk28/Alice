@@ -8,7 +8,7 @@
 				{{ partial "post-card.html" . }}
 			{{ end }}
 			</div>
-			{{ partial "pagination.html" . }}
+			{{ partial "pagination.html" (merge (dict "ctx" .) .Site.Params.Home.pagination) }}
 		</div>
 		<div class="home-sidebar">
 			{{ $pages := (where .Site.RegularPages "Type" "in" .Site.Params.mainSections) -}}
