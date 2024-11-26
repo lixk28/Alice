@@ -1,4 +1,8 @@
 <footer id="{{- if .Params.toc.show -}}footer-with-toc{{- end -}}">
-	<p>Powered by <a href="https://gohugo.io" target="_blank">Hugo</a> with theme <a href="https://github.com/lixk28/Alice" target="_blank">Alice</a>.</p>
-	<p>{{- .Site.Params.license | safeHTML -}}</p>
+	{{ with .Site.Params.Footer.showHugoAlice }}
+	<p>Powered by <a href="https://gohugo.io" target="_blank"><b>Hugo</b></a> | Theme <a href="https://github.com/lixk28/Alice" target="_blank"><b>Alice</b></a></p>
+	{{ end }}
+	{{ with .Site.Params.Footer.copymid }}<p>{{ . | safeHTML }}</p>{{ end }}
+	{{ with .Site.Params.Footer.license }}<p>{{ . | safeHTML }}</p>{{ end }}
+	<p>Created by {{ .Site.Params.Footer.creator | safeHTML }} | Since {{ .Site.Params.Footer.since | default now.Year }}</p>
 </footer>

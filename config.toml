@@ -17,14 +17,16 @@
         tagline = "so damn classic"
 
     [params.footer]
-        # display hugo
-        showHugo = true
-        # display theme
-        showTheme = true
-        # creation date
-        since = ""
-        copyright = ""
-        license = ""
+        # Should display site generator (Hugo) and theme (Alice) 🥰
+        showHugoAlice = true
+        # Copy{left,right} statement, HTML is allowed
+        copymid = "Your copy{left,right} statement."
+        # License statement, HTML is allowed
+        license = "Your site license statement."
+        # Creation year of your site
+        since = 1970
+        # Creator name, HTML is allowed
+        creator = "somebody"
 
     [params.home]
         [params.home.pagination]
