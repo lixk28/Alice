@@ -1,0 +1,32 @@
+{{/* References:
+     https://gohugo.io/templates/pagination
+     https://gohugo.io/methods/page/paginate
+     https://gohugo.io/methods/page/paginator
+     https://gohugo.io/methods/pager
+*/}}
+
+{{- if gt .pager.TotalPages 1 -}}
+<div class="paginator">
+    {{- if ne .pager.PageNumber 1 -}}
+    <a class="paginator-first" href="{{ .pager.First.URL }}">{{ .first | default "<b>&lt;</b>" | safeHTML }}</a>
+    {{- end -}}
+
+    {{- if .pager.HasPrev -}}
+    <a class="paginator-prev" href="{{ .pager.Prev.URL }}">{{ .prev | default "<b>&gt;</b>" | safeHTML }}</a>
+    {{- end -}}
+
+    <span class="paginator-middle">
+        <span class="paginator-curr">{{ .pager.PageNumber }}</span>
+        <span class="paginator-of">&nbsp;of&nbsp;</span>
+        <span class="paginator-total">{{ .pager.TotalPages }}</span>
+    </span>
+
+    {{- if .pager.HasNext -}}
+    <a class="paginator-next" href="{{ .pager.Next.URL }}">{{ .next | default "<b>&lt;&lt;</b>" | safeHTML }}</a>
+    {{- end -}}
+
+    {{- if ne .pager.PageNumber .pager.TotalPages -}}
+    <a class="paginator-last" href="{{ .pager.Last.URL }}">{{ .last | default "<b>&gt;&gt;</b>" | safeHTML }}</a>
+    {{- end -}}
+</div>
+{{- end -}}

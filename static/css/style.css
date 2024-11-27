@@ -251,6 +251,7 @@ svg.copyleft-icon {
     height: var(--svg-size-normal);
 }
 
+/* FIXME: Maybe it's disgusting to have a default style for all anchors... */
 /* anchors */
 a {
     color: var(--link-color);

@@ -1,14 +1,23 @@
 {{ define "main" }}
 <main>
-	{{ $paginator := .Paginate (where .Site.RegularPages "Type" "in" .Site.Params.mainSections) }}
 	<div class="home-content">
+		{{ $paginateParams := .Site.Params.Home.Pagination }}
+		{{ $paginateSections := $paginateParams.sections | default .Site.Params.mainSections }}
+		{{ $pages := where .Site.RegularPages "Section" "in" $paginateSections }}
+		{{ $pager := .Paginate $pages $paginateParams.pagerSize }}
 		<div class="home-post-gallery">
 			<div class="post-card-deck">
-			{{ range $paginator.Pages }}
+			{{ range $pager.Pages }}
 				{{ partial "post-card.html" . }}
 			{{ end }}
 			</div>
-			{{ partial "pagination.html" (merge (dict "ctx" .) .Site.Params.Home.pagination) }}
+			{{ partial "paginator.html" (dict
+				"pager" $pager
+				"first" $paginateParams.first
+				"prev" $paginateParams.prev
+				"next" $paginateParams.next
+				"last" $paginateParams.last
+			) }}
 		</div>
 		<div class="home-sidebar">
 			{{ $pages := (where .Site.RegularPages "Type" "in" .Site.Params.mainSections) -}}

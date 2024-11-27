@@ -1,31 +1,54 @@
 div.paginator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     font-size: var(--paginator-font-size);
-    max-width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
 }
 
-a.paginator-curr,
-a.paginator-curr:hover {
-    cursor: default !important;
-    pointer-events: none !important;
-    font-weight: bold !important;
-    color: var(--font-color) !important;
-    box-shadow: inset 0 -0.15rem 0 var(--font-color) !important;
-    transition: none !important;
+span.paginator-middle {
+    margin: 0 1em;
 }
 
-a[class^=paginator][iconized] {
-    /* border: 1px solid black; */
-    display: inline-block;
-    box-shadow: none !important;
-    transition: none !important;
+a[class^=paginator] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* otherwise it might be narrow, making it hard to click */
+    min-width: 2em;
+
+    border: .1em solid var(--link-color);
+    box-shadow: 0 0 .2em LightSlateGray !important;
+
+    transition: 100ms linear !important;
+    margin: 0 1em;
+    padding: .2em .4em;
+}
+a.paginator-first, a.paginator-prev {
+    border-top-left-radius: .3em;
+    border-bottom-left-radius: .3em;
+}
+a.paginator-last, a.paginator-next {
+    border-top-right-radius: .3em;
+    border-bottom-right-radius: .3em;
 }
 
-svg[class^=paginator] {
-    /* border: 1px solid black; */
+a[class^=paginator] > svg {
     stroke: var(--link-color);
-    vertical-align: bottom;
-    width: 1.6rem;
-    height: 1.6rem;
+    vertical-align: center;
+    width: 1.6em;
+    height: 1.6em;
+}
+
+a[class^=paginator]:hover {
+    transform: translateY(-.1em);
+    border-color: var(--link-active-color);
+    background-color: LightSteelBlue;
+    box-shadow: .1em .1em .2em LightSlateGray,
+                inset 0 -.1em 0 var(--link-active-color) !important;
+}
+a[class^=paginator]:hover > svg {
+    stroke: var(--link-active-color);
 }
