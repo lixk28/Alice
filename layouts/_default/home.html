@@ -20,20 +20,17 @@
 			) }}
 		</div>
 		<div class="home-sidebar">
-			{{ $pages := (where .Site.RegularPages "Type" "in" .Site.Params.mainSections) -}}
-			{{ $recentPages := first 5 $pages.ByLastmod.Reverse }}
-			{{ if $recentPages }}
-			<fieldset class="home-sidebar-item" id="recent-updates">
-				<legend class="home-sidebar-item-title">Recent Updates</legend>
-				<div class="home-sidebar-item-content">
-					<ul>
-					{{ range $recentPages }}
-						<li class="post-item">
-							<time>{{- .Lastmod.Format "2006-01-02" -}}</time>
-							<a href="{{ .RelPermalink }}">{{- .Page.Title | markdownify -}}</a>
-						</li>
-					{{ end }}
-					</ul>
+			{{ $ctx := . }}
+			{{ range sort .Site.Params.Home.Sidebar.items "weight" }}
+			<fieldset class="home-sidebar-item" id="{{ .id }}">
+				<legend class="home-sidebar-item-title" id="{{ .id }}-title">
+					{{- .title -}}
+				</legend>
+				<div class="home-sidebar-item-content" id="{{ .id }}-content">
+					{{ partial (printf "sidebar/%s.html" .id) (dict
+						"page" $.Page
+						"args" .args
+					) }}
 				</div>
 			</fieldset>
 			{{ end }}

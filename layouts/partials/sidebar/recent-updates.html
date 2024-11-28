@@ -1,0 +1,12 @@
+{{ $pages := where .page.Site.RegularPages "Section" "in" .page.Site.Params.mainSections }}
+{{ $recentPages := $pages.ByLastmod.Reverse | first .args.size }}
+{{ if $recentPages }}
+<ul>
+    {{ range $recentPages }}
+    <li class="post-item">
+        <time>{{ .Lastmod.Format "2006-01-02" }}</time>
+        <a href="{{ .RelPermalink }}">{{ .Page.Title | markdownify }}</a>
+    </li>
+    {{ end }}
+</ul>
+{{ end }}

@@ -35,6 +35,7 @@ fieldset.home-sidebar-item {
     border-radius: .2em;
     border: solid 1px slategray;
     box-shadow: inset 0 0 .3em slategray;
+    margin: .8em 0;
 }
 
 legend.home-sidebar-item-title {

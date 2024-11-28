@@ -45,10 +45,14 @@
 
         [params.home.sidebar]
             [[params.home.sidebar.items]]
+                # Will be your side item template name and html element id
                 id = "recent-updates"
                 title = "Recent Updates"
                 weight = 1
-                count = 5
+                [params.home.sidebar.items.args]
+                    size = 5
+                    dateFmt = "2006-01-02"
+                    separator = "&ensp;"
 
     [params.codeblock]
         maxLinesOfCode = 64
