@@ -1,0 +1,13 @@
+{{ range $type, $news := .page.Site.Data.news }}
+<ul>
+    {{ range $news }}
+    <li>
+        {{ $date := .date | time }}
+        {{ $dateFmt := default $.page.Site.Params.dateFmt $.args.dateFmt }}
+        <time>{{ $date.Format $dateFmt }}</time>
+        {{- $.args.separator | safeHTML -}}
+        <span>{{ .news | markdownify }}</span>
+    </li>
+    {{ end }}
+</ul>
+{{ end }}

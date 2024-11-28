@@ -58,6 +58,10 @@ fieldset#recent-updates > div.home-sidebar-item-content > ul {
     margin: .4em .4em .4em 0;
 }
 
+#news {
+    font-family: var(--serif-font);
+}
+
 /* TODO: sidebar mobile ... */
 
 /* summary card for each post */
