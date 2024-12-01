@@ -65,6 +65,16 @@
                     # Delimiter between date and post title, HTML is allowed
                     delimiter = "&ensp;"
 
+            [[params.home.sidebar.items]]
+                id = "tag-list"
+                title = "Tags"
+                weight = 3
+                [params.home.sidebar.items.args]
+                    size = 10
+                    delimiter = "&emsp;"
+                    # Sort by {count | random}, default is count
+                    sortBy = "count"
+
     [params.codeblock]
         maxLinesOfCode = 64
 
