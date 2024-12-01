@@ -5,6 +5,7 @@
     {{ range $recentPages }}
     <li class="post-item">
         <time>{{ .Lastmod.Format "2006-01-02" }}</time>
+        {{- $.args.delimiter | default "&ensp;" | safeHTML -}}
         <a href="{{ .RelPermalink }}">{{ .Page.Title | markdownify }}</a>
     </li>
     {{ end }}

@@ -5,7 +5,7 @@
         {{ $date := .date | time }}
         {{ $dateFmt := default $.page.Site.Params.dateFmt $.args.dateFmt }}
         <time>{{ $date.Format $dateFmt }}</time>
-        {{- $.args.separator | safeHTML -}}
+        {{- $.args.delimiter | safeHTML -}}
         <span>{{ .news | markdownify }}</span>
     </li>
     {{ end }}

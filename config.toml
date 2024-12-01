@@ -51,17 +51,19 @@
                 [params.home.sidebar.items.args]
                     size = 5
                     dateFmt = "2006-01-02"
-                    separator = "&ensp;"
+                    # Delimiter between date and news, HTML is allowed
+                    delimiter = "&ensp;"
 
             [[params.home.sidebar.items]]
                 # Will be your side item template name and html element id
                 id = "recent-updates"
                 title = "Recent Updates"
-                weight = 1
+                weight = 2
                 [params.home.sidebar.items.args]
                     size = 5
                     dateFmt = "2006-01-02"
-                    separator = "&ensp;"
+                    # Delimiter between date and post title, HTML is allowed
+                    delimiter = "&ensp;"
 
     [params.codeblock]
         maxLinesOfCode = 64

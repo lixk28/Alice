@@ -54,7 +54,8 @@ themesDir = "../.."
                 [params.home.sidebar.items.args]
                     size = 5
                     dateFmt = "2006-01-02"
-                    separator = "&ensp;"
+                    # Delimiter between date and news, HTML is allowed
+                    delimiter = "&ensp;"
 
             [[params.home.sidebar.items]]
                 # Will be your side item template name and html element id
@@ -64,7 +65,8 @@ themesDir = "../.."
                 [params.home.sidebar.items.args]
                     size = 5
                     dateFmt = "2006-01-02"
-                    separator = "&ensp;"
+                    # Delimiter between date and post title, HTML is allowed
+                    delimiter = "&ensp;"
 
     [params.codeblock]
         maxLinesOfCode = 64
