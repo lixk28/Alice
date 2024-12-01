@@ -75,6 +75,16 @@
                     # Sort by {count | random}, default is count
                     sortBy = "count"
 
+            [[params.home.sidebar.items]]
+                id = "category-list"
+                title = "Categories"
+                weight = 4
+                [params.home.sidebar.items.args]
+                    size = 5
+                    delimiter = "&emsp;"
+                    # Sort by {count | random}, default is count
+                    sortBy = "count"
+
     [params.codeblock]
         maxLinesOfCode = 64
 

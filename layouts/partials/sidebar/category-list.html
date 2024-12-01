@@ -1,0 +1,18 @@
+{{ $tags := slice }}
+{{ range .page.Site.Taxonomies.categories }}
+    {{ $tags = $tags | append (dict
+        "page" .Page
+        "count" .Count
+    ) }}
+{{ end }}
+
+{{ if eq .args.sortBy "count" }}
+    {{ $tags = sort $tags "count" "desc" }}
+{{ else if eq .args.sortBy "random" }}
+    {{ $tags = $tags | shuffle }}
+{{ end }}
+
+{{ range $tags }}
+    <span><a href="{{ .page.Permalink }}">[{{ .page.Title }}]</a></span>
+    {{- $.args.delimiter | default "&emsp;" | safeHTML -}}
+{{ end }}
