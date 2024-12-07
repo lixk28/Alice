@@ -38,13 +38,13 @@ themesDir = "../.."
             # The number of posts per page
             pagerSize = 3
             # Previous indicator, HTML is allowed
-            prev = "<b>&lt;</b>"
+            prev = "&laquo;"
             # Next indicator, HTML is allowed
-            next = "<b>&gt;</b>"
+            next = "&raquo;"
             # First indicator, HTML is allowed
-            first = "<b>&lt;&lt;</b>"
+            first = "&laquo;&laquo;"
             # Last indicator, HTML is allowed
-            last = "<b>&gt;&gt;</b>"
+            last = "&raquo;&raquo;"
 
         [params.home.sidebar]
             [[params.home.sidebar.items]]

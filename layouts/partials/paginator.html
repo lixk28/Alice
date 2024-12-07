@@ -1,32 +1,50 @@
 {{/* References:
-     https://gohugo.io/templates/pagination
-     https://gohugo.io/methods/page/paginate
-     https://gohugo.io/methods/page/paginator
-     https://gohugo.io/methods/pager
+    https://gohugo.io/templates/pagination
+    https://gohugo.io/methods/page/paginate
+    https://gohugo.io/methods/page/paginator
+    https://gohugo.io/methods/pager
 */}}
 
 {{- if gt .pager.TotalPages 1 -}}
+<div class="paginator-container">
 <div class="paginator">
-    {{- if ne .pager.PageNumber 1 -}}
-    <a class="paginator-first" href="{{ .pager.First.URL }}">{{ .first | default "<b>&lt;</b>" | safeHTML }}</a>
+    {{- $currPageNumber := .pager.PageNumber -}}
+
+    {{- $isFirst := eq $currPageNumber 1 -}}
+    {{- $hasPrev := .pager.HasPrev -}}
+    {{- $hasNext := .pager.HasNext -}}
+    {{- $isLast := eq $currPageNumber .pager.TotalPages -}}
+
+    <a class="paginator-item-first {{ if $isFirst }}disabled{{ end }}" {{ if not $isFirst }}href="{{ .pager.First.URL }}"{{ end }}>
+        {{- .first | default "&laquo;&laquo;" | safeHTML -}}
+    </a>
+
+    <a class="paginator-item-prev {{ if not $hasPrev }}disabled{{ end }}" {{ if $hasPrev }}href="{{ .pager.Prev.URL }}"{{ end }}>
+        {{- .prev | default "&laquo;" | safeHTML -}}
+    </a>
+
+    {{- $slots := 5 -}}
+    {{- $start := math.Max 1 (sub .pager.PageNumber (math.Floor (div $slots 2))) -}}
+    {{- $end := math.Min .pager.TotalPages (sub (add $start $slots) 1) -}}
+    {{- if lt (add (sub $end $start) 1) $slots -}}
+        {{- $start = math.Max 1 (add (sub $end $slots) 1) -}}
     {{- end -}}
 
-    {{- if .pager.HasPrev -}}
-    <a class="paginator-prev" href="{{ .pager.Prev.URL }}">{{ .prev | default "<b>&gt;</b>" | safeHTML }}</a>
+    {{- range $i := seq $start $end -}}
+        {{- $isCurr := eq $currPageNumber $i -}}
+        {{- $p := (index $.pager.Pagers (sub $i 1)) -}}
+        <a class="paginator-item-number {{ if $isCurr }}active{{ end }}" {{ if not $isCurr }}href="{{ $p.URL }}"{{ end }}>
+            {{- $p.PageNumber -}}
+        </a>
     {{- end -}}
 
-    <span class="paginator-middle">
-        <span class="paginator-curr">{{ .pager.PageNumber }}</span>
-        <span class="paginator-of">&nbsp;of&nbsp;</span>
-        <span class="paginator-total">{{ .pager.TotalPages }}</span>
-    </span>
+    <a class="paginator-item-next {{ if not $hasNext }}disabled{{ end }}" {{ if $hasNext }}href="{{ .pager.Next.URL }}"{{ end }}>
+        {{- .next | default "&raquo;" | safeHTML -}}
+    </a>
 
-    {{- if .pager.HasNext -}}
-    <a class="paginator-next" href="{{ .pager.Next.URL }}">{{ .next | default "<b>&lt;&lt;</b>" | safeHTML }}</a>
-    {{- end -}}
-
-    {{- if ne .pager.PageNumber .pager.TotalPages -}}
-    <a class="paginator-last" href="{{ .pager.Last.URL }}">{{ .last | default "<b>&gt;&gt;</b>" | safeHTML }}</a>
-    {{- end -}}
+    <a class="paginator-item-last {{ if $isLast }}disabled{{ end }}" {{ if not $isLast }}href="{{ .pager.Last.URL }}"{{ end }}>
+        {{- .last | default "&raquo;&raquo;" | safeHTML -}}
+    </a>
+</div>
 </div>
 {{- end -}}

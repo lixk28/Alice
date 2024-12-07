@@ -1,54 +1,87 @@
+div.paginator-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 1em 0;
+}
+
 div.paginator {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
 
     font-size: var(--paginator-font-size);
-    width: 100%;
+    overflow-x: auto;
+
+    padding: .4em;
+    margin: auto;
+
+    /* border: solid 1px black; */
+    /* border-radius: .3em; */
+
 }
 
-span.paginator-middle {
-    margin: 0 1em;
-}
-
-a[class^=paginator] {
+a[class^=paginator-item] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    /* otherwise it might be narrow, making it hard to click */
+    /* otherwise it might be narrow, which is hard to click */
     min-width: 2em;
+    min-height: 2em;
 
-    border: .1em solid var(--link-color);
-    box-shadow: 0 0 .2em LightSlateGray !important;
+    margin: 0;
+    padding: 0;
+
+    box-shadow: none !important;
+    border-style: solid;
+    border-color: var(--link-color);
+    border-top-width: .1em;
+    border-bottom-width: .1em;
+    border-left-width: .06em;
+    border-right-width: .06em;
 
     transition: 100ms linear !important;
-    margin: 0 1em;
-    padding: .2em .4em;
 }
-a.paginator-first, a.paginator-prev {
+
+a[class^=paginator-item].disabled {
+    color: dimgray !important;
+    background-color: gainsboro !important;
+    border: .1em solid dimgray !important;
+}
+
+a.paginator-item-first {
+    border-left-width: .1em;
     border-top-left-radius: .3em;
     border-bottom-left-radius: .3em;
 }
-a.paginator-last, a.paginator-next {
+a.paginator-item-last {
+    border-right-width: .1em;
     border-top-right-radius: .3em;
     border-bottom-right-radius: .3em;
 }
 
-a[class^=paginator] > svg {
+/* Current page number */
+a[class^=paginator-item].active {
+    color: var(--bgcolor);
+    background-color: var(--link-color);
+    box-shadow: inset 0 0 .2em navy !important;
+    border-color: navy;
+}
+
+
+a[class^=paginator-item] > svg {
     stroke: var(--link-color);
-    vertical-align: center;
     width: 1.6em;
     height: 1.6em;
 }
 
-a[class^=paginator]:hover {
-    transform: translateY(-.1em);
+a[class^=paginator-item]:not(.disabled):not(.active):hover {
     border-color: var(--link-active-color);
-    background-color: LightSteelBlue;
-    box-shadow: .1em .1em .2em LightSlateGray,
-                inset 0 -.1em 0 var(--link-active-color) !important;
+    box-shadow: inset -.05em -.15em 0 var(--link-active-color),
+                inset .05em .05em 0 var(--link-active-color) !important;
 }
-a[class^=paginator]:hover > svg {
+
+a[class^=paginator-item]:not(.disabled):not(.active):hover > svg {
     stroke: var(--link-active-color);
 }
