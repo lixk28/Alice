@@ -75,6 +75,9 @@ a[class^=paginator-item] > svg {
     width: 1.6em;
     height: 1.6em;
 }
+a[class^=paginator-item].disabled > svg {
+    stroke: dimgray
+}
 
 a[class^=paginator-item]:not(.disabled):not(.active):hover {
     border-color: var(--link-active-color);
