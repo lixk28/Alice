@@ -12,7 +12,7 @@ themesDir = "../.."
     mainSections = ["posts"]
     keywords = []
     dateFmt = "2006-01-02"
-    license = "Licensed under LGPLv3."
+    license = "DBADPL"
 
     [params.header]
         blogo = "images/HugoAliceLogo.webp"
@@ -25,7 +25,7 @@ themesDir = "../.."
         # Copy{left,right} statement, HTML is allowed
         copymid = ""
         # License statement, HTML is allowed
-        license = "Licensed under <b>LGPLv3</b>"
+        license = 'Licensed under the <a href="https://dbad-license.org/"><b>DBADPL</b></a>'
         # Creation year of your site
         since = 2024
         # Creator name, HTML is allowed

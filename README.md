@@ -37,4 +37,4 @@ Please fire an issue to draft a proposal first if you want some new feature.
 
 ## License
 
-![lgplv3](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)
+Hugo-Alice theme is licensed under the [DBADPL](https://dbad-license.org/).
