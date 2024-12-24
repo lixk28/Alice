@@ -16,6 +16,7 @@
 @import "sidenote.css";
 @import "secret.css";
 @import "mark.css";
+@import "quote.css";
 
 * {
     box-sizing: border-box;
@@ -111,7 +112,7 @@ body {
     --code-border-color: LightGray;
     --quote-color: DimGray;
     --quote-bgcolor: Whitesmoke;
-    --quote-left-border-color: DarkGray;
+    --quote-left-border-color: Silver;
     --quote-border-color: Gainsboro;
     --figure-caption-color: DimGray;
     --toc-heading-color: Dodgerblue;
@@ -337,17 +338,6 @@ a.heading-pilcrow:hover {
     margin: .2em 0;
 }
 
-/* blockquote */
-blockquote {
-    color: var(--quote-color);
-    background-color: var(--quote-bgcolor);
-    margin: .4em 0;
-    padding: .2em .4em .2em 1.2em;
-    border-left: 8px solid var(--quote-left-border-color);
-    border-right: 1px solid var(--quote-border-color);
-    border-top: 1px solid var(--quote-border-color);
-    border-bottom: 1px solid var(--quote-border-color);
-}
 
 /* post item in Posts/Categories/Tags */
 li.post-item {

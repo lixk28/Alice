@@ -1,0 +1,57 @@
+/* inline quote */
+q {
+
+}
+
+/* block quote */
+blockquote {
+    position: relative;
+    color: var(--quote-color);
+    background-color: var(--quote-bgcolor);
+    margin: 1em 0;
+
+    border-left: 8px solid var(--quote-left-border-color);
+    border-right: 1px solid var(--quote-border-color);
+    border-top: 1px solid var(--quote-border-color);
+    border-bottom: 1px solid var(--quote-border-color);
+
+    box-shadow: .2em .2em .2em gray;
+
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+}
+
+
+blockquote span.quotation {
+    color: gainsboro;
+    font-size: 4em;
+}
+
+blockquote span.quotation.left {
+    align-self: start;
+    margin: .4em .1em auto .1em;
+}
+
+blockquote span.quotation.right {
+    align-self: end;
+    margin: auto .1em -.2em .1em;
+}
+
+
+blockquote div.content {
+    flex: 1;
+}
+
+blockquote div.citation {
+    display: flex;
+    color: gray;
+    margin-bottom: .6em;
+}
+
+blockquote div.citation.left {
+    justify-self: start;
+}
+blockquote div.citation.right {
+    justify-self: end;
+}
