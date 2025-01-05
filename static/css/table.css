@@ -1,8 +1,37 @@
+div.table-container {
+    display: flex;
+    overflow-x: auto;
+    margin: 1em;
+}
+
 table {
     border-collapse: collapse;
+    border: 2px solid slategray;
+    margin: 0;
+}
+
+table > caption {
+    font-family: var(--serif-font);
+    color: dimgray;
+    caption-side: bottom;
+    text-align: center;
+    margin-top: .4em;
+}
+
+th {
+    font-family: var(--serif-font);
+    font-weight: bold;
+    background-color: whitesmoke;
+    border: 2px solid lightslategray;
+    padding: .4em 1em;
+}
+
+td {
+    border: 1px solid darkgray;
+    padding: .2em 1em;
 }
 
 th, td {
-    border: 1.6px solid var(--font-color);
-    padding: .2em 1em;
+    word-break: keep-all;
+    white-space: pre;
 }

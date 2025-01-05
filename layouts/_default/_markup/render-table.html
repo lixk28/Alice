@@ -1,0 +1,44 @@
+{{ $styleRules := "" }}
+{{ with .Attributes.width }}
+    {{ $styleRules = printf `%s width: %s;` $styleRules . }}
+{{ end }}
+{{ with .Attributes.maxwidth }}
+    {{ $styleRules = printf `%s max-width: %s;` $styleRules . }}
+{{ end }}
+{{ if .Attributes.float }}
+    {{ $styleRules = printf `%s float: %s; justify-content: left;` $styleRules .Attributes.float }}
+{{ else }}
+    {{ with .Attributes.align }}
+        {{ $styleRules = printf `%s justify-content: %s;` $styleRules . }}
+    {{ end }}
+{{ end }}
+
+<div class="table-container" {{ printf `style="%s"` $styleRules | safeHTMLAttr }}>
+<table>
+    {{ with .Attributes.caption }}
+        <caption>{{ if $.Attributes.capord }}Table {{ $.Ordinal }}. {{ end }}{{ . }}</caption>
+    {{ end }}
+    <thead>
+        {{- range .THead }}
+        <tr>
+            {{- range . }}
+            <th {{ with .Alignment }}{{ printf `style="text-align: %s"` . | safeHTMLAttr }}{{ end }}>
+                {{- .Text -}}
+            </th>
+            {{- end }}
+        </tr>
+        {{- end }}
+    </thead>
+    <tbody>
+        {{- range .TBody }}
+        <tr>
+            {{- range . }}
+            <td {{ with .Alignment }}{{ printf `style="text-align: %s"` . | safeHTMLAttr }}{{ end }}>
+                {{- .Text -}}
+            </td>
+            {{- end }}
+        </tr>
+        {{- end }}
+    </tbody>
+</table>
+</div>
