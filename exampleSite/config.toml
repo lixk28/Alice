@@ -51,6 +51,7 @@ themesDir = "../.."
                 id = "news"
                 title = "News"
                 weight = 1
+                enable = true
                 [params.home.sidebar.items.args]
                     size = 5
                     dateFmt = "2006-01-02"
@@ -62,6 +63,7 @@ themesDir = "../.."
                 id = "recent-updates"
                 title = "Recent Updates"
                 weight = 2
+                enable = true
                 [params.home.sidebar.items.args]
                     size = 5
                     dateFmt = "2006-01-02"
@@ -72,6 +74,7 @@ themesDir = "../.."
                 id = "tag-list"
                 title = "Tags"
                 weight = 3
+                enable = true
                 [params.home.sidebar.items.args]
                     size = 10
                     delimiter = "&emsp;"
@@ -82,6 +85,7 @@ themesDir = "../.."
                 id = "category-list"
                 title = "Categories"
                 weight = 4
+                enable = true
                 [params.home.sidebar.items.args]
                     size = 5
                     delimiter = "&emsp;"
