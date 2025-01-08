@@ -31,8 +31,9 @@ article {
     overflow: hidden;
     margin: 1em 0;
     width: var(--post-article-proportion);
-    border-radius: .2em;
-    box-shadow: 0 0 .6em var(--post-card-shadow-color);
+    border-radius: .3em;
+    border: 1px solid silver;
+    box-shadow: inset 0 0 .3em var(--post-card-shadow-color);
 }
 
 figure.featured-image {
@@ -62,10 +63,6 @@ aside#sidenotes {
 
 @media screen and (max-width: 720px) {
     aside#sidenotes {
-        display: none !important;
-    }
-
-    span.sidenote-content {
         display: none !important;
     }
 

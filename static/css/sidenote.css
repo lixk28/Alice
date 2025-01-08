@@ -15,24 +15,28 @@ input.sidenote-checkbox {
 }
 
 label.sidenote-label {
-    border: var(--sidenote-label-border-width) var(--sidenote-label-border-style) var(--sidenote-border-color);
+    /* border: var(--sidenote-label-border-width) var(--sidenote-label-border-style) var(--sidenote-border-color); */
+    /* border-bottom: .2em var(--sidenote-label-border-style) var(--sidenote-border-color); */
+    border-bottom: .2em var(--sidenote-label-border-style) lightslategray;
     padding-left: .2em;
     padding-right: .2em;
-    transition: all 0.15s ease-in-out;
+    /* transition: all 0.15s ease-in-out; */
 }
 
 span.sidenote-content {
     display: block;
     position: absolute;
     right: 0;
-    width: var(--post-sidenote-proportion);
-    margin-top: calc(0em - var(--line-height));
-    padding: .2em .2em .2em .4em;
-    /* background-color: white; */
-    border-top: var(--sidenote-content-border-width) var(--sidenote-content-border-style) var(--sidenote-border-color);
-    border-bottom: var(--sidenote-content-border-width) var(--sidenote-content-border-style) var(--sidenote-border-color);
+    width: calc(var(--post-sidenote-proportion) - .4em);
+    /* margin-top: calc(0em - var(--line-height)); */
+    padding: .6em;
+    border-radius: .3em;
+    border: 1px solid silver;
+    box-shadow: inset 0 0 .3em lightslategray;
+    /* border-top: var(--sidenote-content-border-width) var(--sidenote-content-border-style) var(--sidenote-border-color); */
+    /* border-bottom: var(--sidenote-content-border-width) var(--sidenote-content-border-style) var(--sidenote-border-color); */
 
-    transition: all 0.15s ease-in-out;
+    /* transition: all 0.15s ease-in-out; */
 }
 
 svg.sidenote-pin-icon {
@@ -41,18 +45,34 @@ svg.sidenote-pin-icon {
     width: var(--font-size);
     height: var(--font-size);
     float: left;
+    margin-top: .2em;
     margin-right: .4em;
 }
 
 span.sidenote:hover > label.sidenote-label {
     color: var(--sidenote-color-hover);
-    border-color: var(--sidenote-border-color-hover);
-    box-shadow: 0 0 var(--sidenote-shadow-radius-hover) var(--sidenote-shadow-color-hover);
+    border-color: royalblue;
+    /* box-shadow: 0 0 var(--sidenote-shadow-radius-hover) var(--sidenote-shadow-color-hover); */
 }
 span.sidenote:hover > span.sidenote-content {
     color: var(--sidenote-color-hover);
-    border-color: var(--sidenote-border-color-hover);
-    box-shadow: 0 0 var(--sidenote-shadow-radius-hover) var(--sidenote-shadow-color-hover);
+    border-color: royalblue;
+    box-shadow: inset 0 0 .3em royalblue;
+    /* border-color: var(--sidenote-border-color-hover); */
+    /* box-shadow: 0 0 var(--sidenote-shadow-radius-hover) var(--sidenote-shadow-color-hover); */
     /* box-shadow: 0 8px 8px -6px slategray,
                 0 -8px 8px -6px slategray; */
+}
+
+@media screen and (max-width: 720px) {
+    span.sidenote-content {
+        display: none;
+        position: static;
+        margin: 1em 0;
+        width: 100%;
+    }
+
+    input.sidenote-checkbox:checked + span.sidenote-content {
+        display: block;
+    }
 }
