@@ -23,6 +23,7 @@
 			{{ $ctx := . }}
 			{{ range sort .Site.Params.Home.Sidebar.items "weight" }}
 			{{ if .enable }}
+			<div class="home-sidebar-item-container">
 			<fieldset class="home-sidebar-item" id="{{ .id }}">
 				<legend class="home-sidebar-item-title" id="{{ .id }}-title">
 					{{- .title -}}
@@ -34,6 +35,7 @@
 					) }}
 				</div>
 			</fieldset>
+			</div>
 			{{ end }}
 			{{ end }}
 		</div>

@@ -11,7 +11,10 @@ tags: []
 tldr:
     title: ""
     content: ""
-thumbnail: ""
+card:
+    # portrait, landscape or auto
+    layout: portrait
+    thumbnail: ""
 featuredimage:
     src: ""
     title: ""
