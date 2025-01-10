@@ -1,7 +1,19 @@
-{{- $layout := .Params.card.layout | default "landscape" -}}
+{{- $layout := .Params.card.layout | default "auto" -}}
+{{- $thumb := .Page.Resources.GetMatch .Params.card.thumbnail -}}
+{{- if eq $layout "auto" -}}
+	{{- if $thumb -}}
+		{{- if gt $thumb.Width $thumb.Height -}}
+			{{- $layout = "portrait" -}}
+		{{- else -}}
+			{{- $layout = "landscape" -}}
+		{{- end -}}
+	{{- else -}}
+		{{- $layout = "portrait" -}}
+	{{- end -}}
+{{- end -}}
 <div class="post-card-container">
 <div class="post-card {{ $layout }}">
-	{{- with .Page.Resources.GetMatch .Params.card.thumbnail -}}
+	{{- with $thumb -}}
     <div class="post-thumb-container">
 		<a class="post-thumb-anchor" href="{{ .RelPermalink }}">
         <img class="post-thumb" src="{{ .RelPermalink }}" loading="lazy"/>

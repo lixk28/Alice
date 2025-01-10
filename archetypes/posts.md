@@ -12,8 +12,8 @@ tldr:
     title: ""
     content: ""
 card:
-    # portrait, landscape or auto
-    layout: portrait
+    # auto, portrait or landscape
+    layout: auto
     thumbnail: ""
 featuredimage:
     src: ""
