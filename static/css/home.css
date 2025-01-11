@@ -1,19 +1,19 @@
 :root {
-    --home-cards-proportion: 50%;
-    --home-sidebar-proportion: 50%;
+    --home-cards-proportion: 40%;
+    --home-sidebar-proportion: 60%;
 }
 
 @media screen and (max-width: 1280px) {
     :root {
-        --home-cards-proportion: 55%;
-        --home-sidebar-proportion: 45%;
+        --home-cards-proportion: 50%;
+        --home-sidebar-proportion: 50%;
     }
 }
 
 @media screen and (max-width: 960px) {
     :root {
-        --home-cards-proportion: 60%;
-        --home-sidebar-proportion: 40%;
+        --home-cards-proportion: 55%;
+        --home-sidebar-proportion: 45%;
     }
 }
 
@@ -41,7 +41,7 @@ div.home-sidebar {
 
     display: flex;
     flex-direction: column;
-    padding: 0 1em;
+    padding: 0 0 0 1em;
 }
 
 div.home-sidebar-item-container {
@@ -131,6 +131,7 @@ div.post-card.landscape {
 
 /* post card thumbnail */
 img.post-thumb {
+    display: inline;
     margin: 0 auto;
     width: 100%;
     height: 100%;
@@ -138,11 +139,13 @@ img.post-thumb {
     border-style: none;
 }
 
+a.post-thumb-anchor {
+    box-shadow: none !important;
+}
+
 div.post-card.landscape div.post-thumb-container {
-    min-width: 30%;
-    max-width: 50%;
-    /* min-height: 20vh;
-    max-height: 40vh; */
+    min-width: 20%;
+    max-width: 35%;
 }
 
 div.post-card.portrait div.post-thumb-container {
@@ -152,6 +155,8 @@ div.post-card.portrait div.post-thumb-container {
 
 /* postcard content, containing title, meta information and read more :D */
 div.post-card-content {
+    /* width: 100%; */
+    margin: 0;
     padding: 1em;
     overflow: auto;
 }
