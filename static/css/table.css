@@ -31,7 +31,7 @@ td {
     padding: .2em 1em;
 }
 
-th, td {
+th, td:not(.lntd) {
     word-break: keep-all;
     white-space: pre;
 }
