@@ -1,9 +1,17 @@
-{{ $code := transform.HighlightCodeBlock . }}
-{{ $codeWrapped := $code.Wrapped }}
 {{/* print "Attributes: " .Attributes */}}
 {{/* print "Options: " .Options */}}
 {{ $title := .Attributes.title }}
 {{ $copyable := .Attributes.copyable }}
+{{ $srcfile := .Attributes.srcfile }}
+
+{{ $codeWrapped := "" }}
+{{ if $srcfile }}
+    {{ $src := .Page.Resources.GetMatch $srcfile }}
+    {{ $codeWrapped = transform.Highlight $src.Content .Type .Options }}
+{{ else }}
+    {{ $code := transform.HighlightCodeBlock . }}
+    {{ $codeWrapped = $code.Wrapped }}
+{{ end }}
 
 {{/* copy button injection */}}
 {{ if $copyable }}
