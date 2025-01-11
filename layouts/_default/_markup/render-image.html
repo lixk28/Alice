@@ -1,19 +1,18 @@
-<figure>
-    <a href="{{ .Destination | safeURL }}" data-fancybox="gallery">
-    {{ $size := findRE `\{(\s*width\s*=\s*[0-9]+%?)\s*(,\s*height\s*=\s*[0-9]+%?)?\s*\}$` .Title 1 }}
-    {{ if $size }}
-    {{ $sizecss := index $size 0 }}
-    {{ $sizecss := replaceRE `\s*=\s*` ": " $sizecss }}
-    {{ $sizecss := replaceRE `\{\s*` "" $sizecss }}
-    {{ $sizecss := replaceRE `\s*,\s*` "; " $sizecss }}
-    {{ $sizecss := replaceRE `\s*\}` ";" $sizecss }}
-    <img loading="lazy" src="{{ .Destination | safeURL }}" alt="{{ .Text }}" style="{{ $sizecss | safeCSS }}"/>
-    {{ else }}
-    <img loading="lazy" src="{{ .Destination | safeURL }}" alt="{{ .Text }}"/>
-    {{ end }}
+{{/* print .Attributes */}}
+
+{{/* FIXME: The default values should be configurable */}}
+{{- $width := .Attributes.width | default "100%" -}}
+{{- $height := .Attributes.height | default "auto" -}}
+{{- $classes := .Attributes.classes | default "center" }}
+
+{{- $sizeCSS := printf "width: %s; height: %s;" $width $height }}
+
+<figure {{ with $classes }}class="{{ . }}"{{ end }} style="{{ $sizeCSS | safeCSS }}">
+    <a href="{{ .Destination | safeURL }}">
+    <img loading="lazy" src="{{ .Destination | safeURL }}"
+        {{- with .PlainText }} alt="{{ . }}"{{ end -}}
+        {{- with .Title }} title="{{ . }}"{{ end -}}
+    >
     </a>
-    {{ with .Title -}}
-    {{ $title := replaceRE `\{(\s*width\s*=\s*[0-9]+%?)\s*(,\s*height\s*=\s*[0-9]+%?)?\s*\}$` "" . }}
-    <figcaption>{{ $title | markdownify }}</figcaption>
-    {{- end }}
+    {{- with .Title }}<figcaption>{{ . | markdownify }}</figcaption>{{ end -}}
 </figure>

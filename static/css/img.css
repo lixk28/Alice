@@ -12,9 +12,31 @@ figure {
     align-items: center;
     margin: auto; */
     display: table;
-    margin: 1em auto;
+    /* margin: 1em auto; */
     max-width: 100%;
     height: auto;
+}
+
+figure.center {
+    margin: 1em auto;
+}
+figure.left {
+    margin: 1em auto 1em 0;
+}
+figure.right {
+    margin: 1em 0 1em auto;
+}
+
+/* default floating on the left */
+figure.float {
+    margin: 1em;
+    float: left;
+}
+figure.float.left {
+    float: left;
+}
+figure.float.right {
+    float: right;
 }
 
 figcaption {

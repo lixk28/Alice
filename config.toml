@@ -118,6 +118,11 @@
     defaultMarkdownHandler = "goldmark"
     [markup.goldmark.renderer]
         unsafe = true
+    [markup.goldmark.parser]
+        wrapStandAloneImageWithinParagraph = false
+        [markup.goldmark.parser.attribute]
+            block = true
+            title = true
     [markup.highlight]
         anchorLineNos = false
         codeFences = true
