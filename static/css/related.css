@@ -3,31 +3,14 @@ fieldset.post-related {
     border-radius: .4em;
     /* box-shadow: inset 0 0 .4em gray; */
     box-shadow: inset 0 0 .3em navy;
-    padding-top: 0;
-    padding-right: .4em;
-    padding-bottom: 0;
-    padding-left: 0;
+    padding: 0;
+    margin: 0 1.6em;
 }
 
-div.post-related-card-scrollable {
+fieldset.post-related div.post-card-deck {
+    padding: 1em;
     overflow-y: auto;
-    max-height: 50vh;
-}
-
-div.post-related-card-list {
-    display: flex;
-    flex-direction: column;
-    padding: 1ch 0 1ch 1ch;
-}
-
-div.post-related-card-list div.post-card {
-    box-shadow: inset 0 0 .3em dimgray;
-    border: none;
-    margin: .4em .6em .6em .4em;
-}
-
-div.post-related-card-list div.post-card img.post-thumb {
-    max-height: 25vh;
+    max-height: 60vh;
 }
 
 @keyframes rotate-shaking {
@@ -53,8 +36,7 @@ legend.post-related-legend {
     border-radius: .4em;
     box-shadow: 0 0 .2em dimgray;
     font-family: var(--serif-font);
-    /* FIXME: use h3 font size */
-    font-size: 1.3rem;
+    font-size: var(--h4-font-size);
     font-weight: bold;
     color: darkblue;
 

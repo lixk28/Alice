@@ -3,12 +3,10 @@
 {{- with $related -}}
 <fieldset class="post-related">
     <legend class="post-related-legend">Want more? You might also be interested...</legend>
-    <div class="post-related-card-scrollable">
-        <div class="post-related-card-list">
-            {{- range . -}}
-                {{- partial "post-card.html" . -}}
-            {{- end -}}
-        </div>
+    <div class="post-card-deck">
+        {{- range . -}}
+            {{- partial "post-card.html" . -}}
+        {{- end -}}
     </div>
 </fieldset>
 {{- end -}}
