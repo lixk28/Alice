@@ -109,7 +109,9 @@ pre.chroma > code {
 
 /* code blocks with linenos=true ... */
 div.highlight > div.chroma {
-    overflow-x: auto;
+    overflow: auto;
+    /* 80 lines limit just like ancient terminals :D */
+    max-height: calc(var(--code-block-line-height) * 81);
     border: 1px solid var(--code-block-border-color);
 }
 div.highlight > div.chroma pre.chroma {
@@ -118,7 +120,9 @@ div.highlight > div.chroma pre.chroma {
 
 /* code blocks with linenos=false ... */
 div.highlight > pre.chroma {
-    overflow-x: auto;
+    overflow: auto;
+    /* 80 lines limit just like ancient terminals :D */
+    max-height: calc(var(--code-block-line-height) * 81);
     border: 1px solid var(--code-block-border-color);
     margin: 0;
     padding: 1ch 1ch 1ch 0;
