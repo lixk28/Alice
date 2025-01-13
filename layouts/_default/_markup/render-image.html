@@ -6,10 +6,11 @@
 {{- $classes := .Attributes.classes | default "center" }}
 
 {{- $sizeCSS := printf "width: %s; height: %s;" $width $height }}
+{{- $isFloat := strings.Contains $classes "float" -}}
 
-<figure {{ with $classes }}class="{{ . }}"{{ end }} style="{{ $sizeCSS | safeCSS }}">
+<figure {{ with $classes }}class="{{ . }}"{{ end }} {{ if $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }}>
     <a href="{{ .Destination | safeURL }}">
-    <img loading="lazy" src="{{ .Destination | safeURL }}"
+    <img loading="lazy" src="{{ .Destination | safeURL }}" {{ if not $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }}
         {{- with .PlainText }} alt="{{ . }}"{{ end -}}
         {{- with .Title }} title="{{ . }}"{{ end -}}
     >

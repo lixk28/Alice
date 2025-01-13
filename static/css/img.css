@@ -17,34 +17,39 @@ figure {
     height: auto;
 }
 
-figure.center {
-    margin: 1em auto;
-}
-figure.left {
-    margin: 1em auto 1em 0;
-}
-figure.right {
-    margin: 1em 0 1em auto;
-}
-
-/* default floating on the left */
-figure.float {
-    margin: 1em;
-    float: left;
-}
-figure.float.left {
-    float: left;
-}
-figure.float.right {
-    float: right;
-}
-
 figcaption {
     color: var(--figure-caption-color);
     font-size: var(--font-size-tiny);
     line-height: 2em;
     margin-top: .6em;
     text-align: center;
+}
+
+figure.center { margin: 1em auto; }
+
+figure.left:not(.float) { margin: 1em auto 1em 0; }
+figure.left:not(.float) img { margin: 0 auto 0 0; }
+figure.left:not(.float) figcaption { text-align: left; }
+
+figure.right:not(.float) { margin: 1em 0 1em auto; }
+figure.right:not(.float) img { margin: 0 0 0 auto; }
+figure.right:not(.float) figcaption { text-align: right; }
+
+/* default floating on the left */
+figure.float {
+    margin: 1em 1em 1em 0;
+    float: left;
+}
+figure.float img {
+    margin: 0;
+}
+figure.float.left {
+    margin: 1em 1em 1em 0;
+    float: left;
+}
+figure.float.right {
+    margin: 1em 0 1em 1em;
+    float: right;
 }
 
 /* for featured image */
