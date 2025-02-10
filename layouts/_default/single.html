@@ -48,6 +48,25 @@
 			{{- partial "post-related.html" . -}}
 			{{- /* TODO: Comments? */ -}}
 		</div>
+
+		{{- if and (not .Site.BuildDrafts) .Site.Params.waline.enable -}}
+			{{- if .Params.waline -}}
+				<div id="waline"></div>
+				<script type="module">
+					import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+					init({
+						el: '#waline',
+						serverURL: '{{ .Site.Params.waline.serverURL }}',
+						lang: '{{ .Params.waline.language | default .Site.Params.waline.language }}',
+						texRender: (blockMode, tex) => window.MathJax.startup.adaptor.outerHTML(
+							window.MathJax.tex2svg(tex, {
+								display: blockMode,
+							}),
+						),
+					});
+				</script>
+			{{- end -}}
+		{{- end -}}
 	</article>
 </main>
 {{- end -}}

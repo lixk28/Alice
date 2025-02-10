@@ -1,0 +1,44 @@
+/* https://waline.js.org/en/reference/client/style.html */
+
+:root {
+    --waline-theme-color: royalblue;
+    --waline-active-color: blue;
+
+    --waline-bg-color: aliceblue;
+    --waline-bg-color-light: white;
+    --waline-bg-color-hover: white;
+    --waline-disable-bg-color-hover: gainsboro;
+    --waline-disable-color: lightgray;
+    --waline-border-color: slategray;
+
+    --waline-border: 2px solid var(--waline-border-color);
+    /* --waline-box-shadow: 0 0 .2em slategray: */
+}
+
+div#waline {
+    padding-bottom: 40vh;
+    margin: 1em;
+}
+
+.wl-header label {
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.wl-btn {
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+ul.wl-sort {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+
+div#waline svg {
+    all: initial;
+}
+div#waline a {
+    all: initial;
+}

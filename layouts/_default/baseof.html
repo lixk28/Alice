@@ -36,6 +36,10 @@
 	{{- if .Params.mermaid -}}
 		{{- partial "mermaid.html" -}}
 	{{- end -}}
+	{{- if .Params.waline -}}
+		<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css"/>
+		<link rel="stylesheet" href="{{ "css/waline.css" | relURL }}">
+	{{- end -}}
 	{{- with .OutputFormats.Get "RSS" -}}
 		{{ printf `<link rel="%s" type="%s" href="%s" title="%s">` .Rel .MediaType.Type .RelPermalink $.Site.Title | safeHTML }}
 	{{- end -}}

@@ -108,9 +108,14 @@
         # fancybox or glightbox
         vendor = 'fancybox'
 
-    [params.comment]
-        # the only choice
-        vendor = 'waline'
+    # waline v3 comment system
+    [params.waline]
+        enable = false
+        # required
+        serverURL = 'your-waline-server-domain.example.com'
+        # optional
+        # default language, https://waline.js.org/guide/features/i18n.html
+        language = 'en'
 
 
 # Hugo parameters with Alice default initialization

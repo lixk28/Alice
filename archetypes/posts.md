@@ -35,6 +35,8 @@ tex:
     math: false
     algorithm: false
     tikz: false
+waline:
+    language: en
 mermaid: false
 prext: true
 related: true
