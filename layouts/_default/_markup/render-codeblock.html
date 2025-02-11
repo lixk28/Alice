@@ -35,7 +35,12 @@
 {{ if $title }}
     {{/* NOTE: use ~~~ for code fences when you need inline code surrounded by backticks ` */}}
     {{ $titleDiv := printf `<div class="code-block-title">%s</div>` ($title | markdownify) }}
-    {{ $highlightDiv := printf `<div class="highlight" title="%s" copyable="%s">` $title (string $copyable) }}
+    {{ $highlightDiv := "" }}
+    {{ if $srcfile }}
+        {{ $highlightDiv = printf `<div class="highlight">` }}
+    {{ else }}
+        {{ $highlightDiv = printf `<div class="highlight" title="%s" copyable="%s">` $title (string $copyable) }}
+    {{ end }}
     {{ $highlightDivWithTitle := print $highlightDiv $titleDiv }}
     {{ $codeWrapped = replace $codeWrapped $highlightDiv $highlightDivWithTitle }}
 {{ end }}
