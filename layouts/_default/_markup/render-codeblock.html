@@ -39,7 +39,11 @@
     {{ if $srcfile }}
         {{ $highlightDiv = printf `<div class="highlight">` }}
     {{ else }}
-        {{ $highlightDiv = printf `<div class="highlight" title="%s" copyable="%s">` $title (string $copyable) }}
+        {{ if $copyable }}
+            {{ $highlightDiv = printf `<div class="highlight" title="%s" copyable="%s">` $title (string $copyable) }}
+        {{ else }}
+            {{ $highlightDiv = printf `<div class="highlight" title="%s">` $title }}
+        {{ end }}
     {{ end }}
     {{ $highlightDivWithTitle := print $highlightDiv $titleDiv }}
     {{ $codeWrapped = replace $codeWrapped $highlightDiv $highlightDivWithTitle }}
