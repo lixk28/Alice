@@ -66,15 +66,6 @@ aside#sidenotes {
         display: none !important;
     }
 
-    div.post-preamble {
-        margin: 1ch 1ch 0 1ch;
-    }
-    div.post-content {
-        margin: 0 1ch 0 1ch;
-    }
-    div.post-epilogue {
-        margin: 0 1ch 1ch 1ch;
-    }
     main.post {
         padding: 0 !important;
     }
