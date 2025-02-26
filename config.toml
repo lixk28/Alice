@@ -116,6 +116,7 @@
         # optional
         # default language, https://waline.js.org/guide/features/i18n.html
         language = 'en'
+        reaction = false
 
 
 # Hugo parameters with Alice default initialization

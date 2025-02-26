@@ -37,6 +37,7 @@ tex:
     tikz: false
 waline:
     language: en
+    reaction: false
 mermaid: false
 prext: true
 related: true

@@ -58,6 +58,7 @@
 						el: '#waline',
 						serverURL: '{{ .Site.Params.waline.serverURL }}',
 						lang: '{{ .Params.waline.language | default .Site.Params.waline.language }}',
+						reaction: {{ .Params.waline.reaction | default .Site.Params.waline.reaction }},
 						texRender: (blockMode, tex) => window.MathJax.startup.adaptor.outerHTML(
 							window.MathJax.tex2svg(tex, {
 								display: blockMode,
