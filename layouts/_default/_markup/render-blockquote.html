@@ -2,8 +2,8 @@
     <span class="quotation left">&ldquo;</span>
     <div class="content">
         {{- .Text -}}
-        {{ with .Attributes.cite }}
-            <div class="citation {{ $.Attributes.align | default `right` }}">&horbar;&nbsp;{{ . | markdownify | safeHTML }}</div>
+        {{ with .Attributes.src }}
+            <div class="src {{ $.Attributes.align | default `right` }}">&horbar;&nbsp;{{ . | markdownify | safeHTML }}</div>
         {{ end }}
     </div>
     <span class="quotation right">&rdquo;</span>
