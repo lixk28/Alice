@@ -8,8 +8,16 @@
 {{- $sizeCSS := printf "width: %s; height: %s;" $width $height }}
 {{- $isFloat := strings.Contains $classes "float" -}}
 
-<figure {{ with $classes }}class="{{ . }}"{{ end }} {{ if $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }}>
-    <a href="{{ .Destination | safeURL }}">
+{{- $lightboxVendor := .Page.Params.lightbox.vendor | default "none" }}
+
+<figure {{ with $classes }}class="{{ . }}"{{ end }} {{ if $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }} >
+    <a href="{{ $.Destination | safeURL }}"
+    {{- if eq $lightboxVendor "fancybox" -}}
+        data-fancybox="gallery"
+    {{- else if eq $lightboxVendor "glightbox" -}}
+        class="glightbox"
+    {{- end -}}
+    >
     <img loading="lazy" src="{{ .Destination | safeURL }}" {{ if not $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }}
         {{- with .PlainText }} alt="{{ . }}"{{ end -}}
         {{- with .Title }} title="{{ . }}"{{ end -}}
