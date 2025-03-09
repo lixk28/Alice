@@ -15,7 +15,7 @@
     {{- if eq $lightboxVendor "fancybox" -}}
         data-fancybox="gallery"
     {{- else if eq $lightboxVendor "glightbox" -}}
-        class="glightbox"
+        class="glightbox" data-gallery="gallery"
     {{- end -}}
     >
     <img loading="lazy" src="{{ .Destination | safeURL }}" {{ if not $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }}

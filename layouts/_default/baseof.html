@@ -28,7 +28,7 @@
 		{{- end -}}
 	{{- end -}}
 	{{- if .Params.lightbox -}}
-		{{- partial "lightbox.html" -}}
+		{{- partial "lightbox.html" . -}}
 	{{- end -}}
 	{{- if .Params.tex -}}
 		{{- partial "tex.html" . -}}
