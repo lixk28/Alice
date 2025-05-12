@@ -1,0 +1,8 @@
+id: alice
+name: Alice
+tagline: A classic and elegant hugo theme
+avatar:
+  kind: url
+  content: https://lixk28.github.io/Alice/images/HugoAliceLogo.webp
+website: https://lixk28.github.io/Alice
+koukando: 99

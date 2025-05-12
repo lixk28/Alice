@@ -1,0 +1,4 @@
+id: tikzjax
+name: TikZJax
+tagline: TikZJax converts script tags (containing TikZ code) into SVGs.
+website: https://tikzjax.com

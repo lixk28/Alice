@@ -1,0 +1,8 @@
+id: waline
+name: Waline
+tagline: A Simple, Safe Comment System.
+avatar:
+  kind: url
+  content: https://waline.js.org/logo.png
+website: https://waline.js.org
+koukando: 59

@@ -186,17 +186,22 @@ themesDir = "../.."
         weight = 4
 
     [[menu.main]]
+        identifier = "friends"
+        name = "Friends"
+        url = "/friends/"
+        weight = 5
+
+    [[menu.main]]
         identifier = "about"
         name = "About"
         url = "/about/"
-        weight = 5
+        weight = 6
 
     [[menu.main]]
         identifier = "rss"
         name = "RSS"
         url = "/index.xml"
-        weight = 6
-
+        weight = 7
 [sitemap]
     changefreq = 'weekly'
     filename = 'sitemap.xml'

@@ -1,0 +1,8 @@
+id: gohugo
+name: Hugo
+tagline: The world's fastest framework for building websites
+avatar:
+  kind: url
+  content: https://gohugo.io/images/hugo-logo-wide.svg
+website: https://gohugo.io
+koukando: 100

@@ -1,0 +1,8 @@
+id: codemirror
+name: CodeMirror
+tagline: The in-browser code editor
+avatar:
+  kind: url
+  content: https://codemirror.net/style/logo.svg
+website: https://codemirror.net
+koukando: 90

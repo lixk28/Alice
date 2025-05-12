@@ -1,0 +1,8 @@
+id: mathjax
+name: MathJax
+tagline: Beautiful and accessible math in all browsers
+avatar:
+  kind: url
+  content: https://www.mathjax.org/badge/mj-logo.svg
+website: https://www.mathjax.org
+koukando: 90
