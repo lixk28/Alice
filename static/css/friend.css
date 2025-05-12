@@ -1,0 +1,69 @@
+:root {
+    --friend-avatar-max-width: 120px;
+}
+
+
+a.friend-card-anchor {
+    position: relative;
+    /* display: block !important; */
+    border-radius: .3em !important;
+    text-decoration: none !important;
+
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+
+    margin: 1em 0 !important;
+
+    border: .1em solid lightslategray !important;
+    box-shadow: .1em .1em .1em silver !important;
+}
+a.friend-card-anchor:hover {
+    box-shadow: .2em .2em .3em silver !important;
+    bottom: 0.1em !important;
+}
+
+
+div.friend-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: .6em;
+
+    max-width: var(--friend-avatar-max-width);
+    height: 100%;
+}
+div.friend-avatar > img {
+    width: 100%;
+    height: auto;
+}
+
+
+div.friend-bio {
+    margin: 0;
+    padding: .2em .4em;
+}
+div.friend-bio > h4 {
+    margin: .3em auto;
+}
+div.friend-bio > p {
+    margin: .2em auto;
+}
+
+
+
+div.frienmily {
+    margin: 1em 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+}
+
+div.frienmily > a.friend-card-anchor {
+    flex-grow: 1;
+    min-width: 0;
+    margin: .8em !important;
+}

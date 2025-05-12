@@ -1,0 +1,20 @@
+{{ $friendId := .Get "id" | default "" }}
+{{ $friendMap := index .Site.Data.friends $friendId }}
+<a class="friend-card-anchor" id="{{ $friendMap.id }}" href="{{ $friendMap.website }}" target="_blank">
+    {{ with $friendMap.avatar }}
+    <div class="friend-avatar">
+        {{ $avatarKind := lower .kind }}
+        {{ if eq $avatarKind "url" }}
+            <img src="{{ .content }}" title="" alt="">
+        {{ else if eq $avatarKind "svg" }}
+            {{ .content | safeHTML }}
+        {{ else if eq $avatarKind "text" }}
+            {{ .content | markdownify }}
+        {{ end }}
+    </div>
+    {{ end }}
+    <div class="friend-bio">
+        <h4 class="friend-name">{{ $friendMap.name | markdownify }}</h4>
+        <p class="friend-tagline">{{ $friendMap.tagline | markdownify }}</p>
+    </div>
+</a>

@@ -17,6 +17,7 @@
 @import "secret.css";
 @import "mark.css";
 @import "quote.css";
+@import "friend.css";
 
 * {
     box-sizing: border-box;
