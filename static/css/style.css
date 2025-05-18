@@ -325,10 +325,21 @@ a.heading-pilcrow {
     padding-top: var(--header-height);
     color: var(--font-color);
     box-shadow: none;
-    transition: 0.2s;
+
+    /* pilcrow is initially opaque */
+    opacity: 0;
+    transition: 150ms;
 }
 a.heading-pilcrow:hover {
     color: var(--link-color);
+}
+
+/* show pilcrow on hovering headings */
+main h1:hover a.heading-pilcrow,
+main h2:hover a.heading-pilcrow,
+main h3:hover a.heading-pilcrow,
+main h4:hover a.heading-pilcrow {
+    opacity: 1;
 }
 
 .content p {
