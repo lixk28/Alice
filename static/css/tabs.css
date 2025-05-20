@@ -7,13 +7,13 @@ div.tab-title {
     white-space: nowrap;
     overflow-x: auto;
     padding: 0 1em;
-    color: blue;
+    color: navy;
     cursor: default;
 
-    border-top: 1px solid gray;
-    border-left: 1px solid gray;
-    border-right: 1px solid gray;
-    border-bottom: 0.15em solid royalblue;
+    border-top: .1em solid slategray;
+    border-left: .1em solid slategray;
+    border-right: .1em solid slategray;
+    /* border-bottom: 0.15em solid royalblue; */
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     /* box-shadow: inset 0 -0.15em 0 blue; */
@@ -22,8 +22,9 @@ div.tab > div.tab-content {
     display: block;
     padding: 1ch;
 
-    box-shadow: inset 0 0 .2em darkgray;
-    border: 1px solid darkgray;
+    /* box-shadow: inset 0 0 .2em darkgray; */
+    /* border: 1px solid darkgray; */
+    border: .1em solid silver;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     border-bottom-left-radius: 4px;
@@ -53,6 +54,13 @@ label.tab-title {
     color: dimgray;
     cursor: pointer;
     padding: 0 1em;
+
+    /* transparent borders and box-shadow so that there's no small distorts when switching tabs */
+    border-top: .1em solid transparent;
+    border-left: .1em solid transparent;
+    border-right: .1em solid transparent;
+    box-shadow: inset 0 -0.15em 0 transparent;
+
     border-top-left-radius: .2em;
     border-top-right-radius: .2em;
     white-space: nowrap;
@@ -61,19 +69,20 @@ label.tab-title {
 /* label.tab-title:hover {
     color: darkblue;
     background: ivory;
-    box-shadow: inset 0 -0.15em 0 silver;
+    box-shadow: inset 0 -0.15em 0 royalblue;
 } */
 input.tab-title-radio:checked + label.tab-title {
-    color: blue;
+    /* color: blue; */
+    color: navy;
     cursor: default;
 
-    border-top: 1px solid gray;
-    border-left: 1px solid gray;
-    border-right: 1px solid gray;
-    /* border-bottom: 0.15em solid royalblue; */
+    border-top: .1em solid slategray;
+    border-left: .1em solid slategray;
+    border-right: .1em solid slategray;
+
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    box-shadow: inset 0 -0.15em 0 royalblue;
+    box-shadow: inset 0 -0.15em 0 blue;
 }
 
 div.tab-content-container {
@@ -81,8 +90,9 @@ div.tab-content-container {
     display: block;
     padding: 1ch;
 
-    box-shadow: inset 0 0 .25em darkgray;
-    border: 1px solid darkgray;
+    /* box-shadow: inset 0 0 .25em darkgray; */
+    /* border: 1px solid darkgray; */
+    border: .1em solid silver;
     border-top-right-radius: .2em;
     border-bottom-right-radius: .2em;
     border-bottom-left-radius: .2em;
