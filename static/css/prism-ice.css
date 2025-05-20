@@ -1,0 +1,87 @@
+/* the ice theme for prism */
+
+pre.prism {
+    font-family: var(--mono-font), monospace;
+	font-size: var(--mono-font-size);
+
+    overflow: auto;
+    background-color: white;
+    border: 1px solid silver;
+    border-radius: .3em;
+
+    padding: 1ch;
+    margin: 1em 0;
+
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	line-height: 1.5;
+
+    -moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: darkgray;
+}
+
+.token.puntuation {
+    color: black;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: blue;
+}
+
+.token.boolean,
+.token.number {
+	color: blue;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: royalblue;
+}
+
+.token.string {
+	color: mediumslateblue;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: darkblue;
+}
+
+.token.keyword {
+    font-weight: bold;
+	color: navy;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+
+.token.italic {
+	font-style: italic;
+}

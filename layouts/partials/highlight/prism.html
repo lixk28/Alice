@@ -1,0 +1,3 @@
+{{ $prismId := printf "prism-%02d" .Ordinal }}
+{{ $language := .Get "language" | default "" }}
+<pre class="prism language-{{ $language }}" id="{{ $prismId }}"><code class="language-{{ $language }}">{{ .Inner | strings.TrimSpace }}</code></pre>

@@ -36,6 +36,28 @@
 	{{- if .Params.mermaid -}}
 		{{- partial "mermaid.html" -}}
 	{{- end -}}
+	{{- if .HasShortcode "prism" -}}
+		<link rel="stylesheet" href="{{ "css/prism.css" | relURL }}">
+		<script defer
+			src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-core.min.js"
+			integrity="sha256-bKrTFt2ZHyT4AE4LnBnAVctYKf9l6XP77kBvltgbjn4="
+			crossorigin="anonymous"
+			{{/* this shit is very important */}}
+			data-manual>
+		</script>
+		<script defer
+			src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/plugins/autoloader/prism-autoloader.min.js"
+			integrity="sha256-AjM0J5XIbiB590BrznLEgZGLnOQWrt62s3BEq65Q/I0="
+			crossorigin="anonymous">
+		</script>
+		<script defer>
+			document.addEventListener("DOMContentLoaded", () => {
+				const containers = document.querySelectorAll("pre.prism");
+				for (container of containers)
+					Prism.highlightElement(container, true);
+			});
+		</script>
+	{{- end -}}
 	{{- if .Params.waline -}}
 		<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css"/>
 		<link rel="stylesheet" href="{{ "css/waline.css" | relURL }}">
