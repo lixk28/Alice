@@ -1,0 +1,31 @@
+a.resource-anchor {
+    margin: 0 .3em;
+    box-shadow: none !important;
+    transition: none !important;
+}
+
+svg.resource-icon {
+    position: relative;
+    top: .4em;
+    padding-right: .1em;
+    stroke: royalblue;
+    width: 1.3em;
+    height: 1.3em;
+    transition: 200ms ease;
+}
+
+span.resource-name {
+    color: royalblue;
+    box-shadow: inset 0 -0.1em 0 var(--link-color);
+    transition: 200ms ease;
+}
+
+a.resource-anchor:hover > svg.resource-icon {
+    stroke: blue;
+    transform: rotate(3deg);
+}
+a.resource-anchor:hover > span.resource-name {
+    color: blue;
+    box-shadow: inset 0 -0.15em 0 var(--link-active-color);
+}
+
