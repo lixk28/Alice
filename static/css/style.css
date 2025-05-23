@@ -282,6 +282,7 @@ svg.external-anchor-icon {
 }
 a:hover svg.external-anchor-icon {
     stroke: var(--link-active-color);
+    transform: rotate(3deg);
 }
 
 main h1 {
