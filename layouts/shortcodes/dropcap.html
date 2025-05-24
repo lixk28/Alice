@@ -1,0 +1,4 @@
+{{/* "plain" or "paint" */}}
+{{ $char := .Get "char" | default "T" }}
+{{ $style := .Get "style" | default "plain" }}
+<span class="dropcap-{{ $style }}">{{ $char }}</span>

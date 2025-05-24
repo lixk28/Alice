@@ -19,6 +19,7 @@
 @import "resource.css";
 @import "quote.css";
 @import "friend.css";
+@import "dropcap.css";
 
 * {
     box-sizing: border-box;
