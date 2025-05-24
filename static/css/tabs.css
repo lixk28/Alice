@@ -52,7 +52,8 @@ input.tab-content-radio {
 }
 
 label.tab-title {
-    color: dimgray;
+    color: royalblue;
+
     cursor: pointer;
     padding: 0 1em;
 
@@ -60,30 +61,28 @@ label.tab-title {
     border-top: .1em solid transparent;
     border-left: .1em solid transparent;
     border-right: .1em solid transparent;
-    box-shadow: inset 0 -0.15em 0 transparent;
 
     border-top-left-radius: .2em;
     border-top-right-radius: .2em;
     white-space: nowrap;
-    /* transition: all 0.15s; */
+
+    transition: all 150ms ease;
 }
-/* label.tab-title:hover {
-    color: darkblue;
-    background: ivory;
-    box-shadow: inset 0 -0.15em 0 royalblue;
-} */
+label.tab-title:hover {
+    color: blue;
+    box-shadow: inset 0 -0.1em 0 blue;
+}
 input.tab-title-radio:checked + label.tab-title {
-    /* color: blue; */
     color: navy;
     cursor: default;
 
     border-top: .1em solid slategray;
     border-left: .1em solid slategray;
     border-right: .1em solid slategray;
+    box-shadow: inset 0 -0.1em 0 transparent;
 
     border-top-left-radius: .2em;
     border-top-right-radius: .2em;
-    box-shadow: inset 0 -0.15em 0 blue;
 }
 
 div.tab-content-container {
