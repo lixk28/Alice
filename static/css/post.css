@@ -33,7 +33,8 @@ article {
     width: var(--post-article-proportion);
     border-radius: .3em;
     border: 1px solid silver;
-    box-shadow: inset 0 0 .3em var(--post-card-shadow-color);
+    /* box-shadow: inset 0 0 .3em var(--post-card-shadow-color); */
+    box-shadow: 0 0 .3em silver;
 }
 
 figure.featured-image {
