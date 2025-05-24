@@ -3,30 +3,35 @@
     --admonition-note-background-color: White;
     --admonition-note-border-color: DimGray;
     --admonition-note-indicator-color: var(--admonition-note-foreground-color);
+    --admonition-note-title-color: Black;
     --admonition-note-marker-color: Black;
 
     --admonition-info-foreground-color: RoyalBlue;
     --admonition-info-background-color: AliceBlue;
     --admonition-info-border-color: DarkBlue;
     --admonition-info-indicator-color: var(--admonition-info-foreground-color);
+    --admonition-info-title-color: Navy;
     --admonition-info-marker-color: Navy;
 
     --admonition-tip-foreground-color: Green;
     --admonition-tip-background-color: MintCream;
     --admonition-tip-border-color: DarkGreen;
     --admonition-tip-indicator-color: var(--admonition-tip-foreground-color);
+    --admonition-tip-title-color: DarkSlateGray;
     --admonition-tip-marker-color: DarkSlateGray;
 
     --admonition-help-foreground-color: SlateBlue;
     --admonition-help-background-color: GhostWhite;
     --admonition-help-border-color: DarkSlateBlue;
     --admonition-help-indicator-color: var(--admonition-help-foreground-color);
+    --admonition-help-title-color: Indigo;
     --admonition-help-marker-color: Indigo;
 
     --admonition-alert-foreground-color: Crimson;
     --admonition-alert-background-color: Snow;
     --admonition-alert-border-color: DarkRed;
     --admonition-alert-indicator-color: var(--admonition-alert-foreground-color);
+    --admonition-alert-title-color: Maroon;
     --admonition-alert-marker-color: Maroon;
 
     --admonition-indicator-size: 1.6em;
@@ -55,7 +60,8 @@ svg.admonition-icon.marker.help { stroke: var(--admonition-help-marker-color); }
 svg.admonition-icon.marker.alert { stroke: var(--admonition-alert-marker-color); }
 
 details.admonition {
-    border-radius: 1ch;
+    /* border-radius: 1ch; */
+    border-radius: .3em;
 }
 details.admonition.note {
     border: 1px solid var(--admonition-note-border-color);
@@ -82,5 +88,12 @@ details.admonition.alert {
     border-left: .2em solid var(--admonition-alert-foreground-color);
     background-color: var(--admonition-alert-background-color);
 }
+
+details.admonition.note > summary > span.ai-summary-content { color: var(--admonition-note-title-color); }
+details.admonition.info > summary > span.ai-summary-content { color: var(--admonition-info-title-color); }
+details.admonition.tip > summary > span.ai-summary-content { color: var(--admonition-tip-title-color); }
+details.admonition.help > summary > span.ai-summary-content { color: var(--admonition-help-title-color); }
+details.admonition.alert > summary > span.ai-summary-content { color: var(--admonition-alert-title-color); }
+
 
 /* TODO: styles for links and inline code (<a> and <code>) inside admonitions */
