@@ -1,21 +1,17 @@
 div.table-container {
-    display: flex;
-    overflow-x: auto;
-    margin: 1em;
+    overflow: auto;
+    margin: 1em 0;
 }
 
 table {
     border-collapse: collapse;
     border: 2px solid slategray;
-    margin: 0;
+    margin: 0 auto;
 }
 
 table > caption {
     font-family: var(--serif-font);
     color: dimgray;
-    caption-side: bottom;
-    text-align: center;
-    margin-top: .4em;
 }
 
 th {
@@ -32,6 +28,53 @@ td {
 }
 
 th, td:not(.lntd) {
-    word-break: keep-all;
+    /* word-break: keep-all; */
     white-space: pre;
+}
+
+div.table-container.center { margin: 1em 0; }
+div.table-container.center table { margin: 0 auto; }
+
+div.table-container.left:not(.float) { margin: 1em auto 1em 0; }
+div.table-container.left:not(.float) table { margin: 0 auto 0 0; }
+
+div.table-container.right:not(.float) { margin: 1em 0 1em auto; }
+div.table-container.right:not(.float) table { margin: 0 0 0 auto; }
+
+/* default floating on the left */
+div.table-container.float {
+    float: left;
+    margin: 1em 1em 1em 0;
+}
+div.table-container.float.left {
+    float: left;
+    margin: 1em 1em 1em 0;
+}
+div.table-container.float.right {
+    float: right;
+    margin: 1em 0 1em 1em;
+}
+
+
+/* table caption alignment and side, default bottom side and centrally aligned */
+table > caption {
+    text-align: center;
+    caption-side: bottom;
+    margin-top: .4em;
+    margin-bottom: 0;
+}
+
+table > caption.left { text-align: left; }
+table > caption.center { text-align: center; }
+table > caption.right { text-align: right; }
+
+table > caption.top {
+    caption-side: top;
+    margin-top: 0;
+    margin-bottom: .4em;
+}
+table > caption.bottom {
+    caption-side: bottom;
+    margin-top: .4em;
+    margin-bottom: 0;
 }

@@ -5,18 +5,13 @@
 {{ with .Attributes.maxwidth }}
     {{ $styleRules = printf `%s max-width: %s;` $styleRules . }}
 {{ end }}
-{{ if .Attributes.float }}
-    {{ $styleRules = printf `%s float: %s; justify-content: left;` $styleRules .Attributes.float }}
-{{ else }}
-    {{ with .Attributes.align }}
-        {{ $styleRules = printf `%s justify-content: %s;` $styleRules . }}
-    {{ end }}
-{{ end }}
+{{ $classes := .Attributes.classes | default "" }}
+{{ $capclasses := .Attributes.capclasses | default "" }}
 
-<div class="table-container" {{ printf `style="%s"` $styleRules | safeHTMLAttr }}>
+<div class="table-container {{ with $classes }}{{ . }}{{ end }}" {{ printf `style="%s"` $styleRules | safeHTMLAttr }}>
 <table>
     {{ with .Attributes.caption }}
-        <caption>{{ if $.Attributes.capord }}Table {{ $.Ordinal }}. {{ end }}{{ . }}</caption>
+        <caption class="table-caption {{ with $capclasses }}{{ . }}{{ end }}">{{ if $.Attributes.capord }}Table {{ $.Ordinal }}. {{ end }}{{ . }}</caption>
     {{ end }}
     <thead>
         {{- range .THead }}
