@@ -5,8 +5,16 @@
 		<h3 id="toc-title">{{ .Title | markdownify | safeHTML }}</h3>
 		<div id="toc-hunting-land">
 			{{ .TableOfContents }}
-			<svg id="toc-snake" xmlns="http://www.w3.org/2000/svg" version="1.1">
+			<!-- <svg id="toc-snake" xmlns="http://www.w3.org/2000/svg" version="1.1">
 				<polyline />
+			</svg> -->
+			<svg id="toc-snake" xmlns="http://www.w3.org/2000/svg" version="1.1">
+				<path stroke="black"
+					stroke-width="3"
+					stroke-dasharray="0, 0, 0, 1000"
+					stroke-linecap="round"
+					stroke-linjoin="round"
+					transform="translate(-0.5, -0.5)"/>
 			</svg>
 		</div>
 		{{- end -}}

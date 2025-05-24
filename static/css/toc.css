@@ -139,7 +139,11 @@ svg#toc-snake {
 }
 
 svg#toc-snake > polyline {
-    transition: all 0.2s linear;
+    /* transition: all 0.2s linear; */
+    transition: all 200ms ease;
+}
+svg#toc-snake > path {
+    transition: all 200ms ease;
 }
 
 

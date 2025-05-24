@@ -20,7 +20,8 @@
 		<script src="{{ "js/copyCodeBlock.js" | relURL }}"></script>
 	{{- end -}}
 	{{- if and (isset .Params "toc") .Params.toc.snake -}}
-		<script src="{{ "js/snakeTOC.js" | relURL }}"></script>
+		<!-- <script src="{{ "js/snakeTOC.js" | relURL }}"></script> -->
+		<script src="{{ "js/snakeTOC2.js" | relURL }}"></script>
 	{{- end -}}
 	{{- if .Params.tab -}}
 		{{- if .Params.tab.cursed -}}
