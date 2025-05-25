@@ -3,7 +3,7 @@
     {{- with .Title -}}<h1>{{ . }}</h1>{{- end -}}
     <p class="tags">
     {{- range .Site.Taxonomies.tags -}}
-        <span><a href="{{ .Page.Permalink }}">#{{ .Page.Title }}</a> ({{ .Count }})</span>&emsp;
+        <span><a href="{{ .Page.Permalink }}">#{{ .Page.Title }}</a><sup> ({{ .Count }})</sup></span>&emsp;
     {{- end -}}
     </p>
 </main>
