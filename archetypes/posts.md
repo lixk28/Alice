@@ -35,6 +35,13 @@ tex:
     math: false
     algorithm: false
     tikz: false
+codeeditor:
+    # (codemirror5 | cm5) or (codemirror6 | cm6)
+    vendor: codemirror5
+    # https://codemirror.net/5/doc/manual.html#addons
+    addons: []
+    # https://codemirror.net/5/mode
+    modes: []
 waline:
     language: en
     reaction: false

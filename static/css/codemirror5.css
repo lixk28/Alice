@@ -1,0 +1,15 @@
+/* CodeMirror5 */
+.CodeMirror {
+    font-family: var(--mono-font), monospace !important;
+    font-size: var(--mono-font-size) !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+
+    height: 600px !important;
+    min-height: 25vh !important;
+    max-height: 70vh !important;
+
+    margin: 0 !important;
+    border: 2px solid silver !important;
+    border-radius: .2em !important;
+}

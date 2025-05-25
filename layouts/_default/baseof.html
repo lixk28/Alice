@@ -59,6 +59,82 @@
 			});
 		</script>
 	{{- end -}}
+	{{- if .HasShortcode "codeeditor" -}}
+		{{- $vendor := .Site.Params.codeeditor.vendor | default .Params.codeeditor.vendor | default "codemirror5" -}}
+		{{- if or (eq $vendor "codemirror5") (eq $vendor "cm5") -}}
+			<script defer src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/lib/codemirror.min.js"></script>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/lib/codemirror.min.css">
+			<link rel="stylesheet" href="{{ "css/codemirror5.css" | relURL }}">
+			{{- with .Params.codeeditor.modes -}}
+				<script defer src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/mode/meta.js" integrity="sha256-+VeG+cg+YxIl/nhm85iS+AiusBXoDOnYpY1aHU6cS7Y=" crossorigin="anonymous"></script>
+				{{- range $mode := . -}}
+					<script defer src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/mode/{{ $mode }}/{{ $mode }}.js"></script>
+				{{- end -}}
+			{{- end -}}
+			{{- range $addon := .Params.codeeditor.addons -}}
+				<script defer src="https://cdn.jsdelivr.net/npm/codemirror@5.65.18/addon/{{ $addon }}"></script>
+			{{- end -}}
+			<script defer>
+				document.addEventListener("DOMContentLoaded", () => {
+					/* I'm getting emotional 😅 */
+					CodeMirror.findModeByTheFuckingMode = function (mode) {
+						mode = mode.toLowerCase();
+						for (let i = 0; i < CodeMirror.modeInfo.length; i++) {
+							const info = CodeMirror.modeInfo[i];
+							if (info.mode.toLowerCase() == mode)
+								return info;
+							if (info.alias) {
+								for (let j = 0; j < info.alias.length; j++)
+									if (info.alias[j].toLowerCase() == mode)
+										return info;
+							}
+						}
+					};
+
+					const codeblocks = document.querySelectorAll("pre.cm5-wrapper > code");
+					codeblocks.forEach((codeblock) => {
+						// var language;
+						// codeblock.classList.forEach((className) => {
+						// 	if (className.startsWith('language-')) {
+						// 		language = className.slice('language-'.length);
+						// 		return;
+						// 	}
+						// });
+						const language = codeblock.getAttribute('data-lang');
+
+						// console.log(CodeMirror.modes);
+						// console.log(CodeMirror.mimeModes);
+						// provided by https://codemirror.net/5/doc/manual.html#addon_meta
+						var mode = CodeMirror.findModeByName(language)
+								|| CodeMirror.findModeByExtension(language)
+								|| CodeMirror.findModeByTheFuckingMode(language);
+						// console.log(mode);
+
+						const codemirror = CodeMirror(function (editor) {
+							codeblock.parentNode.replaceChild(editor, codeblock);
+						}, {
+							lineNumbers: true,
+							tabSize: 4,
+							value: codeblock.innerText,
+							mode: mode.mime
+						});
+					});
+				});
+			</script>
+		{{- else if or (eq $vendor "codemirror6") (eq $vendor "cm6") -}}
+			<script defer src="{{ "js/codemirror6.min.js" | relURL }}"></script>
+			<link rel="stylesheet" href="{{ "css/codemirror6.css" | relURL }}">
+			<script defer>
+				document.addEventListener("DOMContentLoaded", () => {
+					const parents = document.querySelectorAll("pre.cm6-wrapper");
+					parents.forEach((parent) => {
+						const state = CodeMirror6.createEditorState(parent.textContent);
+						const view = CodeMirror6.createEditorView(state, parent);
+					});
+				});
+			</script>
+		{{- end -}}
+	{{- end -}}
 	{{- if .Params.waline -}}
 		<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css"/>
 		<link rel="stylesheet" href="{{ "css/waline.css" | relURL }}">

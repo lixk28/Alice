@@ -1,0 +1,7 @@
+{{ $id := printf "cm6-%02d" .index }}
+{{ $language := .language | strings.TrimSpace | lower }}
+<pre class="cm6-wrapper" id="{{ $id }}">
+    <code class="language-{{ $language }}" data-lang="{{ $language }}">
+        {{- .code | strings.TrimSpace }}
+    </code>
+</pre>

@@ -1,0 +1,15 @@
+{{ $vendor := .Site.Params.codeeditor.vendor | default .Page.Params.codeeditor.vendor | default "codemirror5" }}
+{{ $language := .Get "language" }}
+{{ if or (eq $vendor "codemirror5") (eq $vendor "cm5") }}
+    {{ partial "editor/codemirror5.html" (dict
+        "index" .Ordinal
+        "language" $language
+        "code" .Inner
+    ) }}
+{{ else if or (eq $vendor "codemirror6") (eq $vendor "cm6") }}
+    {{ partial "editor/codemirror6.html" (dict
+        "index" .Ordinal
+        "language" $language
+        "code" .Inner
+    ) }}
+{{ end }}
