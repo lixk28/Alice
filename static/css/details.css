@@ -1,5 +1,7 @@
 :root {
     --details-background-color: White;
+    --details-border-width: 2px;
+    --details-border-radius: .3em;
     --details-border-color: Black;
     --details-summary-font-size: 1.2em;
     --details-summary-icon-size: 1.4em;
@@ -8,7 +10,8 @@
 
 details.ai-details {
     background-color: var(--details-background-color);
-    border: 1px solid var(--details-border-color);
+    border: var(--details-border-width) solid var(--details-border-color);
+    border-radius: var(--details-border-radius);
     padding: 1ch;
     margin: 1em 0;
 }

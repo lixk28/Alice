@@ -1,4 +1,8 @@
 :root {
+    --admonition-border-width: 2px;
+    --admonition-border-width-left: .2em;
+    --admonition-border-radius: .4em;
+
     --admonition-note-foreground-color: DimGray;
     --admonition-note-background-color: White;
     --admonition-note-border-color: DimGray;
@@ -61,31 +65,31 @@ svg.admonition-icon.marker.alert { stroke: var(--admonition-alert-marker-color);
 
 details.admonition {
     /* border-radius: 1ch; */
-    border-radius: .3em;
+    border-radius: var(--admonition-border-radius);
 }
 details.admonition.note {
-    border: 1px solid var(--admonition-note-border-color);
-    border-left: .2em solid var(--admonition-note-foreground-color);
+    border: var(--admonition-border-width) solid var(--admonition-note-border-color);
+    border-left: var(--admonition-border-width-left) solid var(--admonition-note-foreground-color);
     background-color: var(--admonition-note-background-color);
 }
 details.admonition.info {
-    border: 1px solid var(--admonition-info-border-color);
-    border-left: .2em solid var(--admonition-info-foreground-color);
+    border: var(--admonition-border-width) solid var(--admonition-info-border-color);
+    border-left: var(--admonition-border-width-left) solid var(--admonition-info-foreground-color);
     background-color: var(--admonition-info-background-color);
 }
 details.admonition.tip {
-    border: 1px solid var(--admonition-tip-border-color);
-    border-left: .2em solid var(--admonition-tip-foreground-color);
+    border: var(--admonition-border-width) solid var(--admonition-tip-border-color);
+    border-left: var(--admonition-border-width-left) solid var(--admonition-tip-foreground-color);
     background-color: var(--admonition-tip-background-color);
 }
 details.admonition.help {
-    border: 1px solid var(--admonition-help-border-color);
-    border-left: .2em solid var(--admonition-help-foreground-color);
+    border: var(--admonition-border-width) solid var(--admonition-help-border-color);
+    border-left: var(--admonition-border-width-left) solid var(--admonition-help-foreground-color);
     background-color: var(--admonition-help-background-color);
 }
 details.admonition.alert {
-    border: 1px solid var(--admonition-alert-border-color);
-    border-left: .2em solid var(--admonition-alert-foreground-color);
+    border: var(--admonition-border-width) solid var(--admonition-alert-border-color);
+    border-left: var(--admonition-border-width-left) solid var(--admonition-alert-foreground-color);
     background-color: var(--admonition-alert-background-color);
 }
 

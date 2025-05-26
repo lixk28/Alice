@@ -29,6 +29,7 @@ div.tab > div.tab-content {
     border-top-right-radius: .2em;
     border-bottom-right-radius: .2em;
     border-bottom-left-radius: .2em;
+    box-shadow: .1em .1em lightslategray;
 }
 
 
@@ -96,6 +97,7 @@ div.tab-content-container {
     border-top-right-radius: .2em;
     border-bottom-right-radius: .2em;
     border-bottom-left-radius: .2em;
+    box-shadow: .1em .1em lightslategray;
 }
 
 div.tab-content-container > div.tab-content {
