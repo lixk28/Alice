@@ -20,6 +20,7 @@
 @import "quote.css";
 @import "friend.css";
 @import "dropcap.css";
+@import "taxo.css";
 
 * {
     box-sizing: border-box;

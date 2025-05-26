@@ -2,9 +2,25 @@
 <main>
     {{ with .Title }}<h1>{{ . }}</h1>{{ end }}
     <ul class="categories">
-        {{ range .Site.Taxonomies.categories }}
-        <li><a href="{{ .Page.RelPermalink }}">[{{ .Page.Title }}]</a> ({{ .Count }})</li>
+        {{ $orderedTaxo := .Data.Terms.ByCount }}
+        {{ $tagCnt := len $orderedTaxo }}
+        {{/* FIXME: bin count should be configurable */}}
+        {{ $binCnt := math.Min 10 $tagCnt | int }}
+        {{ $step := div $tagCnt $binCnt }}
+
+        {{/* Map tag to bin index */}}
+        {{ $binMap := dict }}
+        {{ range $i, $taxo := $orderedTaxo }}
+            {{ $binIdx := div $i $step }}
+            {{ $binMap = merge $binMap (dict .Term $binIdx) }}
         {{ end }}
+
+        {{ range ($orderedTaxo | shuffle) }}
+        <li class="tag bin-{{ index $binMap .Term }}"><a href="{{ .Page.RelPermalink }}">[{{ .Page.Title }}]</a> ({{ .Count }})</li>
+        {{ end }}
+        <!-- {{ range .Site.Taxonomies.categories }}
+        <li><a href="{{ .Page.RelPermalink }}">[{{ .Page.Title }}]</a> ({{ .Count }})</li>
+        {{ end }} -->
     </ul>
 </main>
 {{ end }}
