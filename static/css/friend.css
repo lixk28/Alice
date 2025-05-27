@@ -24,6 +24,21 @@ a.friend-card-anchor:hover {
     bottom: 0.1em !important;
 }
 
+/* dead friend */
+a.friend-card-anchor.dead {
+    border-color: black !important;
+    color: black !important;
+    background-color: gainsboro !important;
+}
+a.friend-card-anchor.dead img {
+    filter: grayscale(100%);
+    -webkit-filter: grayscale(100%);
+}
+/* it's dead so it cannot jump */
+a.friend-card-anchor.dead:hover {
+    bottom: 0 !important;
+}
+
 
 div.friend-avatar {
     display: flex;

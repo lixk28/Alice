@@ -39,7 +39,8 @@ Example friend data file:
         "content": "https://your.cool/avatar.webp"
     },
     "website": "https://your.cool.site",
-    "koukando": 99
+    "koukando": 99,
+    "dead": false
 }
 ```
 {{< /tab >}}
@@ -54,6 +55,7 @@ avatar:
   content: https://your.cool/avatar.webp
 website: https://your.cool.site
 koukando: 99
+dead: false
 ```
 {{< /tab >}}
 
@@ -67,6 +69,7 @@ tagline = "Your cool tagline"
     content = "https://your.cool/avatar.webp"
 website = "https://your.cool.site"
 koukando = 99
+dead = false
 ```
 {{< /tab >}}
 
@@ -81,6 +84,7 @@ koukando = 99
 </avatar>
 <website>https://your.cool.site</website>
 <koukando>99</koukando>
+<dead>false</dead>
 ```
 {{< /tab >}}
 
@@ -90,6 +94,8 @@ koukando = 99
 `avatar` also supports SVG, change `kind` to `svg` and fill the `content` with the raw `svg` markup string.
 
 `koukando` is the weight that will be used for sorting your friends in `frienmily` shortcode. It's the romaji of "好感度" in Japanese kanji (it's also of the same meaning and orthography in Chinese), `koukando` basically stands for "favorability" in English.
+
+So human/animal dies... `dead` is `true` if your friend dies, or his/her website dies... The dead friend will still be rendered and displayed, but the card style will be "dead", looking black and gray, the avatar will be converted to grayscale image.
 
 The other data fields are easy to understand.
 {{< /info >}}
