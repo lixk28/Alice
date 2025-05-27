@@ -83,7 +83,8 @@ svg.code-block-copy-icon {
     height: 3ch;
 }
 
-svg.code-block-check-icon {
+svg.code-block-check-icon,
+svg.code-block-close-icon {
     visibility: hidden;
     position: absolute;
     top: .5ch;
