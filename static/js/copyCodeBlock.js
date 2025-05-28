@@ -20,38 +20,61 @@ async function copyCodeBlock(copyBtn) {
     var copyIcon = copyBtn.querySelector('svg.code-block-copy-icon');
     var checkIcon = copyBtn.querySelector('svg.code-block-check-icon');
     var closeIcon = copyBtn.querySelector('svg.code-block-close-icon');
+    var tooltip = copyBtn.querySelector('span.code-block-copy-tooltip');
 
-    // Make copy button unclickable during the timeout
-    copyBtn.style.pointerEvents = "none";
-    copyIcon.style.visibility = "hidden";
-    checkIcon.style.visibility = "visible";
-    closeIcon.style.visibility = "hidden";
-
-    const timeout = 2000;
-    const onFail = (error) => {
-        console.error('AsyncCopy: Could not copy text: ', error);
-        alert(`Oops! Failed to copy! ${error}`);
-
-        copyBtn.style.pointerEvents = "none";
-        copyIcon.style.visibility = "hidden";
-        checkIcon.style.visibility = "hidden";
-        closeIcon.style.visibility = "visible";
-
-        setTimeout(() => {
-            copyBtn.style.pointerEvents = "";
+    function setCopyState(state) {
+        if (state === "default") {
+            tooltip.innerText = tooltip.dataset.tipText;
             copyIcon.style.visibility = "visible";
             checkIcon.style.visibility = "hidden";
             closeIcon.style.visibility = "hidden";
+            copyBtn.style.pointerEvents = "";
+        } else if (state === "success") {
+            copyBtn.style.pointerEvents = "none";
+            copyIcon.style.visibility = "hidden";
+            checkIcon.style.visibility = "visible";
+            closeIcon.style.visibility = "hidden";
+            tooltip.innerText = tooltip.dataset.successText;
+        } else if (state === "failure") {
+            copyBtn.style.pointerEvents = "none";
+            copyIcon.style.visibility = "hidden";
+            checkIcon.style.visibility = "hidden";
+            closeIcon.style.visibility = "visible";
+            tooltip.innerText = tooltip.dataset.failureText;
+        }
+    }
+
+    function onTooltipDisappear() {
+        setCopyState("default");
+        tooltip.removeEventListener("transitionend", onTooltipDisappear, false);
+    }
+
+    const timeout = 2000;
+    // const duration = parseFloat(getComputedStyle(tooltip).transitionDuration) * 1000;
+
+    const onFail = (error) => {
+        console.error('AsyncCopy: Could not copy text: ', error);
+        // alert(`Oops! Failed to copy! ${error}`);
+
+        setCopyState("failure");
+        tooltip.classList.add("active");
+
+        setTimeout(() => {
+            // IMPORTANT: Wait for the hovering transition to finish
+            tooltip.addEventListener("transitionend", onTooltipDisappear);
+            tooltip.classList.remove("active");
         }, timeout);
     };
 
     return getCodeChroma(copyBtn).then((code) => {
         return navigator.clipboard.writeText(code).then(() => {
+            setCopyState("success");
+            tooltip.classList.add("active");
+
             setTimeout(() => {
-                copyBtn.style.pointerEvents = "";
-                copyIcon.style.visibility = "visible";
-                checkIcon.style.visibility = "hidden";
-                closeIcon.style.visibility = "hidden";
+                // IMPORTANT: Wait for the hovering transition to finish
+                tooltip.addEventListener("transitionend", onTooltipDisappear);
+                tooltip.classList.remove("active");
             }, timeout);
         }, onFail);
     }, onFail);

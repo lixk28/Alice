@@ -59,6 +59,43 @@ div.code-block-copy-btn {
     height: 0;
 }
 
+div.code-block-copy-icon-wrapper:hover  {
+    background-color: white;
+}
+div.code-block-copy-icon-wrapper:hover + span.code-block-copy-tooltip {
+    /* visibility: visible !important; */
+    opacity: 1 !important;
+}
+
+span.code-block-copy-tooltip.active {
+    /* visibility: visible !important; */
+    opacity: 1 !important;
+}
+
+span.code-block-copy-tooltip {
+    pointer-events: none;
+    position: absolute;
+    top: .2em;
+    right: 5ch;
+    /* visibility: hidden !important; */
+    opacity: 0 !important;
+    transition: opacity ease-in-out 300ms;
+
+    border-radius: .3em;
+    padding: .2em .3em;
+    color: white;
+    background-color: dimgray;
+}
+span.code-block-copy-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 35%;
+    left: 100%;
+    border-width: .3em;
+    border-style: solid;
+    border-color: transparent transparent transparent dimgray;
+}
+
 div.code-block-copy-icon-wrapper {
     display: block;
     position: absolute;
@@ -72,9 +109,6 @@ div.code-block-copy-icon-wrapper {
     border: 1px solid LightGray;
     -webkit-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
-}
-div.code-block-copy-icon-wrapper:hover {
-    background-color: White;
 }
 
 svg.code-block-copy-icon {
