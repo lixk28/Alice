@@ -20,6 +20,7 @@ async function copyCodeBlock(copyBtn) {
     var copyIcon = copyBtn.querySelector('svg.code-block-copy-icon');
     var checkIcon = copyBtn.querySelector('svg.code-block-check-icon');
     var closeIcon = copyBtn.querySelector('svg.code-block-close-icon');
+    var tooltip = copyBtn.querySelector('span.code-block-copy-tooltip');
 
     // Make copy button unclickable during the timeout
     copyBtn.style.pointerEvents = "none";
@@ -36,22 +37,31 @@ async function copyCodeBlock(copyBtn) {
         copyIcon.style.visibility = "hidden";
         checkIcon.style.visibility = "hidden";
         closeIcon.style.visibility = "visible";
+        tooltip.innerText = tooltip.dataset.failureText;
+        tooltip.style.opacity = 1;
 
         setTimeout(() => {
             copyBtn.style.pointerEvents = "";
             copyIcon.style.visibility = "visible";
             checkIcon.style.visibility = "hidden";
             closeIcon.style.visibility = "hidden";
+            tooltip.style.opacity = 0;
+            tooltip.innerText = tooltip.dataset.tipText;
         }, timeout);
     };
 
     return getCodeChroma(copyBtn).then((code) => {
         return navigator.clipboard.writeText(code).then(() => {
+            tooltip.innerText = tooltip.dataset.successText;
+            tooltip.style.opacity = 1;
+
             setTimeout(() => {
                 copyBtn.style.pointerEvents = "";
                 copyIcon.style.visibility = "visible";
                 checkIcon.style.visibility = "hidden";
                 closeIcon.style.visibility = "hidden";
+                tooltip.style.opacity = 0;
+                tooltip.innerText = tooltip.dataset.tipText;
             }, timeout);
         }, onFail);
     }, onFail);

@@ -27,7 +27,9 @@
 
     {{ $noLineNumber := or (not (isset .Options "linenos")) (eq .Options.linenos false) }}
     {{ $chromaElement := cond $noLineNumber `<pre tabindex="0" class="chroma">` `<div class="chroma">` }}
-    {{ $chromaElementWithCopy := printf `%s<div class="code-block-copy-btn" onclick="copyCodeBlock(this)"><div class="code-block-copy-icon-wrapper">%s%s%s</div></div>` $chromaElement $copySVG $checkSVG $closeSVG }}
+    {{/* FIXME: These tooltip texts should be configurable */}}
+    {{ $toolTipElement := `<span class="code-block-copy-tooltip" data-tip-text="Copy!" data-success-text="Copied!" data-failure-text="Failed...">Copy!</span>` }}
+    {{ $chromaElementWithCopy := printf `%s<div class="code-block-copy-btn" onclick="copyCodeBlock(this)"><div class="code-block-copy-icon-wrapper">%s%s%s</div>%s</div>` $chromaElement $copySVG $checkSVG $closeSVG $toolTipElement }}
 
     {{ $codeWrapped = replace $codeWrapped $chromaElement $chromaElementWithCopy }}
 {{ end }}
