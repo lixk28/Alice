@@ -59,8 +59,12 @@ div.code-block-copy-btn {
     height: 0;
 }
 
-div.code-block-copy-icon-wrapper:hover  {
+div.code-block-copy-icon-wrapper:hover {
     background-color: white;
+    box-shadow: 2px 2px gray;
+}
+div.code-block-copy-icon-wrapper:hover svg {
+    stroke: blue
 }
 div.code-block-copy-icon-wrapper:hover + span.code-block-copy-tooltip {
     /* visibility: visible !important; */
@@ -106,12 +110,17 @@ div.code-block-copy-icon-wrapper {
     height: 4ch;
     background-color: GhostWhite;
     border-radius: 20%;
-    border: 1px solid LightGray;
+    border: 1px solid silver;
+    box-shadow: 2px 2px silver;
     -webkit-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
 }
 
 svg.code-block-copy-icon {
+    stroke: royalblue;
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
     visibility: visible;
     width: 3ch;
     height: 3ch;
@@ -119,6 +128,10 @@ svg.code-block-copy-icon {
 
 svg.code-block-check-icon,
 svg.code-block-close-icon {
+    stroke: navy;
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
     visibility: hidden;
     position: absolute;
     top: .5ch;
