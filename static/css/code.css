@@ -77,10 +77,12 @@ span.code-block-copy-tooltip.active {
 }
 
 span.code-block-copy-tooltip {
+    font-family: var(--mono-font), monospace;
+    white-space: pre;
     pointer-events: none;
     position: absolute;
-    top: .2em;
-    right: 5ch;
+    top: 1ch;
+    right: 6ch;
     /* visibility: hidden !important; */
     opacity: 0 !important;
     transition: opacity ease-in-out 300ms;
@@ -181,6 +183,10 @@ div.highlight > pre.chroma > code > span {
 div.highlight > pre.chroma div.code-block-copy-icon-wrapper {
     top: 0;
     right: 0;
+}
+div.highlight > pre.chroma span.code-block-copy-tooltip {
+    top: .2em;
+    right: 5ch;
 }
 
 /* highlighted lines are not full width in code block with linenos=true... */
