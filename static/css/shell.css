@@ -11,9 +11,9 @@ div.shell-cmd-wrapper {
     background-color: whitesmoke;
 }
 
+
 /* prompt and command */
 div.shell-cmd-container {
-    /* border: 1px solid red; */
     display: flex;
     flex-direction: row;
     align-items: start;
@@ -22,14 +22,19 @@ div.shell-cmd-container {
     overflow: auto;
 }
 
+div.shell-cmd-container.line {
+    flex-wrap: nowrap;
+}
+
 div.shell-ps1-info {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
     color: green;
-    padding: .4em 1ch;
+    white-space: pre;
+    /* padding: .4em 1ch; */
+    padding: .4em 0 .4em 1ch;
     border-radius: .3em;
-    /* border: 1px solid silver; */
 }
 
 div.shell-ps1-symbol {
