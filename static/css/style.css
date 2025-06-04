@@ -21,6 +21,7 @@
 @import "friend.css";
 @import "dropcap.css";
 @import "taxo.css";
+@import "shell.css";
 
 * {
     box-sizing: border-box;

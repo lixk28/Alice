@@ -1,0 +1,12 @@
+{{/* Must be used inside of the cmd shortcode */}}
+
+{{ $isInsideCmd := and .Parent (eq .Parent.Name "cmd") }}
+
+{{ if $isInsideCmd }}
+    {{ $output := .InnerDeindent | strings.TrimSpace }}
+    {{ if not (.Parent.Scratch.Get "output") }}
+        {{ .Parent.Scratch.Set "output" $output }}
+    {{ end }}
+{{ else }}
+    {{ errorf `The %q shortcode can only be used inside the cmd shortcode. See %s` .Name .Position }}
+{{ end }}

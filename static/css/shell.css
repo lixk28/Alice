@@ -1,0 +1,105 @@
+/* single command */
+div.shell-cmd-container {
+    font-family: var(--mono-font), monospace;
+    font-size: var(--font-size-normal);
+
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    flex-wrap: wrap;
+
+    margin: 1em 0;
+
+    border-radius: .3em;
+    border: 2px solid silver;
+    box-shadow: .2em .2em gray;
+    background-color: whitesmoke;
+
+    overflow: auto;
+}
+
+
+div.shell-ps1-info {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    color: green;
+    padding: .4em 1ch;
+    border-radius: .3em;
+    /* border: 1px solid silver; */
+}
+
+div.shell-ps1-symbol {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    color: purple;
+    padding: .4em 0;
+}
+
+div.shell-cmd {
+    padding: .4em 1ch;
+    /* white-space: nowrap; */
+    /* white-space: pre-wrap; */
+    /* white-space: pre; */
+    white-space: pre-line;
+    /* overflow-x: auto; */
+    flex-grow: 1;
+}
+
+div.shell-cmd-output {
+    border-top: 2px dashed silver;
+    padding: .4em 1ch 1ch 1ch;
+    white-space: pre;
+    max-height: 80vh;
+    flex-grow: 1;
+    width: 100%;
+}
+
+
+div.shell-cmd-container.auto > div.shell-ps1-info,
+div.shell-cmd-container.block > div.shell-ps1-info {
+    width: 100%;
+}
+
+div.shell-cmd-container.auto > div.shell-ps1-symbol,
+div.shell-cmd-container.block > div.shell-ps1-symbol {
+    padding-top: 0;
+    padding-left: 1ch;
+    flex-shrink: 1;
+}
+
+div.shell-cmd-container.auto > div.shell-cmd,
+div.shell-cmd-container.block > div.shell-cmd {
+    padding-top: 0;
+}
+
+
+/* commands inside of shell */
+div.shell-container {
+    margin: 1em 0;
+    border-radius: .3em;
+    border: 2px solid silver;
+    box-shadow: .2em .2em gray;
+    overflow-y: auto;
+    max-height: 80vh;
+}
+div.shell-container div.shell-cmd-container {
+    margin: 0;
+    border-radius: 0;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 2px solid silver;
+    box-shadow: none;
+}
+div.shell-container div.shell-cmd-container:first-child {
+    border-top-left-radius: .3em;
+    border-top-right-radius: .3em;
+}
+div.shell-container div.shell-cmd-container:last-child {
+    border-bottom-left-radius: .3em;
+    border-bottom-right-radius: .3em;
+    border-bottom: none;
+}

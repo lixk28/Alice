@@ -1,0 +1,49 @@
+{{ $user := .Get "user" | default "root" }}
+{{ $host := .Get "host" | default "localhost" }}
+{{ $workdir := .Get "workdir" | default "~" }}
+{{ $symbol := .Get "symbol" | default "$" }}
+{{ $ps1 := .Get "PS1" | default "%s@%s:%s %s" }}
+{{ $prompt := printf $ps1 $user $host $workdir $symbol }}
+{{ $copyable := .Get "copyable" | default false }}
+{{/* "auto", "line" or "block" */}}
+{{ $layout := .Get "layout" | default "auto" }}
+
+{{ $infoStr := $prompt | strings.TrimSuffix $symbol }}
+{{ $symbolStr := $symbol | strings.TrimSpace }}
+{{ $inner := .InnerDeindent | strings.TrimSpace }}
+{{ $output := "" }}
+{{ with .Scratch.Get "output" }}
+    {{ $output = . }}
+{{ end }}
+
+{{ $isInsideShell := and .Parent (eq .Parent.Name "shell") }}
+
+{{ if $isInsideShell }}
+
+{{/* A Command inside a shell */}}
+{{ $shellScratch := .Parent.Scratch }}
+{{ if not ($shellScratch.Get "cmds") }}
+    {{ $shellScratch.Set "cmds" slice }}
+{{ end }}
+{{ $shellScratch.Add "cmds" (dict
+    "layout" $layout
+    "copyable" $copyable
+    "info" $infoStr
+    "symbol" $symbolStr
+    "inner" $inner
+    "output" $output
+)}}
+
+{{ else }}
+
+{{/* An orphan command with optional output */}}
+<div class="shell-cmd-container {{ $layout }}">
+    <div class="shell-ps1-info">{{ $infoStr }}</div>
+    <div class="shell-ps1-symbol">{{ $symbolStr }}</div>
+    <div class="shell-cmd" data-cmd="{{ $inner }}">{{ $inner }}</div>
+    {{ with $output }}
+    <div class="shell-cmd-output">{{ . }}</div>
+    {{ end }}
+</div>
+
+{{ end }}

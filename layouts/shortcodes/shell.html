@@ -1,0 +1,15 @@
+{{- /* shortcodes must invoke the freaking .Inner */ -}}
+{{- if .Inner -}}{{- end -}}
+
+<div class="shell-container">
+{{ range $cmdIdx, $cmd := .Scratch.Get "cmds" }}
+    <div class="shell-cmd-container {{ $cmd.layout }}">
+        <div class="shell-ps1-info">{{ $cmd.info }}</div>
+        <div class="shell-ps1-symbol">{{ $cmd.symbol }}</div>
+        <div class="shell-cmd" data-cmd="{{ $cmd.inner }}">{{ $cmd.inner }}</div>
+        {{ with $cmd.output }}
+        <div class="shell-cmd-output">{{ . }}</div>
+        {{ end }}
+    </div>
+{{ end }}
+</div>
