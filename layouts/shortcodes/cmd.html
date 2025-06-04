@@ -5,8 +5,8 @@
 {{ $ps1 := .Get "PS1" | default "%s@%s:%s %s" }}
 {{ $prompt := printf $ps1 $user $host $workdir $symbol }}
 {{ $copyable := .Get "copyable" | default false }}
-{{/* "auto", "line" or "block" */}}
-{{ $layout := .Get "layout" | default "auto" }}
+{{/* "line" or "block" */}}
+{{ $layout := .Get "layout" | default "line" }}
 
 {{ $infoStr := $prompt | strings.TrimSuffix $symbol }}
 {{ $symbolStr := $symbol | strings.TrimSpace }}

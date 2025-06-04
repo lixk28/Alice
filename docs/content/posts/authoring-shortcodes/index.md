@@ -228,12 +228,7 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
 
 Display commands and their outputs.
 
-Auto layout:
-{{< cmd >}}
-ls -al
-{{< /cmd >}}
-
-Line layout:
+Line layout (default):
 {{< cmd layout="line" >}}
 ls -al
 {{< /cmd >}}
@@ -245,12 +240,14 @@ ls -al
 
 Multi-line commands:
 
+Line layout:
 {{< cmd layout="line" >}}
 ls -al \
 qwd \
 qdwwqd
 {{< /cmd >}}
 
+Block layout:
 {{< cmd layout="block" >}}
 ls -al \
 qwd \
@@ -260,7 +257,15 @@ qdwwqd
 ### Command Outputs
 
 Command with outputs:
-
+{{< cmd layout="line" >}}
+ls -al ls -al ls -al ls -al ls -al
+{{< cmdout >}}
+total 240
+drwx------. 34 xack xack  4096 Jun  3 02:43 .
+drwxr-xr-x.  4 root root  4096 May  4 02:02 ..
+drwxr-xr-x.  9 xack xack  4096 May 29 00:54 Alice
+{{< /cmdout >}}
+{{< /cmd >}}
 
 {{< cmd layout="block" >}}
 ls -al
