@@ -1,13 +1,7 @@
 /* single command */
-div.shell-cmd-container {
+div.shell-cmd-wrapper {
     font-family: var(--mono-font), monospace;
     font-size: var(--font-size-normal);
-
-    /* border: 1px solid red; */
-    display: flex;
-    flex-direction: row;
-    align-items: start;
-    flex-wrap: wrap;
 
     margin: 1em 0;
 
@@ -15,10 +9,18 @@ div.shell-cmd-container {
     border: 2px solid silver;
     box-shadow: .2em .2em gray;
     background-color: whitesmoke;
+}
+
+/* prompt and command */
+div.shell-cmd-container {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    flex-wrap: wrap;
 
     overflow: auto;
 }
-
 
 div.shell-ps1-info {
     -webkit-user-select: none;
@@ -40,14 +42,11 @@ div.shell-ps1-symbol {
 
 div.shell-cmd {
     padding: .4em 1ch;
-    /* white-space: nowrap; */
-    /* white-space: pre-wrap; */
-    /* white-space: pre; */
-    white-space: pre-line;
-    /* overflow-x: auto; */
+    white-space: pre;
     flex-grow: 1;
 }
 
+/* command output */
 div.shell-cmd-output {
     border-top: 2px dashed silver;
     padding: .4em 1ch 1ch 1ch;
@@ -55,6 +54,8 @@ div.shell-cmd-output {
     max-height: 80vh;
     flex-grow: 1;
     width: 100%;
+
+    overflow: auto;
 }
 
 
@@ -85,7 +86,7 @@ div.shell-container {
     overflow-y: auto;
     max-height: 80vh;
 }
-div.shell-container div.shell-cmd-container {
+div.shell-container div.shell-cmd-wrapper {
     margin: 0;
     border-radius: 0;
     border-top: none;
@@ -94,11 +95,11 @@ div.shell-container div.shell-cmd-container {
     border-bottom: 2px solid silver;
     box-shadow: none;
 }
-div.shell-container div.shell-cmd-container:first-child {
+div.shell-container div.shell-cmd-wrapper:first-child {
     border-top-left-radius: .3em;
     border-top-right-radius: .3em;
 }
-div.shell-container div.shell-cmd-container:last-child {
+div.shell-container div.shell-cmd-wrapper:last-child {
     border-bottom-left-radius: .3em;
     border-bottom-right-radius: .3em;
     border-bottom: none;

@@ -37,13 +37,14 @@
 {{ else }}
 
 {{/* An orphan command with optional output */}}
-<div class="shell-cmd-container {{ $layout }}">
-    <div class="shell-ps1-info">{{ $infoStr }}</div>
-    <div class="shell-ps1-symbol">{{ $symbolStr }}</div>
-    <div class="shell-cmd" data-cmd="{{ $inner }}">{{ $inner }}</div>
+<div class="shell-cmd-wrapper">
+    <div class="shell-cmd-container {{ $layout }}">
+        <div class="shell-ps1-info">{{ $infoStr }}</div>
+        <div class="shell-ps1-symbol">{{ $symbolStr }}</div>
+        <div class="shell-cmd" data-cmd="{{ $inner }}">{{ $inner }}</div>
+    </div>
     {{ with $output }}
     <div class="shell-cmd-output">{{ . }}</div>
     {{ end }}
 </div>
-
 {{ end }}
