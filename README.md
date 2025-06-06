@@ -1,8 +1,6 @@
 # Hugo Alice
 
-*MistY's OWN* hugo theme.
-
-**DISCLAIMER**: This theme is initially made for my own blog, I have been developed it in my spare time as entertaining for more than one year. Now I'm just tired of maintaining blog contents and its html/css/js in the same time, and some templates and code are very nasty since it's hardcoded and involves my personal customizations and contents. It's under pre-release stage and there might be breaking changes, use it at your own risk. The alpha release is scheduled on 2024-12-31.
+*MistY's OWN* hugo theme for blogging.
 
 ## Installation
 
@@ -24,17 +22,17 @@ Now only *part* of the "Authoring Shortcodes" section is documented.
 
 Build documentation locally:
 ```
-hugo server --source=exampleSite
+hugo server --source=docs
 ```
 
 Then go to `http://localhost:1313`.
 
 ## Contribution
 
-Bug fixes are always welcome.
+New features: Please draft a proposal first before sending your PR.
 
-Please fire an issue to draft a proposal first if you want some new feature.
+Bugs: Bug fixes are always welcome. If you find a bug, fire an issue, I will fix it tomorrow.
 
 ## License
 
-Hugo-Alice theme is licensed under the [DBADPL](https://dbad-license.org/).
+Hugo-Alice is licensed under the [DBADPL](https://dbad-license.org/).
