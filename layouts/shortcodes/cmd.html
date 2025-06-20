@@ -7,6 +7,7 @@
 {{ $copyable := .Get "copyable" | default false }}
 {{/* "line" or "block" */}}
 {{ $layout := .Get "layout" | default "line" }}
+{{ $showInfo := .Get "showinfo" | default false }}
 
 {{ $infoStr := $prompt | strings.TrimSuffix $symbol }}
 {{ $symbolStr := $symbol | strings.TrimSpace }}
@@ -39,8 +40,12 @@
 {{/* An orphan command with optional output */}}
 <div class="shell-cmd-wrapper">
     <div class="shell-cmd-container {{ $layout }}">
+        {{ if $showInfo }}
         <div class="shell-ps1-info">{{ $infoStr }}</div>
         <div class="shell-ps1-symbol">{{ $symbolStr }}</div>
+        {{ else }}
+        <div class="shell-ps1-symbol-only">{{ $symbolStr }}</div>
+        {{ end }}
         <div class="shell-cmd" data-cmd="{{ $inner }}">{{ $inner }}</div>
     </div>
     {{ with $output }}

@@ -234,7 +234,7 @@ ls -al
 {{< /cmd >}}
 
 Block layout:
-{{< cmd layout="block" >}}
+{{< cmd layout="block" showinfo="yes" >}}
 ls -al
 {{< /cmd >}}
 

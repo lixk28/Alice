@@ -28,6 +28,7 @@ div.shell-cmd-container.block {
     flex-wrap: wrap;
 }
 
+/* ps1 with user, hostname, workdir and symbol */
 div.shell-ps1-info {
     -webkit-user-select: none;
     -ms-user-select: none;
@@ -35,7 +36,7 @@ div.shell-ps1-info {
     color: green;
     white-space: pre;
     /* padding: .4em 1ch; */
-    padding: .4em 0 .4em 1ch;
+    padding: .4em 0 0 1ch;
     border-radius: .3em;
 }
 
@@ -45,6 +46,15 @@ div.shell-ps1-symbol {
     user-select: none;
     color: purple;
     padding: .4em 0;
+}
+
+/* ps1 with only the symbol */
+div.shell-ps1-symbol-only {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    color: purple;
+    padding: .4em 0 .4em .4em;
 }
 
 div.shell-cmd {
@@ -70,12 +80,8 @@ div.shell-cmd-container.block > div.shell-ps1-info {
     width: 100%;
 }
 div.shell-cmd-container.block > div.shell-ps1-symbol {
-    padding-top: 0;
     padding-left: 1ch;
     flex-shrink: 1;
-}
-div.shell-cmd-container.block > div.shell-cmd {
-    padding-top: 0;
 }
 
 
