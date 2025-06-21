@@ -61,7 +61,7 @@ div#header-bg {
 div#blogo {
     float: left;
 }
-img#blogo {
+div#blogo a img {
     margin: 0 auto;
     max-width: 144px;
     max-height: var(--header-height);
