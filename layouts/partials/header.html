@@ -30,7 +30,7 @@
 		{{- $isExternal := ne $logoTarget "baseurl" -}}
 		{{- $targetUrl := cond (eq $logoTarget "baseurl") site.BaseURL (cond (eq $logoTarget "imgurl") $blogoLink $logoTarget) -}}
 		<a href="{{ $targetUrl }}" {{ if $isExternal }} target="_blank" {{ end }}>
-			<img id="blogo" alt="blogo" src="{{ $blogoLink }}"/>
+		    <img alt="blogo" src="{{ $blogoLink }}"/>
 		</a>
 	</div>
 	{{- end -}}
