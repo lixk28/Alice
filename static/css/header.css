@@ -214,6 +214,10 @@ div.hamburger-menu-item {
         margin: 0 0 0 1ch;
     }
 
+    header#header-with-toc div#bio {
+        display: none;
+    }
+
     nav#menu {
         display: none;
     }
