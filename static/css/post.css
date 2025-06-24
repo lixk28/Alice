@@ -79,3 +79,27 @@ aside#sidenotes {
         box-shadow: none;
     }
 }
+
+@media screen and (max-width: 1080px) {
+
+    /* Make post-meta items display as block on small screens */
+    article .post-meta span.post-meta-item {
+        display: block;
+        margin: 0.5em 0;
+    }
+
+    /* Hide separators on small screens */
+    article .post-meta span:not(.post-meta-item) {
+        display: none;
+    }
+
+    /* Remove white-space: nowrap on small screens to allow wrapping */
+    article .post-meta {
+        white-space: normal;
+    }
+
+    /* Add space between post-date and lastmod-date on small screens */
+    article .post-meta .post-lastmod-date-icon {
+        margin-left: 1em;
+    }
+}
