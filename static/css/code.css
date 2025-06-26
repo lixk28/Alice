@@ -198,3 +198,14 @@ div.chroma table.lntable td.lntd:last-child {
 div.chroma .hl {
     display: block !important;
 }
+
+pre.mermaid {
+    display: flex;
+}
+
+pre.mermaid svg {
+    width: 100%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
