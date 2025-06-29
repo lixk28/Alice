@@ -15,6 +15,8 @@
         blogo = "HugoAliceLogo.webp"
         title = "Hugo Alice"
         tagline = "so damn classic"
+        # "baseurl" or "imgurl" or "https://somewhere.com"
+        logoTarget = "baseurl"
 
     [params.footer]
         # Should display site generator (Hugo) and theme (Alice) 🥰
