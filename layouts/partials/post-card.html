@@ -30,6 +30,9 @@
 			"metaItemSep" ""
 		) -}}
 		{{- partial "post-tldr.html" . -}}
+        {{- if site.Params.postcard.showDescription -}}
+            <p class="post-description">{{ .Description | markdownify | safeHTML }}</p>
+        {{- end -}}
 		<a class="post-read-more" href="{{ .Permalink }}">Read more >>></a>
 	</div>
 </div>
