@@ -110,6 +110,9 @@
         # fancybox or glightbox
         vendor = 'fancybox'
 
+    [params.postcard]
+        showDescription = false
+
     # waline v3 comment system
     [params.waline]
         enable = false
