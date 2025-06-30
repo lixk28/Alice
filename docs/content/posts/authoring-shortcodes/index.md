@@ -380,6 +380,24 @@ https://gohugo.io/content-management/diagrams/#goat-diagrams-ascii
 
 https://gohugo.io/content-management/diagrams/#mermaid-diagrams
 
+````md
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+````
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
 ## Marks
 
 If this <mark>word</mark> has yellow background color and black font color on your screen,
