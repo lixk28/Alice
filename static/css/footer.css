@@ -1,7 +1,7 @@
 footer {
     clear: both;
     display: block;
-    font-family: var(--serif-font);
+    font-family: var(--sans-font);
     float: none;
     padding: 1ch;
     box-shadow: 0 -2px 8px var(--post-card-shadow-color);

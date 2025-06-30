@@ -10,12 +10,12 @@ table {
 }
 
 table > caption {
-    font-family: var(--serif-font);
+    font-family: var(--sans-font);
     color: dimgray;
 }
 
 th {
-    font-family: var(--serif-font);
+    font-family: var(--sans-font);
     font-weight: bold;
     background-color: whitesmoke;
     border: 2px solid lightslategray;
