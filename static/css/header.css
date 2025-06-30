@@ -40,7 +40,7 @@ header {
     flex-direction: row;
     align-items: center;
 
-    font-family: var(--serif-font);
+    font-family: var(--sans-font);
 }
 
 /* header background color and bottom shadow */
@@ -79,14 +79,14 @@ div#bio {
     margin: 0 1em 0 1ch;
 }
 h1#title {
-    font-family: var(--serif-font);
+    font-family: var(--sans-font);
     font-size: var(--title-font-size);
     line-height: var(--title-font-size);
     margin: 0;
     padding: 0;
 }
 h3#tagline {
-    font-family: var(--serif-font);
+    font-family: var(--sans-font);
     font-size: var(--tagline-font-size);
     line-height: var(--tagline-font-size);
     margin: 1ch 0 0 0;
@@ -105,7 +105,7 @@ nav#menu {
     overflow-x: auto;
 
     height: 100%;
-    font-family: var(--serif-font);
+    font-family: var(--sans-font);
     font-size: var(--menu-font-size);
 
     /* align to the right */

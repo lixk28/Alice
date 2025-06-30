@@ -59,7 +59,7 @@ aside#sidetoc {
     position: sticky;
     top: var(--header-height);
     width: var(--post-sidetoc-proportion);
-    font-family: var(--serif-font);
+    font-family: var(--sans-font);
     font-size: var(--font-size-small);
     padding-right: 1ch;
 

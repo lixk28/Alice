@@ -49,7 +49,7 @@ a.post-next:hover {
 
 p.post-prev-title,
 p.post-next-title {
-    font-family: var(--serif-font);
+    font-family: var(--sans-font);
     font-size: var(--font-size);
     font-weight: bold;
 }
