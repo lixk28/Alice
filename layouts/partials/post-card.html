@@ -15,8 +15,10 @@
 <div class="post-card {{ $layout }}">
 	{{- with $thumb -}}
     <div class="post-thumb-container">
-		<a class="post-thumb-anchor" href="{{ .RelPermalink }}">
-        <img class="post-thumb" src="{{ .RelPermalink }}" loading="lazy"/>
+		{{- $thumbLink := cond (eq site.Params.postcard.thumbTarget "posturl") $.RelPermalink .RelPermalink -}}
+		{{- $thumbTarget := cond (eq site.Params.postcard.thumbTarget "posturl") "" "_blank" -}}
+		<a class="post-thumb-anchor" href="{{ $thumbLink }}" target="{{ $thumbTarget }}">
+			<img alt="{{ $.Title }}" class="post-thumb" src="{{ .RelPermalink }}" loading="lazy"/>
 		</a>
 	</div>
 	{{- end -}}
