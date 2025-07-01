@@ -111,6 +111,8 @@
         vendor = 'fancybox'
 
     [params.postcard]
+        # "posturl" or "imgurl"
+        thumbTarget = "posturl"
         showDescription = false
 
     # waline v3 comment system
