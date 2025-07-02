@@ -1,27 +1,71 @@
-{{/* print .Attributes */}}
-
-{{/* FIXME: The default values should be configurable */}}
-{{- $width := .Attributes.width | default "100%" -}}
-{{- $height := .Attributes.height | default "auto" -}}
-{{- $classes := .Attributes.classes | default "center" }}
-
-{{- $sizeCSS := printf "width: %s; height: %s;" $width $height }}
-{{- $isFloat := strings.Contains $classes "float" -}}
-
-{{- $lightboxVendor := .Page.Params.lightbox.vendor | default "none" }}
-
-<figure {{ with $classes }}class="{{ . }}"{{ end }} {{ if $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }} >
-    <a href="{{ $.Destination | safeURL }}"
-    {{- if eq $lightboxVendor "fancybox" -}}
+{{- $image_sizes := slice "420" "789" "1019" "1430" "2048" -}}
+{{- $image_quality := "Lanczos" -}}
+{{- $alt := .Text -}}
+{{- $label := .Text -}}
+{{- $caption := "" -}}
+{{- if ne .Title "" -}}
+  {{- $caption = .Title | $.Page.RenderString -}}
+  {{- $label = $caption -}}
+{{- end -}}
+{{- $image := .Page.Resources.GetMatch .Destination -}}
+{{- if and (not $image) .Page.File -}}
+  {{- $image = resources.Get (path.Join .Page.File.Dir .Destination) -}}
+{{- else -}}
+  {{- $image := resources.Get $image -}}
+{{- end -}}
+{{- with $image -}}
+  {{- $image_width := $image.Width -}}
+  {{- $image_height := $image.Height -}}
+  {{- if strings.Contains $image "_2x" -}}
+    {{- $image_width = math.Floor (math.Div $image_width 2) -}}
+    {{- $image_height = math.Floor (math.Div $image_height 2) -}}
+  {{- end -}}
+  {{- $fallback_image := ($image.Resize (print "789x jpg " $image_quality)) -}}
+  {{- $lightboxVendor := $.Page.Params.lightbox.vendor | default "none" }}
+  <figure role="figure" aria-label="{{- $label | plainify -}}">
+    <a href="{{- $image.RelPermalink -}}"
+      {{- if eq $lightboxVendor "fancybox" -}}
         data-fancybox="gallery"
-    {{- else if eq $lightboxVendor "glightbox" -}}
+      {{- else if eq $lightboxVendor "glightbox" -}}
         class="glightbox" data-gallery="gallery"
-    {{- end -}}
+      {{- end -}}
     >
-    <img loading="lazy" src="{{ .Destination | safeURL }}" {{ if not $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }}
-        {{- with .PlainText }} alt="{{ . }}"{{ end -}}
-        {{- with .Title }} title="{{ . }}"{{ end -}}
-    >
+      <img
+        alt="{{- $caption | markdownify | plainify -}}"
+        title="{{- $label | plainify -}}"
+        width="{{- $image_width -}}"
+        height="{{- $image_height -}}"
+        {{- if (or (strings.HasSuffix $image ".gif") (strings.HasSuffix $image ".svg")) -}}
+          src="{{- $image.RelPermalink -}}"
+        {{- else -}}
+          srcset="
+            {{- if le $image.Width (index $image_sizes 0) }}
+              {{- with $image.Resize (print $image.Width "x webp " $image_quality) -}}
+                {{- print .RelPermalink " " .Width "w, " -}}
+              {{- end -}}
+            {{- end -}}
+            {{- with $image_sizes -}}
+              {{- range $index, $size := . -}}
+                {{- if ge $image.Width $size -}}
+                  {{- with $image.Resize (print $size "x webp " $image_quality) -}}
+                    {{- print .RelPermalink " " $size "w, " -}}
+                  {{- end -}}
+                {{- end -}}
+              {{- end -}}
+            {{- end -}}
+          "
+          sizes="(min-width: 800px) 50vw, 100vw"
+          src="{{- $fallback_image.RelPermalink -}}"
+        {{- end -}}
+        {{- if strings.Contains $image "featured" -}}
+          loading="eager"
+          decoding="sync"
+        {{- else -}}
+          decoding="async"
+          loading="lazy"
+        {{- end -}}
+      />
     </a>
-    {{- with .Title }}<figcaption>{{ . | markdownify }}</figcaption>{{ end -}}
-</figure>
+    <figcaption>{{- $caption | markdownify -}}</figcaption>
+  </figure>
+{{- end -}}
