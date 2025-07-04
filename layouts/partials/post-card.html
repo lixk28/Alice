@@ -11,8 +11,14 @@
 		{{- $layout = "portrait" -}}
 	{{- end -}}
 {{- end -}}
-{{- $image_sizes := slice "420" "789" "1019" "1430" "2048" -}}
-{{- $image_quality := "Lanczos" -}}
+{{- $enable_imgproc := site.Params.imgproc.enable | default false -}}
+{{- $image_sizes := site.Params.imgproc.sizes | default (slice "420" "789" "1019" "1430" "2048") -}}
+{{- $resampling_filter := site.Params.imgproc.resamplingFilter | default "Lanczos" -}}
+{{- $image_quality_value := site.Params.imgproc.quality | default 75 -}}
+{{- $quality_filter := print "q" $image_quality_value " " $resampling_filter -}}
+{{- $fallback_size := site.Params.imgproc.fallbackSize | default "789" -}}
+{{- $fallback_format := site.Params.imgproc.fallbackFormat | default "jpg" -}}
+{{- $image_format := site.Params.imgproc.format | default "webp" -}}
 <div class="post-card-container">
 	<div class="post-card {{ $layout }}">
 		{{- with $thumb -}}
@@ -26,31 +32,31 @@
 					{{- $image_width = math.Floor (math.Div .Width 2) -}}
 					{{- $image_height = math.Floor (math.Div .Height 2) -}}
 				{{- end -}}
-				{{- $fallback_image := (.Resize (print "789x jpg " $image_quality)) -}}
 				<img
 					alt="{{ $.Title }}"
 					class="post-thumb"
 					width="{{- $image_width -}}"
 					height="{{- $image_height -}}"
-					{{- if (or (strings.HasSuffix . ".gif") (strings.HasSuffix . ".svg")) -}}
+					{{- if (or (strings.HasSuffix . ".gif") (strings.HasSuffix . ".svg") (not $enable_imgproc)) -}}
 						src="{{- .RelPermalink -}}"
 					{{- else -}}
+						{{- $fallback_image := (.Resize (print $fallback_size "x " $fallback_format " " $quality_filter)) -}}
 						srcset="
 							{{- if le .Width (index $image_sizes 0) }}
-								{{- with .Resize (print .Width "x webp " $image_quality) -}}
-									{{- print .RelPermalink " " .Width "w, " -}}
-								{{- end -}}
+							    {{- with .Resize (print .Width "x " $image_format " " $quality_filter) -}}
+							        {{- print .RelPermalink " " .Width "w, " -}}
+							    {{- end -}}
 							{{- end -}}
 							{{- range $index, $size := $image_sizes -}}
-								{{- if ge $thumb.Width $size -}}
-									{{- with $thumb.Resize (print $size "x webp " $image_quality) -}}
+							    {{- if ge $thumb.Width $size -}}
+							        {{- with $thumb.Resize (print $size "x " $image_format " " $quality_filter) -}}
 										{{- print .RelPermalink " " $size "w, " -}}
 									{{- end -}}
 								{{- end -}}
 							{{- end -}}
 						"
 						sizes="(min-width: 800px) 50vw, 100vw"
-						src="{{- $fallback_image.RelPermalink -}}"
+						src="{{- (.Resize (print $fallback_size "x " $fallback_format " " $quality_filter)).RelPermalink -}}"
 					{{- end -}}
 					loading="lazy"
 					decoding="async"

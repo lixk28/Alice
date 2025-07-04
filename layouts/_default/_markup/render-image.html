@@ -1,5 +1,11 @@
-{{- $image_sizes := slice "420" "789" "1019" "1430" "2048" -}}
-{{- $image_quality := "Lanczos" -}}
+{{- $enable_imgproc := site.Params.imgproc.enable | default false -}}
+{{- $image_sizes := site.Params.imgproc.sizes | default (slice "420" "789" "1019" "1430" "2048") -}}
+{{- $resampling_filter := site.Params.imgproc.resamplingFilter | default "Lanczos" -}}
+{{- $image_quality_value := site.Params.imgproc.quality | default 75 -}}
+{{- $quality_filter := print "q" $image_quality_value " " $resampling_filter -}}
+{{- $fallback_size := site.Params.imgproc.fallbackSize | default "789" -}}
+{{- $fallback_format := site.Params.imgproc.fallbackFormat | default "jpg" -}}
+{{- $image_format := site.Params.imgproc.format | default "webp" -}}
 {{- $alt := .Text -}}
 {{- $label := .Text -}}
 {{- $caption := "" -}}
@@ -20,7 +26,6 @@
     {{- $image_width = math.Floor (math.Div $image_width 2) -}}
     {{- $image_height = math.Floor (math.Div $image_height 2) -}}
   {{- end -}}
-  {{- $fallback_image := ($image.Resize (print "789x jpg " $image_quality)) -}}
   {{- $lightboxVendor := $.Page.Params.lightbox.vendor | default "none" }}
   <figure role="figure" aria-label="{{- $label | plainify -}}">
     <a href="{{- $image.RelPermalink -}}"
@@ -35,19 +40,20 @@
         title="{{- $label | plainify -}}"
         width="{{- $image_width -}}"
         height="{{- $image_height -}}"
-        {{- if (or (strings.HasSuffix $image ".gif") (strings.HasSuffix $image ".svg")) -}}
+        {{- if (or (strings.HasSuffix $image ".gif") (strings.HasSuffix $image ".svg") (not $enable_imgproc)) -}}
           src="{{- $image.RelPermalink -}}"
         {{- else -}}
+          {{- $fallback_image := ($image.Resize (print $fallback_size "x " $fallback_format " " $quality_filter)) -}}
           srcset="
             {{- if le $image.Width (index $image_sizes 0) }}
-              {{- with $image.Resize (print $image.Width "x webp " $image_quality) -}}
+              {{- with $image.Resize (print $image.Width "x " $image_format " " $quality_filter) -}}
                 {{- print .RelPermalink " " .Width "w, " -}}
               {{- end -}}
             {{- end -}}
             {{- with $image_sizes -}}
               {{- range $index, $size := . -}}
                 {{- if ge $image.Width $size -}}
-                  {{- with $image.Resize (print $size "x webp " $image_quality) -}}
+                  {{- with $image.Resize (print $size "x " $image_format " " $quality_filter) -}}
                     {{- print .RelPermalink " " $size "w, " -}}
                   {{- end -}}
                 {{- end -}}
@@ -55,7 +61,7 @@
             {{- end -}}
           "
           sizes="(min-width: 800px) 50vw, 100vw"
-          src="{{- $fallback_image.RelPermalink -}}"
+          src="{{- ($image.Resize (print $fallback_size "x " $fallback_format " " $quality_filter)).RelPermalink -}}"
         {{- end -}}
         {{- if strings.Contains $image "featured" -}}
           loading="eager"
