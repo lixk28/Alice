@@ -11,31 +11,67 @@
 		{{- $layout = "portrait" -}}
 	{{- end -}}
 {{- end -}}
+{{- $image_sizes := slice "420" "789" "1019" "1430" "2048" -}}
+{{- $image_quality := "Lanczos" -}}
 <div class="post-card-container">
-<div class="post-card {{ $layout }}">
-	{{- with $thumb -}}
-    <div class="post-thumb-container">
-		{{- $thumbLink := cond (eq site.Params.postcard.thumbTarget "posturl") $.RelPermalink .RelPermalink -}}
-		{{- $thumbTarget := cond (eq site.Params.postcard.thumbTarget "posturl") "" "_blank" -}}
-		<a class="post-thumb-anchor" href="{{ $thumbLink }}" target="{{ $thumbTarget }}">
-			<img alt="{{ $.Title }}" class="post-thumb" src="{{ .RelPermalink }}" loading="lazy"/>
-		</a>
+	<div class="post-card {{ $layout }}">
+		{{- with $thumb -}}
+			<div class="post-thumb-container">
+			{{- $thumbLink := cond (eq site.Params.postcard.thumbTarget "posturl") $.RelPermalink .RelPermalink -}}
+			{{- $thumbTarget := cond (eq site.Params.postcard.thumbTarget "posturl") "" "_blank" -}}
+			<a class="post-thumb-anchor" href="{{ $thumbLink }}" target="{{ $thumbTarget }}">
+				{{- $image_width := .Width -}}
+				{{- $image_height := .Height -}}
+				{{- if strings.Contains . "_2x" -}}
+					{{- $image_width = math.Floor (math.Div .Width 2) -}}
+					{{- $image_height = math.Floor (math.Div .Height 2) -}}
+				{{- end -}}
+				{{- $fallback_image := (.Resize (print "789x jpg " $image_quality)) -}}
+				<img
+					alt="{{ $.Title }}"
+					class="post-thumb"
+					width="{{- $image_width -}}"
+					height="{{- $image_height -}}"
+					{{- if (or (strings.HasSuffix . ".gif") (strings.HasSuffix . ".svg")) -}}
+						src="{{- .RelPermalink -}}"
+					{{- else -}}
+						srcset="
+							{{- if le .Width (index $image_sizes 0) }}
+								{{- with .Resize (print .Width "x webp " $image_quality) -}}
+									{{- print .RelPermalink " " .Width "w, " -}}
+								{{- end -}}
+							{{- end -}}
+							{{- range $index, $size := $image_sizes -}}
+								{{- if ge $thumb.Width $size -}}
+									{{- with $thumb.Resize (print $size "x webp " $image_quality) -}}
+										{{- print .RelPermalink " " $size "w, " -}}
+									{{- end -}}
+								{{- end -}}
+							{{- end -}}
+						"
+						sizes="(min-width: 800px) 50vw, 100vw"
+						src="{{- $fallback_image.RelPermalink -}}"
+					{{- end -}}
+					loading="lazy"
+					decoding="async"
+				/>
+			</a>
+		</div>
+		{{- end -}}
+		<div class="post-card-content">
+			<h3 class="post-title">
+					<a href="{{ .RelPermalink }}">{{ .Title | markdownify | safeHTML }}</a>
+			</h3>
+			{{- partial "post-meta.html" (dict
+				"page" .
+				"metaItemTag" "div"
+				"metaItemSep" ""
+			) -}}
+			{{- partial "post-tldr.html" . -}}
+			{{- if site.Params.postcard.showDescription -}}
+					<p class="post-description">{{ .Description | markdownify | safeHTML }}</p>
+			{{- end -}}
+			<a class="post-read-more" href="{{ .Permalink }}">Read more >>></a>
+		</div>
 	</div>
-	{{- end -}}
-	<div class="post-card-content">
-        <h3 class="post-title">
-            <a href="{{ .RelPermalink }}">{{ .Title | markdownify | safeHTML }}</a>
-		</h3>
-        {{- partial "post-meta.html" (dict
-			"page" .
-			"metaItemTag" "div"
-			"metaItemSep" ""
-		) -}}
-		{{- partial "post-tldr.html" . -}}
-        {{- if site.Params.postcard.showDescription -}}
-            <p class="post-description">{{ .Description | markdownify | safeHTML }}</p>
-        {{- end -}}
-		<a class="post-read-more" href="{{ .Permalink }}">Read more >>></a>
-	</div>
-</div>
 </div>
