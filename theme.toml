@@ -5,5 +5,7 @@ description = "MistY's OWN Hugo Theme"
 homepage = "https://github.com/lixk28/Alice"
 min_version = "0.20"
 
-[author]
-  name = "Xuekun Li"
+authors = [
+  { name = "Xuekun Li", homepage = "https://github.com/lixk28" },
+  { name = "Akbar Hamaminatu", homepage = "https://ngoding.id" }
+]
