@@ -1,0 +1,86 @@
+/* Jump to top/bottom buttons */
+.jump-buttons {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.jump-btn {
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(100px);
+}
+
+.jump-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.jump-btn:hover {
+    background-color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transform: translateX(0) scale(1.1);
+}
+
+.jump-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke: #333;
+    stroke-width: 2;
+    transition: stroke 0.3s ease;
+}
+
+.jump-btn:hover svg {
+    stroke: #007acc;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .jump-buttons {
+        right: 15px;
+        bottom: 15px;
+    }
+    
+    .jump-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .jump-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .jump-buttons {
+        right: 10px;
+        bottom: 10px;
+    }
+    
+    .jump-btn {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .jump-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+}
