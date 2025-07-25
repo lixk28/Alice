@@ -48,9 +48,25 @@ themesDir = "../.."
 
         [params.home.sidebar]
             [[params.home.sidebar.items]]
+                id = "author"
+                title = "Author"
+                weight = 1
+                enable = true
+                [params.home.sidebar.items.args]
+                    name = "Xuekun Li"
+                    avatar = "/images/avatar.png"
+                    bio = "Lorem."
+                    [[params.home.sidebar.items.args.social]]
+                        name = "Blog"
+                        url = "https://lixk28.github.io/Alice/"
+                    [[params.home.sidebar.items.args.social]]
+                        name = "GitHub"
+                        url = "https://github.com/lixk28/Alice"
+
+            [[params.home.sidebar.items]]
                 id = "news"
                 title = "News"
-                weight = 1
+                weight = 2
                 enable = true
                 [params.home.sidebar.items.args]
                     size = 5
@@ -62,7 +78,7 @@ themesDir = "../.."
                 # Will be your side item template name and html element id
                 id = "recent-updates"
                 title = "Recent Updates"
-                weight = 2
+                weight = 3
                 enable = true
                 [params.home.sidebar.items.args]
                     size = 5
@@ -73,7 +89,7 @@ themesDir = "../.."
             [[params.home.sidebar.items]]
                 id = "tag-list"
                 title = "Tags"
-                weight = 3
+                weight = 4
                 enable = true
                 [params.home.sidebar.items.args]
                     size = 10
@@ -84,7 +100,7 @@ themesDir = "../.."
             [[params.home.sidebar.items]]
                 id = "category-list"
                 title = "Categories"
-                weight = 4
+                weight = 5
                 enable = true
                 [params.home.sidebar.items.args]
                     size = 5
