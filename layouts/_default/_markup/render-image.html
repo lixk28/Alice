@@ -1,27 +1,77 @@
-{{/* print .Attributes */}}
-
-{{/* FIXME: The default values should be configurable */}}
-{{- $width := .Attributes.width | default "100%" -}}
-{{- $height := .Attributes.height | default "auto" -}}
-{{- $classes := .Attributes.classes | default "center" }}
-
-{{- $sizeCSS := printf "width: %s; height: %s;" $width $height }}
-{{- $isFloat := strings.Contains $classes "float" -}}
-
-{{- $lightboxVendor := .Page.Params.lightbox.vendor | default "none" }}
-
-<figure {{ with $classes }}class="{{ . }}"{{ end }} {{ if $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }} >
-    <a href="{{ $.Destination | safeURL }}"
-    {{- if eq $lightboxVendor "fancybox" -}}
+{{- $enable_imgproc := site.Params.imgproc.enable | default false -}}
+{{- $image_sizes := site.Params.imgproc.sizes | default (slice "420" "789" "1019" "1430" "2048") -}}
+{{- $resampling_filter := site.Params.imgproc.resamplingFilter | default "Lanczos" -}}
+{{- $image_quality_value := site.Params.imgproc.quality | default 75 -}}
+{{- $quality_filter := print "q" $image_quality_value " " $resampling_filter -}}
+{{- $fallback_size := site.Params.imgproc.fallbackSize | default "789" -}}
+{{- $fallback_format := site.Params.imgproc.fallbackFormat | default "jpg" -}}
+{{- $image_format := site.Params.imgproc.format | default "webp" -}}
+{{- $alt := .Text -}}
+{{- $label := .Text -}}
+{{- $caption := "" -}}
+{{- if ne .Title "" -}}
+  {{- $caption = .Title | $.Page.RenderString -}}
+  {{- $label = $caption -}}
+{{- end -}}
+{{- $image := .Page.Resources.GetMatch .Destination -}}
+{{- if and (not $image) .Page.File -}}
+  {{- $image = resources.Get (path.Join .Page.File.Dir .Destination) -}}
+{{- else -}}
+  {{- $image := resources.Get $image -}}
+{{- end -}}
+{{- with $image -}}
+  {{- $image_width := $image.Width -}}
+  {{- $image_height := $image.Height -}}
+  {{- if strings.Contains $image "_2x" -}}
+    {{- $image_width = math.Floor (math.Div $image_width 2) -}}
+    {{- $image_height = math.Floor (math.Div $image_height 2) -}}
+  {{- end -}}
+  {{- $lightboxVendor := $.Page.Params.lightbox.vendor | default "none" }}
+  <figure role="figure" aria-label="{{- $label | plainify -}}">
+    <a href="{{- $image.RelPermalink -}}"
+      {{- if eq $lightboxVendor "fancybox" -}}
         data-fancybox="gallery"
-    {{- else if eq $lightboxVendor "glightbox" -}}
+      {{- else if eq $lightboxVendor "glightbox" -}}
         class="glightbox" data-gallery="gallery"
-    {{- end -}}
+      {{- end -}}
     >
-    <img loading="lazy" src="{{ .Destination | safeURL }}" {{ if not $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }}
-        {{- with .PlainText }} alt="{{ . }}"{{ end -}}
-        {{- with .Title }} title="{{ . }}"{{ end -}}
-    >
+      <img
+        alt="{{- $caption | markdownify | plainify -}}"
+        title="{{- $label | plainify -}}"
+        width="{{- $image_width -}}"
+        height="{{- $image_height -}}"
+        {{- if (or (strings.HasSuffix $image ".gif") (strings.HasSuffix $image ".svg") (not $enable_imgproc)) -}}
+          src="{{- $image.RelPermalink -}}"
+        {{- else -}}
+          {{- $fallback_image := ($image.Resize (print $fallback_size "x " $fallback_format " " $quality_filter)) -}}
+          srcset="
+            {{- if le $image.Width (index $image_sizes 0) }}
+              {{- with $image.Resize (print $image.Width "x " $image_format " " $quality_filter) -}}
+                {{- print .RelPermalink " " .Width "w, " -}}
+              {{- end -}}
+            {{- end -}}
+            {{- with $image_sizes -}}
+              {{- range $index, $size := . -}}
+                {{- if ge $image.Width $size -}}
+                  {{- with $image.Resize (print $size "x " $image_format " " $quality_filter) -}}
+                    {{- print .RelPermalink " " $size "w, " -}}
+                  {{- end -}}
+                {{- end -}}
+              {{- end -}}
+            {{- end -}}
+          "
+          sizes="(min-width: 800px) 50vw, 100vw"
+          src="{{- ($image.Resize (print $fallback_size "x " $fallback_format " " $quality_filter)).RelPermalink -}}"
+        {{- end -}}
+        {{- if strings.Contains $image "featured" -}}
+          loading="eager"
+          decoding="sync"
+        {{- else -}}
+          decoding="async"
+          loading="lazy"
+        {{- end -}}
+      />
     </a>
-    {{- with .Title }}<figcaption>{{ . | markdownify }}</figcaption>{{ end -}}
-</figure>
+    <figcaption>{{- $caption | markdownify -}}</figcaption>
+  </figure>
+{{- end -}}

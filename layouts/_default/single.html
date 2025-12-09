@@ -1,4 +1,12 @@
 {{- define "main" -}}
+{{- $enable_imgproc := site.Params.imgproc.enable | default false -}}
+{{- $image_sizes := site.Params.imgproc.sizes | default (slice "420" "789" "1019" "1430" "2048") -}}
+{{- $resampling_filter := site.Params.imgproc.resamplingFilter | default "Lanczos" -}}
+{{- $image_quality_value := site.Params.imgproc.quality | default 75 -}}
+{{- $quality_filter := print "q" $image_quality_value " " $resampling_filter -}}
+{{- $fallback_size := site.Params.imgproc.fallbackSize | default "789" -}}
+{{- $fallback_format := site.Params.imgproc.fallbackFormat | default "jpg" -}}
+{{- $image_format := site.Params.imgproc.format | default "webp" -}}
 <main class="post">
 	<aside id="sidetoc">
 		{{- if .Params.toc.show -}}
@@ -22,18 +30,59 @@
 	<article>
 		{{- if .Params.featuredimage -}}
 		<figure class="featured-image">
-			{{- $link := "" -}}
 			{{- $src := .Params.featuredimage.src -}}
+			{{- $image := "" -}}
 			{{- if $src -}}
 				{{- if eq .Params.type "series" -}}
-					{{- $link = path.Join .Parent.RelPermalink $src -}}
+					{{- $link := path.Join .Parent.RelPermalink $src -}}
+					<a href="{{ $link }}" data-fancybox="featured-image">
+					<img class="featured-image" src="{{ $link }}" alt="{{ with .Params.featuredimage.title }}.{{ else }}featured-image{{ end }}" loading="eager" decoding="sync"/>
+					</a>
 				{{- else -}}
-					{{- $link = (.Page.Resources.GetMatch $src).RelPermalink -}}
+					{{- $image = .Page.Resources.GetMatch $src -}}
+					{{- with $image -}}
+						{{- $image_width := .Width -}}
+						{{- $image_height := .Height -}}
+						{{- if strings.Contains . "_2x" -}}
+							{{- $image_width = math.Floor (math.Div .Width 2) -}}
+							{{- $image_height = math.Floor (math.Div .Height 2) -}}
+						{{- end -}}
+						<a href="{{ .RelPermalink }}" data-fancybox="featured-image">
+							<img
+								class="featured-image"
+								alt="{{ with $.Params.featuredimage.title }}.{{ else }}featured-image{{ end }}"
+								width="{{- $image_width -}}"
+								height="{{- $image_height -}}"
+								{{- if (or (strings.HasSuffix . ".gif") (strings.HasSuffix . ".svg") (not $enable_imgproc)) -}}
+									src="{{- .RelPermalink -}}"
+								{{- else -}}
+									{{- $fallback_image := (.Resize (print $fallback_size "x " $fallback_format " " $quality_filter)) -}}
+									srcset="
+										{{- if le .Width (index $image_sizes 0) }}
+											{{- with .Resize (print .Width "x " $image_format " " $quality_filter) -}}
+												{{- print .RelPermalink " " .Width "w, " -}}
+											{{- end -}}
+										{{- end -}}
+										{{- with $image_sizes -}}
+											{{- range $index, $size := . -}}
+												{{- if ge $image.Width $size -}}
+													{{- with $image.Resize (print $size "x " $image_format " " $quality_filter) -}}
+														{{- print .RelPermalink " " $size "w, " -}}
+													{{- end -}}
+												{{- end -}}
+											{{- end -}}
+										{{- end -}}
+									"
+									sizes="(min-width: 800px) 50vw, 100vw"
+									src="{{- (.Resize (print $fallback_size "x " $fallback_format " " $quality_filter)).RelPermalink -}}"
+								{{- end -}}
+								loading="eager"
+								decoding="sync"
+							/>
+						</a>
+					{{- end -}}
 				{{- end -}}
 			{{- end -}}
-			<a href="{{ $link }}" data-fancybox="featured-image">
-			<img class="featured-image" src="{{ $link }}" alt="{{ with .Params.featuredimage.title }}.{{ else }}featured-image{{ end }}"/>
-			</a>
 			{{- with .Params.featuredimage.title -}}
 			<figcaption>{{ . | markdownify }}</figcaption>
 			{{- end -}}

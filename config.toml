@@ -100,11 +100,18 @@
 
     [params.imgproc]
         enable = false
-        maxWidth = 1280
-        maxHeight = 1280
-        format = 'webp'
-        # 0-100
+        # Default format for processed images
+        format = "webp"
+        # 0-100, image quality for compressed formats
         quality = 75
+        # Image sizes for responsive images
+        sizes = ["420", "789", "1019", "1430", "2048"]
+        # Image resampling filter (Box, Lanczos, CatmullRom, MitchellNetravali, Linear, and NearestNeighbor)
+        resamplingFilter = "Lanczos"
+        # Default format for fallback images
+        fallbackFormat = "jpg"
+        # Default fallback image size
+        fallbackSize = "789"
 
     [params.lightbox]
         # fancybox or glightbox
