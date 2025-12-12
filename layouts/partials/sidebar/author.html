@@ -1,0 +1,20 @@
+<div class="h-card">
+    {{ if .args.avatar }}
+    <img class="u-photo" src="{{ .args.avatar }}" alt="{{ .args.name }}" />
+    {{ end }}
+    <div class="author-info">
+        <h3 class="p-name">{{ .args.name }}</h3>
+        {{ if .args.bio }}
+        <p class="p-note">{{ .args.bio }}</p>
+        {{ end }}
+        {{ if .args.social }}
+        <div class="author-social">
+            {{ range .args.social }}
+            <a class="u-url" href="{{ .url }}" target="_blank" rel="me noopener" title="{{ .name }}">
+                {{ .name }}
+            </a>
+            {{ end }}
+        </div>
+        {{ end }}
+    </div>
+</div>
