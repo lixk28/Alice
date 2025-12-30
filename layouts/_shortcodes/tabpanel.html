@@ -33,7 +33,7 @@
             data-tab-group="{{ $tabGroup }}"
             data-tab-index="{{ $tabIndex }}"
             onclick="switchTab('{{ $tabGroup }}', '{{ $tabIndex }}');
-                     persistTabChoices('{{ $tabGroup }}', '{{ $tabIndex }}', 'sessionStorage');">
+                     persistTabChoices('{{ $tabGroup }}', '{{ $tabIndex }}', '{{ site.Params.storage.type | default "sessionStorage" }}');">
             {{- $tab.Title | markdownify -}}
         </label>
     {{- end -}}

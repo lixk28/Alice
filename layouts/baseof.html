@@ -25,7 +25,8 @@
 	{{- end -}}
 	{{- if .Params.tab -}}
 		{{- if .Params.tab.cursed -}}
-		<script src="{{ "js/switchTab.js" | relURL }}"></script>
+		{{- $switchTab := resources.Get "js/switchTab.js" | resources.ExecuteAsTemplate "js/switchTab.js" . -}}
+		<script src="{{ $switchTab.RelPermalink }}"></script>
 		{{- end -}}
 	{{- end -}}
 	{{- if .Params.lightbox -}}

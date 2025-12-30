@@ -35,7 +35,7 @@ function persistTabChoices(tabGroup, tabIndex, storageType) {
     const key = window.location.origin + window.location.pathname + 'tab-choices';
     const val = storage.getItem(key) ?? "{}";
 
-    var tabChoices = JSON.parse(val);
+    const tabChoices = JSON.parse(val);
     tabChoices[tabGroup] = tabIndex;
     // console.log(key, tabChoices);
 
@@ -80,7 +80,5 @@ function switchTab(tabGroup, tabIndex) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const storageType = "sessionStorage";
-    // const storageType = "localStorage";
-    resumeTabChoices(storageType);
+    resumeTabChoices("{{ site.Params.storage.type | default `sessionStorage` }}");
 });

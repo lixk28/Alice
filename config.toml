@@ -87,6 +87,10 @@
                     # Sort by {count | random}, default is count
                     sortBy = "count"
 
+    [params.storage]
+        # localStorage or sessionStorage
+        type = "sessionStorage"
+
     [params.codeblock]
         maxLinesOfCode = 64
 
