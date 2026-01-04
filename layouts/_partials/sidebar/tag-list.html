@@ -13,6 +13,6 @@
 {{ end }}
 
 {{ range $tags }}
-    <span><a href="{{ .page.Permalink }}">#{{ .page.Title }}</a><sup> ({{ .count }})</sup></span>
+    <span><a href="{{ .page.RelPermalink }}">#{{ .page.Title }}</a><sup> ({{ .count }})</sup></span>
     {{- $.args.delimiter | default "&emsp;" | safeHTML -}}
 {{ end }}
