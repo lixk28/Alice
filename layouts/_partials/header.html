@@ -28,14 +28,14 @@
 		{{- $blogoLink := (resources.Get .).RelPermalink -}}
 		{{- $logoTarget := site.Params.Header.LogoTarget | default "baseurl" -}}
 		{{- $isExternal := ne $logoTarget "baseurl" -}}
-		{{- $targetUrl := cond (eq $logoTarget "baseurl") site.BaseURL (cond (eq $logoTarget "imgurl") $blogoLink $logoTarget) -}}
+		{{- $targetUrl := cond (eq $logoTarget "baseurl") site.Home.RelPermalink (cond (eq $logoTarget "imgurl") $blogoLink $logoTarget) -}}
 		<a href="{{ $targetUrl }}" {{ if $isExternal }} target="_blank" {{ end }}>
 		    <img alt="blogo" src="{{ $blogoLink }}"/>
 		</a>
 	</div>
 	{{- end -}}
 	<div id="bio">
-		<h1 id="title"><a href="{{ .Site.BaseURL }}">{{ .Site.Params.Header.Title }}</a></h1>
+		<h1 id="title"><a href="{{ site.Home.RelPermalink }}">{{ .Site.Params.Header.Title }}</a></h1>
 		<h3 id="tagline">{{ .Site.Params.Header.Tagline }}</h3>
 	</div>
 	<nav id="menu">

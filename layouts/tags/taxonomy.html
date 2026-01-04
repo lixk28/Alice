@@ -16,10 +16,10 @@
     {{ end }}
 
     {{ range ($orderedTaxo | shuffle) }}
-        <span class="tag bin-{{ index $binMap .Term }}"><a href="{{ .Page.Permalink }}">#{{ .Page.Title }}</a><sup> ({{ .Count }})</sup></span>&emsp;
+        <span class="tag bin-{{ index $binMap .Term }}"><a href="{{ .Page.RelPermalink }}">#{{ .Page.Title }}</a><sup> ({{ .Count }})</sup></span>&emsp;
     {{ end }}
     <!-- {{- range .Site.Taxonomies.tags -}}
-        <span><a href="{{ .Page.Permalink }}">#{{ .Page.Title }}</a><sup> ({{ .Count }})</sup></span>&emsp;
+        <span><a href="{{ .Page.RelPermalink }}">#{{ .Page.Title }}</a><sup> ({{ .Count }})</sup></span>&emsp;
     {{- end -}} -->
     </p>
 </main>
