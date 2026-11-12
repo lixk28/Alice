@@ -71,8 +71,11 @@ div.friend-bio > h4 {
 .friend-card-anchor.dead div.friend-bio > h4 {
     color: black !important;
 }
-div.friend-bio > p {
-    margin: .2em auto;
+.friend-tagline p {
+    margin: 0;
+}
+.friend-tagline ul {
+    margin-block-start: .3em;
 }
 
 
@@ -101,6 +104,7 @@ a.friend-card-link:hover {
     pointer-events: none;
 }
 .friend-tagline {
+    margin: .2em auto;
     pointer-events: auto;
 }
 
