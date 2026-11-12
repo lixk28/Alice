@@ -115,7 +115,7 @@ Scripts in `static/js/` are served as-is and linked with `relURL`. A template lo
 
 For anything unclear, for a new feature, and for reference material, use the [Hugo documentation](https://gohugo.io/documentation/).
 
-## Style Guide
+## Style Guidelines
 
 The theme looks classic and editorial, not like a modern SaaS dashboard. The site tagline is "so damn classic". New UI should look like the existing header, post cards, friend cards, and sidebar fieldsets.
 
@@ -127,6 +127,13 @@ The theme looks classic and editorial, not like a modern SaaS dashboard. The sit
 - Icons are stroke SVGs with round caps, `Black` or `Navy`, sized in `em`. Do not fill them as solid glyphs unless the existing icon already does.
 - Dark mode variables in `style.css` are commented out. Do not add a dark theme unless asked.
 - Put new visual rules in the matching component sheet under `static/css/`, using `em` / `rem` / `ch`. Page-wide tokens belong in `style.css`.
+
+## Design Guidelines
+
+- Keep the theme light. Prefer a small template, a CSS sheet, or a short `static/js` file over a new npm package, bundled vendor, or CDN library. Do not add a heavy dependency when HTML, CSS, or a few lines of Hugo template can do the job.
+- Function comes first. Ship the feature, then keep the look simple. Do not add ornament, extra motion, or visual chrome that does not help reading or using the page. Visual tokens still follow Style Guidelines.
+- New features, pages, and shortcodes should be pluggable and configurable. Gate them with site params and page front matter the way tabs, TeX, lightbox, and Waline already are. Let the user turn the piece off, pick a vendor, or pass arguments. Do not hard-code a single path that every site must take.
+- Templates should be reusable. Extract shared markup into a partial (as admonitions share `details.html`) instead of copying a block into each shortcode. Prefer a small, composable template over a one-off that only works on one page.
 
 ## Git commits
 
