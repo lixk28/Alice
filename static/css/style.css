@@ -418,3 +418,25 @@ p.tags {
 p.tags > span {
     white-space: nowrap;
 }
+
+/* tags and categories tilt clockwise on hover.
+ * line-height: 1 keeps the inset underline on the em box.
+ * The inherited line box (3.2em on the tag cloud) would otherwise
+ * push that underline away from the glyphs. */
+span.tag > a,
+.post-meta-item.tags a,
+span.category > a,
+ul.categories > li > a,
+.post-meta-item.categories a {
+    display: inline-block;
+    line-height: 1;
+    vertical-align: baseline;
+    transition: 0.2s ease;
+}
+span.tag > a:hover,
+.post-meta-item.tags a:hover,
+span.category > a:hover,
+ul.categories > li > a:hover,
+.post-meta-item.categories a:hover {
+    transform: rotate(2deg);
+}
