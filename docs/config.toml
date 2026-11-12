@@ -15,7 +15,7 @@ themesDir = "../.."
     license = "DBADPL"
 
     [params.header]
-        blogo = "images/HugoAliceLogo.webp"
+        blogo = "img/HugoAliceLogo.webp"
         title = "Hugo Alice"
         tagline = "so damn classic"
 

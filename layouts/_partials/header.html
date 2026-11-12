@@ -25,7 +25,7 @@
 	{{- end -}}
 	{{- with .Site.Params.Header.Blogo -}}
 	<div id="blogo">
-		{{- $blogoLink := (resources.Get .).RelPermalink -}}
+		{{- $blogoLink := . | relURL -}}
 		{{- $logoTarget := site.Params.Header.LogoTarget | default "baseurl" -}}
 		{{- $isExternal := ne $logoTarget "baseurl" -}}
 		{{- $targetUrl := cond (eq $logoTarget "baseurl") site.Home.RelPermalink (cond (eq $logoTarget "imgurl") $blogoLink $logoTarget) -}}

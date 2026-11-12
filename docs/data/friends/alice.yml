@@ -3,7 +3,7 @@ name: Alice
 tagline: A classic and elegant hugo theme
 avatar:
   kind: url
-  content: https://lixk28.github.io/Alice/images/HugoAliceLogo.webp
+  content: https://lixk28.github.io/Alice/img/HugoAliceLogo.webp
 website: https://lixk28.github.io/Alice
 koukando: 99
 dead: false

@@ -12,7 +12,7 @@
         keywords = ["your", "site", "keywords"]
 
     [params.header]
-        blogo = "HugoAliceLogo.webp"
+        blogo = "img/HugoAliceLogo.webp"
         title = "Hugo Alice"
         tagline = "so damn classic"
         # "baseurl" or "imgurl" or "https://somewhere.com"
