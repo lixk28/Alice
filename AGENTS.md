@@ -56,6 +56,7 @@ Pages:
 - Chrome on every page:
   - `layouts/_partials/header.html`. Styles: `static/css/header.css`.
   - `layouts/_partials/footer.html`. Styles: `static/css/footer.css`.
+  - `layouts/_partials/head-extra.html`: empty hook called at the end of `<head>` in `baseof.html`. Sites override it to inject page CSS/JS without copying `baseof`.
 
 Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the friends page. Unless noted, their CSS is imported by `style.css`:
 
