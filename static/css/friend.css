@@ -98,6 +98,10 @@ a.friend-card-link:hover {
 .friend-card-anchor > .friend-bio {
     position: relative;
     z-index: 1;
+    pointer-events: none;
+}
+.friend-tagline {
+    pointer-events: auto;
 }
 
 div.frienmily > .friend-card-anchor {
