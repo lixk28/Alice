@@ -3,11 +3,12 @@
 }
 
 
-a.friend-card-anchor {
+.friend-card-anchor {
     position: relative;
     /* display: block !important; */
     border-radius: .3em !important;
     text-decoration: none !important;
+    transition: 0.2s ease;
 
     display: flex !important;
     flex-direction: row;
@@ -19,23 +20,23 @@ a.friend-card-anchor {
     border: .1em solid lightslategray !important;
     box-shadow: .1em .1em .1em silver !important;
 }
-a.friend-card-anchor:hover {
+.friend-card-anchor:hover {
     box-shadow: .2em .2em .3em silver !important;
     bottom: 0.1em !important;
 }
 
 /* dead friend */
-a.friend-card-anchor.dead {
+.friend-card-anchor.dead {
     border-color: black !important;
     color: black !important;
     background-color: gainsboro !important;
 }
-a.friend-card-anchor.dead img {
+.friend-card-anchor.dead img {
     filter: grayscale(100%);
     -webkit-filter: grayscale(100%);
 }
 /* it's dead so it cannot jump */
-a.friend-card-anchor.dead:hover {
+.friend-card-anchor.dead:hover {
     bottom: 0 !important;
 }
 
@@ -62,6 +63,13 @@ div.friend-bio {
 }
 div.friend-bio > h4 {
     margin: .3em auto;
+    color: var(--link-color);
+}
+.friend-card-anchor:hover div.friend-bio > h4 {
+    color: var(--link-active-color);
+}
+.friend-card-anchor.dead div.friend-bio > h4 {
+    color: black !important;
 }
 div.friend-bio > p {
     margin: .2em auto;
@@ -77,7 +85,22 @@ div.frienmily {
     justify-content: center;
 }
 
-div.frienmily > a.friend-card-anchor {
+a.friend-card-link,
+a.friend-card-link:hover {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    box-shadow: none !important;
+}
+.friend-card-anchor > .friend-avatar {
+    pointer-events: none;
+}
+.friend-card-anchor > .friend-bio {
+    position: relative;
+    z-index: 1;
+}
+
+div.frienmily > .friend-card-anchor {
     flex-grow: 1;
     min-width: 0;
     margin: .8em !important;

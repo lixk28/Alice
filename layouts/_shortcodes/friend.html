@@ -1,6 +1,7 @@
 {{ $friendId := .Get "id" | default "" }}
 {{ $friendMap := index .Site.Data.friends $friendId }}
-<a class="friend-card-anchor {{ with $friendMap.dead }}dead{{ end }}" id="{{ $friendMap.id }}" href="{{ $friendMap.website }}" target="_blank">
+<div class="friend-card-anchor {{ with $friendMap.dead }}dead{{ end }}" id="{{ $friendMap.id }}">
+<a class="friend-card-link" href="{{ $friendMap.website }}" target="_blank" aria-label="{{ $friendMap.name | plainify }}"></a>
     {{ with $friendMap.avatar }}
     <div class="friend-avatar">
         {{ $avatarKind := lower .kind }}
@@ -17,4 +18,4 @@
         <h4 class="friend-name">{{ $friendMap.name | markdownify }}</h4>
         <p class="friend-tagline">{{ $friendMap.tagline | markdownify }}</p>
     </div>
-</a>
+</div>

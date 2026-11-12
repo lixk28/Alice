@@ -3,7 +3,8 @@
 {{ $friendsSorted := sort . "koukando" "desc" }}
 <div class="frienmily">
     {{ range $friendId, $friendMap := $friendsSorted }}
-    <a class="friend-card-anchor {{ with $friendMap.dead }}dead{{ end }}" id="{{ $friendMap.id }}" href="{{ $friendMap.website }}" target="_blank">
+    <div class="friend-card-anchor {{ with $friendMap.dead }}dead{{ end }}" id="{{ $friendMap.id }}">
+    <a class="friend-card-link" href="{{ $friendMap.website }}" target="_blank" aria-label="{{ $friendMap.name | plainify }}"></a>
         {{ with $friendMap.avatar }}
         <div class="friend-avatar">
             {{ $avatarKind := lower .kind }}
@@ -25,7 +26,7 @@
                 {{ $friendMap.tagline | markdownify }}
             </p>
         </div>
-    </a>
+    </div>
     {{ end }}
 </div>
 {{ end }}
