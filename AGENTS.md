@@ -12,6 +12,8 @@ Open it in the browser at http://localhost:1314.
 
 After code changes, do not start this server on your own to verify the site. Assume the user runs it when they want a preview, or the server is already started and listening.
 
+The published GitHub Pages site is https://lixk28.github.io/Alice/. That is the official deployment of the example site, not a substitute for the local server.
+
 ## Project Structure
 
 This repository is the Alice theme. Theme templates, static files, assets, and the default config live at the repository root. `docs/` is the example site. Hugo is started with `--source=docs`; `docs/config.toml` sets `theme = "Alice"` and `themesDir = "../.."`, so the theme resolves to this repository.
