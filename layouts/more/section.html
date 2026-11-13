@@ -1,0 +1,9 @@
+{{ define "main" }}
+<main>
+	{{- with .Title -}}<h1>{{ . }}</h1>{{- end -}}
+	{{- partial "morehub.html" . -}}
+	{{- with .Content -}}
+	<div class="more-content">{{ . }}</div>
+	{{- end -}}
+</main>
+{{ end }}

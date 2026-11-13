@@ -1,0 +1,32 @@
+{{- /*
+  More hub link list — menu.main children of identifier "more".
+  Override at site layouts/_partials/morehub.html to restyle entries.
+*/ -}}
+<ul>
+	{{- range site.Menus.main -}}
+		{{- if eq .Identifier "more" -}}
+			{{- range .Children -}}
+				{{- $id := .Identifier -}}
+				{{- $page := site.GetPage .URL -}}
+				{{- $kind := "page" -}}
+				{{- if isset site.Taxonomies $id -}}
+					{{- $kind = "taxonomy" -}}
+				{{- else if $page -}}
+					{{- if eq $page.Kind "section" -}}{{- $kind = "section" -}}{{- end -}}
+				{{- end -}}
+				{{- $desc := "" -}}
+				{{- with .Params.description -}}{{- $desc = . -}}{{- end -}}
+				{{- if and (not $desc) $page -}}
+					{{- $desc = $page.Description | default $page.Params.description | default "" -}}
+				{{- end -}}
+	<li>
+		<a href="{{ .URL | relURL }}">{{ .Name }}</a>
+		<span>({{ $kind }})</span>
+				{{- with $desc -}}
+		<p>{{ . }}</p>
+				{{- end -}}
+	</li>
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+</ul>
