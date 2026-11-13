@@ -20,6 +20,7 @@
 					{{- $desc = $page.Description | default $page.Params.description | default "" -}}
 				{{- end -}}
 	<li>
+		{{- partial "header/menu-icon.html" $id -}}
 		<a href="{{ .URL | relURL }}">{{ .Name }}</a>
 		<span>({{ $kind }})</span>
 				{{- with $desc -}}

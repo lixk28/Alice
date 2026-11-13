@@ -103,6 +103,9 @@ ul.dropdown-menu {
     margin: 0.35em 0;
     padding: 0;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
 }
 
 .dropdown-menu-item a {
