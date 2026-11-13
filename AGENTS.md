@@ -55,6 +55,8 @@ Pages:
 - `layouts/404.html` renders the 404 page and has no separate stylesheet.
 - Chrome on every page:
   - `layouts/_partials/header.html`. Styles: `static/css/header.css`.
+    - Menu entries: `layouts/_partials/header/menu-entry.html` and `menu-icon.html`.
+    - Nested menus use the shared `dropdown` partial with Hugo native `parent` children (`menu-entry.html`).
   - `layouts/_partials/footer.html`. Styles: `static/css/footer.css`.
   - `layouts/_partials/head-extra.html`: empty hook called at the end of `<head>` in `baseof.html`. Sites override it to inject page CSS/JS without copying `baseof`.
 
