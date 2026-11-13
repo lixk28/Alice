@@ -46,6 +46,7 @@ Pages:
   - `layouts/list.html` is the fallback list. List-item rules live in `style.css`.
 - Taxonomy pages:
   - `layouts/categories/taxonomy.html` renders `/categories/`. `layouts/tags/taxonomy.html` renders `/tags/`.
+  - `layouts/more/section.html` renders `/more/` (section hub via `content/more/`); the link list is `layouts/_partials/morehub.html` (`menu.main` children of `identifier = "more"`).
   - Term-size bins: `static/css/taxo.css`. Tag and category link tilt: `style.css`.
   - `layouts/categories/term.html` and `layouts/tags/term.html` render one category or one tag with `post-list.html`.
 - `layouts/friends.html` renders `/friends/`.
