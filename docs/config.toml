@@ -19,6 +19,9 @@ themesDir = "../.."
         title = "Hugo Alice"
         tagline = "so damn classic"
 
+    [params.dropdown]
+        mode = "hover"
+
     [params.footer]
         # Should display site generator (Hugo) and theme (Alice) 🥰
         showHugoAlice = true

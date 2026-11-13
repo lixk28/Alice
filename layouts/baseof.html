@@ -38,6 +38,14 @@
 	{{- if .Params.mermaid -}}
 		{{- partial "mermaid.html" -}}
 	{{- end -}}
+	{{- $loadDropdownJS := .HasShortcode "dropdown" -}}
+	{{- range site.Menus.main -}}
+		{{- if .HasChildren -}}{{- $loadDropdownJS = true -}}{{- end -}}
+	{{- end -}}
+
+	{{- if $loadDropdownJS -}}
+		<script src="{{ "js/dropdown.js" | relURL }}" defer></script>
+	{{- end -}}
 	{{- if .HasShortcode "prism" -}}
 		<link rel="stylesheet" href="{{ "css/prism.css" | relURL }}">
 		<script defer

@@ -1,0 +1,134 @@
+/* Shared dropdown component — panel chrome matches hamburger menu */
+
+.dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+}
+
+.dropdown-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15em;
+}
+
+.dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.15em;
+    line-height: 1;
+}
+
+/* play-1001 caret: solid triangle, points right by default.
+   Override global svg { stroke: black }. */
+.dropdown-caret {
+    display: block;
+    width: 0.65em;
+    height: 0.65em;
+    fill: var(--link-color);
+    stroke: none;
+    stroke-width: 0;
+    transition: transform 150ms ease, fill 150ms ease;
+    transform-origin: center;
+}
+
+.dropdown-caret polygon {
+    fill: inherit;
+    stroke: none;
+}
+
+.dropdown-toggle:hover .dropdown-caret {
+    fill: var(--link-active-color);
+}
+
+.dropdown-checkbox:checked + .dropdown-toggle .dropdown-caret {
+    transform: rotate(90deg);
+    fill: var(--link-active-color);
+}
+
+.dropdown-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    min-width: 11em;
+    margin: 0;
+    padding: 1ch;
+    line-height: 1.4;
+    background-color: var(--bgcolor);
+    border: 1px solid slategray;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.3em slategray;
+}
+
+.dropdown-checkbox:checked ~ .dropdown-panel {
+    display: block;
+}
+
+/* hover mode: open on hover; caret click dismisses until mouseleave */
+.dropdown[data-dropdown-mode="hover"] > .dropdown-checkbox:checked ~ .dropdown-panel {
+    display: none;
+}
+
+.dropdown[data-dropdown-mode="hover"]:hover:not(.is-dismissed) > .dropdown-panel {
+    display: block;
+}
+
+.dropdown[data-dropdown-mode="hover"]:hover:not(.is-dismissed) .dropdown-caret {
+    transform: rotate(90deg);
+    fill: var(--link-active-color);
+}
+
+.dropdown[data-dropdown-mode="hover"].is-dismissed > .dropdown-panel {
+    display: none;
+}
+
+.dropdown[data-dropdown-mode="hover"].is-dismissed .dropdown-caret {
+    transform: none;
+    fill: var(--link-color);
+}
+
+/* panel list helper (header menu children, etc.) */
+ul.dropdown-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dropdown-menu-item {
+    margin: 0.35em 0;
+    padding: 0;
+    white-space: nowrap;
+}
+
+.dropdown-menu-item a {
+    display: inline;
+    padding: 0;
+    font-weight: normal;
+    color: var(--link-color);
+}
+
+.dropdown-menu-item a:hover {
+    color: var(--link-active-color);
+}
+
+/* markdown / shortcode body inside the panel */
+.dropdown-panel > :first-child {
+    margin-top: 0;
+}
+
+.dropdown-panel > :last-child {
+    margin-bottom: 0;
+}
+
+.dropdown-panel > ul:not(.dropdown-menu) {
+    padding-left: 1.2em;
+}
+
+.dropdown-title {
+    font-weight: bold;
+}

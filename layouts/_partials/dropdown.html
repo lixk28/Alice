@@ -1,0 +1,35 @@
+{{- /*
+  Shared dropdown component.
+
+  Context dict:
+    id        string — unique checkbox id (required)
+    label     string — optional left-side HTML
+    panel     string — dropdown panel HTML
+    mode      string — "click" | "hover" (default: params.dropdown.mode or "hover")
+    class     string — extra classes on the root
+    ariaLabel string — toggle accessible name
+    icon      string — optional caret HTML (default: play-1001 triangle)
+*/ -}}
+{{- $id := .id | default "" -}}
+{{- if not $id -}}
+	{{- errorf "partial %q: id is required" "dropdown" -}}
+{{- end -}}
+{{- $mode := .mode | default site.Params.dropdown.mode | default "hover" | lower -}}
+{{- if and (ne $mode "click") (ne $mode "hover") -}}
+	{{- $mode = "hover" -}}
+{{- end -}}
+{{- $ariaLabel := .ariaLabel | default "Toggle dropdown" -}}
+{{- $class := .class | default "" -}}
+{{- $label := .label | default "" -}}
+{{- $panel := .panel | default "" -}}
+{{- $icon := .icon | default `<svg class="dropdown-caret" viewBox="-0.5 0 8 8" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polygon points="0 0 0 8 7 4"></polygon></svg>` -}}
+<span class="dropdown{{ with $class }} {{ . }}{{ end }}" data-dropdown-mode="{{ $mode }}">
+	{{- with $label -}}
+	<span class="dropdown-label">{{- . | safeHTML -}}</span>
+	{{- end -}}
+	<input type="checkbox" id="{{ $id }}" class="dropdown-checkbox" hidden>
+	<label for="{{ $id }}" class="dropdown-toggle" aria-label="{{ $ariaLabel }}">
+		{{- $icon | safeHTML -}}
+	</label>
+	<div class="dropdown-panel">{{- $panel | safeHTML -}}</div>
+</span>

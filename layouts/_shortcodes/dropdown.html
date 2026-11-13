@@ -1,0 +1,32 @@
+{{- /*
+  Dropdown shortcode — wraps partial "dropdown".
+
+  Args:
+    id    — optional unique id (default: dropdown-<ordinal>)
+    title — optional left-side text (markdownified)
+    mode  — "click" | "hover" (default: params.dropdown.mode or "hover")
+    class — extra classes
+
+  Inner content becomes the dropdown panel (markdownified).
+*/ -}}
+{{- $id := .Get "id" | default (printf "dropdown-%d" .Ordinal) -}}
+{{- $mode := .Get "mode" -}}
+{{- $class := .Get "class" -}}
+{{- $title := .Get "title" -}}
+{{- $label := "" -}}
+{{- $ariaTitle := "dropdown" -}}
+{{- with $title -}}
+	{{- $titleHTML := . | markdownify | replaceRE `(?s)^<p>(.*)</p>\n?$` `$1` -}}
+	{{- $label = printf `<span class="dropdown-title">%s</span>` $titleHTML -}}
+	{{- $ariaTitle = . | markdownify | plainify | strings.TrimSpace -}}
+{{- end -}}
+{{- $panel := trim .Inner "\n" | markdownify -}}
+
+{{- partial "dropdown.html" (dict
+	"id" $id
+	"label" $label
+	"panel" $panel
+	"mode" $mode
+	"class" $class
+	"ariaLabel" (printf "Toggle %s" (or $ariaTitle "dropdown"))
+) -}}
