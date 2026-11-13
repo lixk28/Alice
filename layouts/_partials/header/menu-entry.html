@@ -35,7 +35,7 @@
 	{{- $lis := "" -}}
 	{{- range $item.Children -}}
 		{{- $childIcon := partial "header/menu-icon.html" .Identifier -}}
-		{{- $lis = printf `%s<li class="dropdown-menu-item">%s<a href="%s">%s</a></li>` $lis $childIcon (.URL | relURL) .Name -}}
+		{{- $lis = printf `%s<li class="dropdown-menu-item">%s<b><a href="%s">%s</a></b></li>` $lis $childIcon (.URL | relURL) .Name -}}
 	{{- end -}}
 	{{- $panel := printf `<ul class="dropdown-menu">%s</ul>` $lis | safeHTML -}}
 	{{- $wrapperClass := cond $isHamburger "hamburger-menu-item menu-dropdown" (cond $isMore "menu-item menu-dropdown menu-dropdown-more" "menu-item menu-dropdown") -}}
