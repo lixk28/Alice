@@ -63,6 +63,11 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
 - Admonitions: `note`, `tip`, `info`, `help`, `alert`, `admonition`, and `details`.
   - Shared partial: `layouts/_partials/details.html`.
   - Styles: `static/css/admonition.css`, `static/css/details.css`.
+- `dropdown`:
+  - Shared partial: `layouts/_partials/dropdown.html` (also used by header menu entries with children).
+  - Styles: `static/css/dropdown.css`. Script: `static/js/dropdown.js` (linked in `baseof` `<head>` when the page has the shortcode or the header menu has children).
+  - Left side optional `title` (markdownified); right side play caret (`static/svg/minimal-ui/play-1001.svg`). Header menu entries still pass left-side HTML into the partial.
+  - Mode `hover` (default) or `click` via shortcode arg, `params.dropdown.mode`, or `params.header.dropdown.mode` for the header. Hamburger menus always use `click`.
 - `tab` and `tabpanel`: `static/css/tabs.css`.
 - `shell`, `cmd`, and `cmdout`: `static/css/shell.css`.
 - `secret`: `static/css/secret.css`.
