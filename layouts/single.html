@@ -52,8 +52,13 @@
 			{{ .Content }}
 		</div>
 		<div class="post-epilogue">
-			{{- partial "post-prext.html" . -}}
-			{{- partial "post-related.html" . -}}
+			{{- /* Default on; set prext/related: false in front matter to hide. */ -}}
+			{{- if ne .Params.prext false -}}
+				{{- partial "post-prext.html" . -}}
+			{{- end -}}
+			{{- if ne .Params.related false -}}
+				{{- partial "post-related.html" . -}}
+			{{- end -}}
 			{{- /* TODO: Comments? */ -}}
 		</div>
 
