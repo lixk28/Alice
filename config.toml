@@ -17,7 +17,6 @@
         tagline = "so damn classic"
         # "baseurl" or "imgurl" or "https://somewhere.com"
         logoTarget = "baseurl"
-
         # Header override for nested menu dropdowns (falls back to params.dropdown.mode)
         [params.header.dropdown]
             mode = "hover"
@@ -174,6 +173,15 @@
             leftSingleQuote = "'"
             rightSingleQuote = "'"
 
+# Optional extra taxonomies (e.g. jokes). More itself is a section: content/more/.
+# Declaring [taxonomies] replaces Hugo defaults — redeclare every one you need.
+# [taxonomies]
+#     category = "categories"
+#     tag = "tags"
+#     joke = "jokes"
+
+
+
 [menu]
     [[menu.main]]
         identifier = "home"
@@ -199,23 +207,44 @@
         url = "/tags/"
         weight = 4
 
+    # Optional More hub: content/more/_index.md + menu entry (section, not taxonomy).
+    # Dropdown children use parent = "more" (section or taxonomy URLs both work).
+    # [[menu.main]]
+    #     identifier = "more"
+    #     name = "More"
+    #     url = "/more/"
+    #     weight = 5
+    # [[menu.main]]
+    #     identifier = "gallery"
+    #     name = "Gallery"
+    #     url = "/gallery/"
+    #     parent = "more"
+    #     weight = 1
+    # [[menu.main]]
+    #     identifier = "jokes"
+    #     name = "Jokes"
+    #     url = "/jokes/"
+    #     parent = "more"
+    #     weight = 2
+
     # [[menu.main]]
     #     identifier = "friends"
     #     name = "Friends"
     #     url = "/friends/"
-    #     weight = 5
+    #     weight = 6
+
 
     [[menu.main]]
         identifier = "about"
         name = "About"
         url = "/about/"
-        weight = 6
+        weight = 7
 
     [[menu.main]]
         identifier = "rss"
         name = "RSS"
         url = "/index.xml"
-        weight = 7
+        weight = 8
 
 [sitemap]
     changefreq = 'weekly'
