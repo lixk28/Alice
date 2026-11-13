@@ -123,14 +123,14 @@ nav#menu:last-child {
 }
 
 /* menu items */
-span.menu-item,
+.menu-item,
 span.menu-separator {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-nav#menu > span.menu-item {
+nav#menu > .menu-item {
     align-self: stretch;
     height: 100%;
 }
