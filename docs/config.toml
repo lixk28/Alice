@@ -1,4 +1,4 @@
-languageCode = "en-US"
+locale = "en-US"
 hasCJKLanguage = true
 title = "Hugo Alice"
 theme = "Alice"

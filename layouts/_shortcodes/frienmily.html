@@ -1,4 +1,4 @@
-{{ $friends := .Site.Data.friends }}
+{{ $friends := hugo.Data.friends }}
 {{ with $friends }}
 {{ $friendsSorted := sort . "koukando" "desc" }}
 <div class="frienmily">

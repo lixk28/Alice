@@ -20,7 +20,7 @@ This repository is the Alice theme. Theme templates, static files, assets, and t
 
 Change theme behavior in the root `layouts/`, `static/`, `assets/`, and `config.toml`. Change example posts, example data, and the example site's own settings under `docs/`. The root `config.toml` is the theme default. `docs/config.toml` overrides it for the example site. When a key exists in both files, change `docs/config.toml` for it to show up at http://localhost:1314.
 
-CI uses Hugo extended 0.146.0.
+CI uses Hugo 0.170.0 (single binary; the extended edition was removed upstream in 0.170).
 
 - `layouts/` holds the templates. `layouts/baseof.html` wraps every page. Shortcodes go in `layouts/_shortcodes/`, partials in `layouts/_partials/`, and render hooks in `layouts/_markup/`.
 - `static/css/` and `static/js/` are served as-is. `static/css/style.css` is linked on every page and `@import`s the shared component sheets. Scripts in `static/js/` are linked with `relURL` only when a page needs them.
@@ -151,6 +151,17 @@ Write commit messages in [Conventional Commits 1.0.0](https://www.conventionalco
 ```
 
 Use `feat` for a new feature and `fix` for a bug fix. Other types such as `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, and `chore` are allowed. Mark a breaking change with `!` after the type/scope, or with a `BREAKING CHANGE:` footer.
+
+Message body: when one commit covers several independent changes under the same theme, list them as `*` bullets instead of packing them into a paragraph. Prefer the same bullet list for other list-friendly bodies (migration steps, checklist-style notes, multiple touched surfaces). Keep the subject line a short summary; put the detail in the body.
+
+```
+build: bump Hugo to 0.170.0 and replace deprecated APIs
+
+* CI: install the single-binary package (extended edition removed).
+* Templates: Site.Data → hugo.Data; LanguageCode → locale / Language.Locale.
+* Waline: Site.BuildDrafts → skip draft pages with not .Draft.
+* Front matter: Params.type → .Type for series featured images.
+```
 
 Do not add an agent sign-off, attribution trailer, or similar footer (for example `Signed-off-by`, `Co-authored-by` for the agent).
 

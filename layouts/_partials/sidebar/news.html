@@ -1,4 +1,4 @@
-{{ range $type, $news := .page.Site.Data.news }}
+{{ range $type, $news := hugo.Data.news }}
 <ul>
     {{ range $news }}
     <li>

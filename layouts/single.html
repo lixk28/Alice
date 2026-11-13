@@ -25,7 +25,7 @@
 			{{- $link := "" -}}
 			{{- $src := .Params.featuredimage.src -}}
 			{{- if $src -}}
-				{{- if eq .Params.type "series" -}}
+				{{- if eq .Type "series" -}}
 					{{- $link = path.Join .Parent.RelPermalink $src -}}
 				{{- else -}}
 					{{- $link = (.Page.Resources.GetMatch $src).RelPermalink -}}
@@ -57,7 +57,8 @@
 			{{- /* TODO: Comments? */ -}}
 		</div>
 
-		{{- if and (not .Site.BuildDrafts) .Site.Params.waline.enable -}}
+		{{- /* Site.BuildDrafts deprecated in 0.156; skip Waline on draft pages. */ -}}
+		{{- if and (not .Draft) .Site.Params.waline.enable -}}
 			{{- if .Params.waline -}}
 				<div id="waline"></div>
 				<script type="module">
