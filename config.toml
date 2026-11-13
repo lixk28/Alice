@@ -18,6 +18,10 @@
         # "baseurl" or "imgurl" or "https://somewhere.com"
         logoTarget = "baseurl"
 
+        # Header override for nested menu dropdowns (falls back to params.dropdown.mode)
+        [params.header.dropdown]
+            mode = "hover"
+
     # Shared dropdown component / shortcode defaults
     [params.dropdown]
         # "hover" (default) or "click"

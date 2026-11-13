@@ -19,6 +19,9 @@ themesDir = "../.."
         title = "Hugo Alice"
         tagline = "so damn classic"
 
+        [params.header.dropdown]
+            mode = "hover"
+
     [params.dropdown]
         mode = "hover"
 

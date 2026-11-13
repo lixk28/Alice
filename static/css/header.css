@@ -102,7 +102,8 @@ nav#menu {
     flex-direction: row;
     flex-wrap: nowrap;
     white-space: nowrap;
-    overflow-x: auto;
+    /* visible so floating dropdown panels are not clipped */
+    overflow: visible;
 
     height: 100%;
     font-family: var(--sans-font);
@@ -122,13 +123,20 @@ nav#menu:last-child {
 }
 
 /* menu items */
-span[class^=menu] {
+span.menu-item,
+span.menu-separator {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
+
+nav#menu > span.menu-item {
+    align-self: stretch;
+    height: 100%;
+}
+
 /* and their icons */
-svg[class^=menu] {
+svg[class^="menu-"][class$="-icon"] {
     stroke: var(--menu-icon-color);
     width: var(--menu-font-size);
     height: var(--menu-font-size);
@@ -140,6 +148,20 @@ span.menu-separator::before {
 }
 span.menu-separator::after {
     content: var(--menu-separator);
+}
+
+/* header menu + shared dropdown component */
+nav#menu > .dropdown.menu-dropdown {
+    align-self: stretch;
+    height: 100%;
+}
+
+/* More dropdown: float panel under the header bar (hamburger-like chrome) */
+nav#menu > .dropdown.menu-dropdown-more > .dropdown-panel {
+    top: 100%;
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 /* hamburger menu on the right of header */
@@ -200,8 +222,31 @@ input#hamburger-btn:checked + nav#hamburger-menu {
 div.hamburger-menu-item {
     margin: 1ch 0;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    gap: 0.25em;
+}
+
+nav#hamburger-menu .dropdown.menu-dropdown {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    margin: 1ch 0;
+}
+
+nav#hamburger-menu .dropdown.menu-dropdown > .dropdown-panel {
+    position: static;
+    flex-basis: 100%;
+    width: 100%;
+    margin: 0.35em 0 0 0;
+    padding: 0.2em 0 0.2em 1.2em;
+    border: none;
+    border-left: 2px solid Navy;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: transparent;
 }
 
 

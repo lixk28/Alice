@@ -1,0 +1,49 @@
+{{- /*
+  Renders one top-level header menu entry.
+  Context: dict "item" MenuEntry "variant" ("desktop"|"hamburger") "mode" string
+
+  Dropdown when the item has native .Children (menu entries with parent = this id).
+
+  isHamburger — inside the mobile drawer (forces click; hamburger-menu-item).
+  isMore      — desktop identifier "more" (menu-dropdown-more under-bar panel).
+*/ -}}
+{{- $item := .item -}}
+{{- $variant := .variant | default "desktop" -}}
+{{- $id := $item.Identifier -}}
+{{- $isHamburger := eq $variant "hamburger" -}}
+{{- $isMore := and (eq $id "more") (not $isHamburger) -}}
+{{- $mode := .mode | default "hover" -}}
+{{- if $isHamburger -}}
+	{{- $mode = "click" -}}
+{{- end -}}
+
+{{- if not $item.HasChildren -}}
+	{{- if $isHamburger -}}
+<div class="hamburger-menu-item">
+	{{- partial "header/menu-icon.html" $id -}}
+	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
+</div>
+	{{- else -}}
+<span class="menu-item">
+	{{- partial "header/menu-icon.html" $id -}}
+	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
+</span>
+	{{- end -}}
+{{- else -}}
+	{{- $icon := partial "header/menu-icon.html" $id -}}
+	{{- $label := printf `%s<b><a href="%s">%s</a></b>` $icon ($item.URL | relURL) $item.Name -}}
+	{{- $lis := "" -}}
+	{{- range $item.Children -}}
+		{{- $lis = printf `%s<li class="dropdown-menu-item"><a href="%s">%s</a></li>` $lis (.URL | relURL) .Name -}}
+	{{- end -}}
+	{{- $panel := printf `<ul class="dropdown-menu">%s</ul>` $lis | safeHTML -}}
+	{{- $wrapperClass := cond $isHamburger "hamburger-menu-item menu-dropdown" (cond $isMore "menu-item menu-dropdown menu-dropdown-more" "menu-item menu-dropdown") -}}
+	{{- partial "dropdown.html" (dict
+		"id" (printf "%s-dd-%s" $variant $id)
+		"label" $label
+		"panel" $panel
+		"mode" $mode
+		"class" $wrapperClass
+		"ariaLabel" (printf "Toggle %s submenu" $item.Name)
+	) -}}
+{{- end -}}
