@@ -186,6 +186,7 @@ themesDir = "../.."
 
 
 
+# Menu icons: path relative to static/. Omit params.icon to use svg/menu/{identifier}.svg.
 [menu]
     [[menu.main]]
         identifier = "home"
@@ -225,8 +226,10 @@ themesDir = "../.."
         parent = "more"
         weight = 1
         # Optional; falls back to the target page's description.
+        # Icon path is relative to static/ (default: svg/menu/{identifier}.svg).
         # [menu.main.params]
         #     description = "…"
+        #     icon = "svg/menu/gallery.svg"
 
     [[menu.main]]
         identifier = "jokes"

@@ -182,12 +182,15 @@
 
 
 
+# Menu icons: path relative to static/. Omit params.icon to use svg/menu/{identifier}.svg.
 [menu]
     [[menu.main]]
         identifier = "home"
         name = "Home"
         url = "/"
         weight = 1
+        # [menu.main.params]
+        #     icon = "svg/menu/home.svg"
 
     [[menu.main]]
         identifier = "posts"
@@ -220,6 +223,8 @@
     #     url = "/gallery/"
     #     parent = "more"
     #     weight = 1
+    #     # [menu.main.params]
+    #     #     icon = "svg/menu/gallery.svg"
     # [[menu.main]]
     #     identifier = "jokes"
     #     name = "Jokes"

@@ -20,21 +20,21 @@
 {{- if not $item.HasChildren -}}
 	{{- if $isHamburger -}}
 <div class="hamburger-menu-item">
-	{{- partial "header/menu-icon.html" $id -}}
+	{{- partial "header/menu-icon.html" $item -}}
 	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
 </div>
 	{{- else -}}
 <span class="menu-item">
-	{{- partial "header/menu-icon.html" $id -}}
+	{{- partial "header/menu-icon.html" $item -}}
 	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
 </span>
 	{{- end -}}
 {{- else -}}
-	{{- $icon := partial "header/menu-icon.html" $id -}}
+	{{- $icon := partial "header/menu-icon.html" $item -}}
 	{{- $label := printf `%s<b><a href="%s">%s</a></b>` $icon ($item.URL | relURL) $item.Name -}}
 	{{- $lis := "" -}}
 	{{- range $item.Children -}}
-		{{- $childIcon := partial "header/menu-icon.html" .Identifier -}}
+		{{- $childIcon := partial "header/menu-icon.html" . -}}
 		{{- $lis = printf `%s<li class="dropdown-menu-item">%s<b><a href="%s">%s</a></b></li>` $lis $childIcon (.URL | relURL) .Name -}}
 	{{- end -}}
 	{{- $panel := printf `<ul class="dropdown-menu">%s</ul>` $lis | safeHTML -}}

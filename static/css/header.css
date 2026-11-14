@@ -135,11 +135,15 @@ nav#menu > .menu-item {
     height: 100%;
 }
 
-/* and their icons */
-svg[class^="menu-"][class$="-icon"] {
-    stroke: var(--menu-icon-color);
+/* and their icons (path via --menu-icon-mask from menu-icon partial) */
+span.menu-icon {
+    display: inline-block;
     width: var(--menu-font-size);
     height: var(--menu-font-size);
+    vertical-align: -0.15em;
+    background-color: var(--menu-icon-color);
+    -webkit-mask: var(--menu-icon-mask) center / contain no-repeat;
+    mask: var(--menu-icon-mask) center / contain no-repeat;
 }
 
 /* white spaces of separators */
