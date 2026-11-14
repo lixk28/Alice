@@ -91,6 +91,65 @@ fieldset#recent-updates > div.home-sidebar-item-content > ul {
     font-family: var(--sans-font);
 }
 
+/* Author sidebar component styles */
+#author .h-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1em;
+    font-family: var(--serif-font);
+}
+
+#author .h-card .u-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid slategray;
+    margin-bottom: 0.8em;
+}
+
+#author .h-card .author-info {
+    text-align: center;
+    width: 100%;
+}
+
+#author .h-card .p-name {
+    margin: 0.2em 0;
+    color: navy;
+    font-size: var(--h4-font-size);
+}
+
+#author .h-card .p-note {
+    margin: 0.5em 0;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+#author .h-card .author-social {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8em;
+    margin-top: 0.8em;
+}
+
+#author .h-card .author-social a {
+    color: navy;
+    text-decoration: none;
+    font-size: 0.9em;
+    padding: 0.3em 0.6em;
+    border-radius: 0.3em;
+    background-color: ghostwhite;
+    border: 1px solid slategray;
+    transition: all 0.2s ease;
+}
+
+#author .h-card .author-social a:hover {
+    background-color: navy;
+    color: white;
+}
+
 
 div.post-card-deck {
     display: flex;
