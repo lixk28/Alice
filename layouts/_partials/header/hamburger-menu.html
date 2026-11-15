@@ -1,5 +1,5 @@
 <label id="hamburger-btn-icon-wrapper" for="hamburger-btn">
-	<svg id="hamburger-btn-icon" aria-hidden="true"><use href="{{ `svg/ui-oval/menu-01.svg` | relURL }}"/></svg>
+	<svg id="hamburger-btn-icon" aria-hidden="true"><use href="{{ (site.Params.icons.sprite | default "svg/svg-icon-sprite.svg") | relURL }}#ui-oval_menu-01"/></svg>
 </label>
 <input type="checkbox" id="hamburger-btn" name="hamburger-btn">
 <nav id="hamburger-menu">

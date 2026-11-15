@@ -19,7 +19,7 @@
 				{{- if and (not $desc) $page -}}
 					{{- $desc = $page.Description | default $page.Params.description | default "" -}}
 				{{- end -}}
-	{{- $path := .Params.icon | default (printf "svg/ui-oval/%s.svg" $id) -}}
+	{{- $path := (.Params.icon.path | default (printf "svg/ui-oval/%s.svg" $id)) | relURL -}}
 	<li>
 		<span class="menu-icon menu-{{ $id }}-icon" style="--menu-icon-mask: url({{ $path | relURL }})" aria-hidden="true"></span>
 		<a href="{{ .URL | relURL }}">{{ .Name }}</a>

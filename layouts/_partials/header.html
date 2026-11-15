@@ -6,7 +6,7 @@
 	<div id="header-bg"></div>
 	{{- if .Params.toc.show -}}
 	<label id="droptoc-btn-icon-wrapper" for="droptoc-btn">
-		<svg id="droptoc-btn-icon"><use href="{{ `svg/ui-oval/align-left-02.svg` | relURL }}"/></svg>
+		<svg id="droptoc-btn-icon"><use href="{{ (site.Params.icons.sprite | default "svg/svg-icon-sprite.svg") | relURL }}#ui-oval_align-left-02"/></svg>
 	</label>
 	<input type="checkbox" id="droptoc-btn" name="droptoc-btn">
 	<aside id="droptoc">

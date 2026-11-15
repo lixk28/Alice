@@ -1,19 +1,5 @@
 # AGENTS.md
 
-## Example site
-
-Start the example site with:
-
-```bash
-hugo server --source=docs --bind 127.0.0.1 --port 1314 --disableFastRender
-```
-
-Open it in the browser at http://localhost:1314.
-
-After code changes, do not start this server on your own to verify the site. Assume the user runs it when they want a preview, or the server is already started and listening.
-
-The published GitHub Pages site is https://lixk28.github.io/Alice/. That is the official deployment of the example site, not a substitute for the local server.
-
 ## Project Structure
 
 This repository is the Alice theme. Theme templates, static files, assets, and the default config live at the repository root. `docs/` is the example site. Hugo is started with `--source=docs`; `docs/config.toml` sets `theme = "Alice"` and `themesDir = "../.."`, so the theme resolves to this repository.
@@ -28,6 +14,30 @@ CI uses Hugo 0.170.0 (single binary; the extended edition was removed upstream i
 - Example data lives under `docs/data/`. Friend YAML is in `docs/data/friends/`. Homepage news is in `docs/data/news/`. Change those files when editing the Friends page or the home sidebar; do not add a second copy at the theme root.
 
 Which template, stylesheet, and script belongs to which page or shortcode is listed under Components.
+
+## Building and Serving
+
+The npm scripts drive building and serving. The theme root is **not itself a Hugo site**, so:
+
+- `build` / `serve` — target a subscriber's own site root (no hard-coded `--source`; `serve` = `hugo server` and also rebuilds the icon sprite in `--watch` mode, for live icon preview).
+- `build:docs` / `serve:docs` — the same two, but for this repository's example site (`--source=docs`, port 1314).
+- `build:icons` — rebuild the icon sprite only; both `build`-flavors call it automatically.
+
+Run the example site locally with:
+
+```bash
+hugo server --source=docs --bind 127.0.0.1 --port 1314 --disableFastRender
+```
+
+Then open **http://localhost:1314**. After code changes, do not start this server on your own to verify the site. Assume the user runs it when they want a preview, or the server is already started and listening.
+
+The published GitHub Pages site is https://lixk28.github.io/Alice/. That is the official deployment of the example site, not a substitute for the local server.
+
+The build flow for a site in two steps:
+
+1. **`npm run build:icons`** — build the sprite. Source SVG icons live in `static/svg/ui-oval/`; `scripts/build-icons.js` optimizes each through svgo (colors folded to `currentColor`), then merges everything into `static/svg/svg-icon-sprite.svg` — one `<svg>` holding a `<symbol id="<dir>_<name>">` per icon. Defaults: `src = static/svg/ui-oval` → `out = static/svg/svg-icon-sprite.svg`; add your own icon dirs with `--src <dir>` (merged into the same sprite, `<dir>` prefixes keep ids collision-free); `--watch` rebuilds whenever a source `.svg` changes. Duplicate symbol ids **fail the build** — all collisions collected into one error (no early break); on success it logs `Bundled <dir> → <sprite>` then `Wrote <sprite> (N symbols)`.
+
+2. **Sprite → site**: `hugo` (or `hugo server`) picks the sprite up through `site.Params.icons.sprite` (`[params.icons] sprite = "svg/svg-icon-sprite.svg"` in `config.toml`, optional override in `docs/config.toml`). Templates reference it via `(site.Params.icons.sprite | default "svg/svg-icon-sprite.svg") | relURL`, so a site can point at its own sprite. The sprite is committed, so git-submodule and Hugo-module users skip step 1 unless an icon source changes.
 
 ## Components
 
@@ -57,7 +67,7 @@ Pages:
 - Chrome on every page:
   - `layouts/_partials/header.html`. Styles: `static/css/header.css`.
     - Menu entries: `layouts/_partials/header/menu-entry.html`, reused by the desktop `<nav id="menu">` (in `header.html`) and the mobile `layouts/_partials/header/hamburger-menu.html`.
-    - Menu icon: inline `<svg class="menu-icon"><use href="svg/ui-oval/{icon}.svg"/></svg>`, where `{icon}` is set via `[menu.main.params] icon` (a path relative to `static/`); when `icon` is omitted the default `svg/ui-oval/placeholder.svg` is used. Nested menus use the shared `dropdown` partial with Hugo native `parent` children (`menu-entry.html`).
+    - Menu icon: inline `<svg class="menu-icon"><use href="svg/svg-icon-sprite.svg#ui-oval_{file}"/></svg>`; `[menu.main.params.icon]` (`id` = sprite symbol id, `path` = full path relative to `static/`); when `icon` is omitted the default `ui-oval/placeholder` is used. See Building and Serving. Nested menus use the shared `dropdown` partial with Hugo native `parent` children (`menu-entry.html`).
   - `layouts/_partials/footer.html`. Styles: `static/css/footer.css`.
   - `layouts/_partials/head-extra.html`: empty hook called at the end of `<head>` in `baseof.html`. Sites override it to inject page CSS/JS without copying `baseof`.
 

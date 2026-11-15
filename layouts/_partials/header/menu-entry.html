@@ -4,28 +4,28 @@
 {{- $id := $item.Identifier -}}
 {{- $isMore := and (eq $id "more") (eq $variant "desktop") -}}
 {{- $mode := .mode | default "hover" -}}
+{{- $iconId := $item.Params.icon.id | default "placeholder" -}}
+{{- $spriteURL := (site.Params.icons.sprite | default "svg/svg-icon-sprite.svg") | relURL -}}
 
 {{- if not $item.HasChildren -}}
-	{{- $path := $item.Params.icon | default "svg/ui-oval/placeholder.svg" -}}
 	{{- if eq $variant "hamburger" -}}
 <div class="hamburger-menu-item">
-	<svg class="menu-icon menu-{{ $id }}-icon" aria-hidden="true"><use href="{{ $path | relURL }}"/></svg>
+	<svg class="menu-icon menu-{{ $id }}-icon" aria-hidden="true"><use href="{{ $spriteURL }}#{{ $iconId }}"/></svg>
 	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
 </div>
 	{{- else -}}
 <span class="menu-item">
-	<svg class="menu-icon menu-{{ $id }}-icon" aria-hidden="true"><use href="{{ $path | relURL }}"/></svg>
+	<svg class="menu-icon menu-{{ $id }}-icon" aria-hidden="true"><use href="{{ $spriteURL }}#{{ $iconId }}"/></svg>
 	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
 </span>
 	{{- end -}}
 {{- else -}}
-	{{- $path := $item.Params.icon | default "svg/ui-oval/placeholder.svg" -}}
-	{{- $icon := printf `<svg class="menu-icon menu-%s-icon" aria-hidden="true"><use href="%s"/></svg>` $id ($path | relURL) -}}
+	{{- $icon := printf `<svg class="menu-icon menu-%s-icon" aria-hidden="true"><use href="%s#%s"/></svg>` $id $spriteURL $iconId -}}
 	{{- $label := printf `%s<b><a href="%s">%s</a></b>` $icon ($item.URL | relURL) $item.Name -}}
 	{{- $lis := "" -}}
 	{{- range $item.Children -}}
-		{{- $childPath := .Params.icon | default "svg/ui-oval/placeholder.svg" -}}
-		{{- $childIcon := printf `<svg class="menu-icon menu-%s-icon" aria-hidden="true"><use href="%s"/></svg>` .Identifier ($childPath | relURL) -}}
+		{{- $childId := .Params.icon.id | default "placeholder" -}}
+		{{- $childIcon := printf `<svg class="menu-icon menu-%s-icon" aria-hidden="true"><use href="%s#%s"/></svg>` .Identifier $spriteURL $childId -}}
 		{{- $lis = printf `%s<li class="dropdown-menu-item">%s<b><a href="%s">%s</a></b></li>` $lis $childIcon (.URL | relURL) .Name -}}
 	{{- end -}}
 	{{- $panel := printf `<ul class="dropdown-menu">%s</ul>` $lis | safeHTML -}}
