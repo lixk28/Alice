@@ -56,9 +56,8 @@ Pages:
 - `layouts/404.html` renders the 404 page and has no separate stylesheet.
 - Chrome on every page:
   - `layouts/_partials/header.html`. Styles: `static/css/header.css`.
-    - Menu entries: `layouts/_partials/header/menu-entry.html` and `menu-icon.html`.
-    - Menu icons: path relative to `static/` via `[menu.main.params] icon`; default `svg/ui-oval/{identifier}.svg` (built-ins under `static/svg/ui-oval/`). Rendered as CSS-mask `span.menu-icon`.
-    - Nested menus use the shared `dropdown` partial with Hugo native `parent` children (`menu-entry.html`).
+    - Menu entries: `layouts/_partials/header/menu-entry.html`, reused by the desktop `<nav id="menu">` (in `header.html`) and the mobile `layouts/_partials/header/hamburger-menu.html`.
+    - Menu icon: inline `<svg class="menu-icon"><use href="svg/ui-oval/{icon}.svg"/></svg>`, where `{icon}` is set via `[menu.main.params] icon` (a path relative to `static/`); when `icon` is omitted the default `svg/ui-oval/placeholder.svg` is used. Nested menus use the shared `dropdown` partial with Hugo native `parent` children (`menu-entry.html`).
   - `layouts/_partials/footer.html`. Styles: `static/css/footer.css`.
   - `layouts/_partials/head-extra.html`: empty hook called at the end of `<head>` in `baseof.html`. Sites override it to inject page CSS/JS without copying `baseof`.
 

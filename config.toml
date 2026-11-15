@@ -182,7 +182,7 @@
 
 
 
-# Menu icons: path relative to static/. Omit params.icon to use svg/ui-oval/{identifier}.svg.
+# Menu icons: path relative to static/. Omit params.icon to use svg/ui-oval/placeholder.svg.
 [menu]
     [[menu.main]]
         identifier = "home"
