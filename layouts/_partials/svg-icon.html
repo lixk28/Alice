@@ -1,0 +1,48 @@
+{{- /* 
+Resolve an icon URL — reusable for any inline `<use>` / sprite icon.
+Priority:
+  1. path (when it points to an .svg file);
+  2. sprite#<id> (when the sprite contains that symbol id;
+     parsed once, cached globally in hugo.Store);
+  3. "svg/placeholder.svg" (universal default).
+  Every returned value goes through relURL, so it resolves from any page depth
+  (e.g. /posts/).
+
+Parameters (flat dict, e.g. a menu entry's .Params.icon):
+  path (string, optional): path to an .svg file, e.g. "svg/ui-oval/home.svg".
+    When present and ends with ".svg", it wins outright; the sprite is ignored.
+  id   (string, optional): sprite symbol id, e.g. "ui-oval_home". Used only
+    when "path" is absent; when "id" is missing or not in the sprite (from
+    site.Params.icons.sprite, default "svg/svg-icon-sprite.svg"), nothing
+    further happens and the default "svg/placeholder.svg" is returned.
+
+Return:
+  string $iconURL — the icon reference for an inline `<use href="...">`, always
+  root-relative: a "/…/icon.svg" path, a "/sprite.svg#id" fragment, or the
+  "/svg/placeholder.svg" default when nothing resolved.
+*/ -}}
+{{- $sprite := (site.Params.icons.sprite | default "svg/svg-icon-sprite.svg") -}}
+{{- $spriteIDs := hugo.Store.Get "alice-sprite-ids" -}}
+{{- if not $spriteIDs -}}
+	{{- $raw := os.ReadFile $sprite -}}
+	{{- with $raw | transform.Unmarshal -}}
+		{{- $spriteIDs = slice -}}
+		{{- range .symbol -}}
+			{{- $spriteIDs = $spriteIDs | append (index . "-id") -}}
+		{{- end -}}
+		{{- hugo.Store.Set "alice-sprite-ids" $spriteIDs -}}
+	{{- end -}}
+{{- end -}}
+{{- $iconPath := .path -}}
+{{- $iconId := .id -}}
+{{- $iconURL := "svg/placeholder.svg" | relURL -}}
+{{- if $iconPath -}}
+	{{- if strings.HasSuffix $iconPath ".svg" -}}
+		{{- $iconURL = $iconPath | relURL -}}
+	{{- end -}}
+{{- else -}}
+	{{- if in $spriteIDs $iconId -}}
+		{{- $iconURL = printf "%s#%s" ($sprite | relURL) $iconId -}}
+	{{- end -}}
+{{- end -}}
+{{- return $iconURL -}}
