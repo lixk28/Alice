@@ -141,6 +141,8 @@ svg.menu-icon {
     width: var(--menu-font-size);
     height: var(--menu-font-size);
     vertical-align: -0.15em;
+}
+svg.menu-icon path {
     stroke: var(--menu-icon-color);
 }
 

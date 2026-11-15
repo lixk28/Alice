@@ -63,13 +63,16 @@ p.post-next-title {
 
 svg.post-prev-icon,
 svg.post-next-icon {
+    width: 2rem;
+    height: 2rem;
+}
+svg.post-prev-icon path,
+svg.post-next-icon path {
     stroke: var(--link-color);
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
     fill: none;
-    width: 2rem;
-    height: 2rem;
 }
 
 svg.post-prev-icon {

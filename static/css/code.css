@@ -119,27 +119,32 @@ div.code-block-copy-icon-wrapper {
 }
 
 svg.code-block-copy-icon {
-    stroke: royalblue;
-    stroke-width: 1;
-    stroke-linecap: round;
-    stroke-linejoin: round;
     visibility: visible;
     width: 3ch;
     height: 3ch;
 }
-
-svg.code-block-check-icon,
-svg.code-block-close-icon {
-    stroke: navy;
+svg.code-block-copy-icon path {
+    stroke: royalblue;
     stroke-width: 1;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+svg.code-block-check-icon,
+svg.code-block-close-icon {
     visibility: hidden;
     position: absolute;
     top: .5ch;
     left: .5ch;
     height: 3ch;
     width: 3ch;
+}
+svg.code-block-check-icon path,
+svg.code-block-close-icon path {
+    stroke: navy;
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 /* chroma highlight div */
