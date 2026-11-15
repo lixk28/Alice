@@ -13,7 +13,8 @@ label#droptoc-btn-icon-wrapper {
 }
 
 svg#droptoc-btn-icon {
-    stroke: Black;
+    stroke: currentColor;
+    color: Black;
     width: var(--dropdown-toc-icon-size);
     height: var(--dropdown-toc-icon-size);
 }
