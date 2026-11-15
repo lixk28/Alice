@@ -47,15 +47,5 @@
 		{{- end -}}
 	{{- end -}}
 	</nav>
-	<label id="hamburger-btn-icon-wrapper" for="hamburger-btn">
-		<svg id="hamburger-btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 12H21M3 6H21M3 18H21" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-	</label>
-	<input type="checkbox" id="hamburger-btn" name="hamburger-btn">
-	<nav id="hamburger-menu">
-		{{- with .Site.Menus.main -}}
-		{{- range $item := . -}}
-		{{- partial "header/menu-entry.html" (dict "item" $item "variant" "hamburger" "mode" "click") -}}
-		{{- end -}}
-		{{- end -}}
-	</nav>
+	{{- partial "header/hamburger-menu.html" . -}}
 </header>

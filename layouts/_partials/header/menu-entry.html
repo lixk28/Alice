@@ -1,47 +1,35 @@
-{{- /*
-  Renders one top-level header menu entry.
-  Context: dict "item" MenuEntry "variant" ("desktop"|"hamburger") "mode" string
-
-  Dropdown when the item has native .Children (menu entries with parent = this id).
-
-  isHamburger — inside the mobile drawer (forces click; hamburger-menu-item).
-  isMore      — desktop identifier "more" (menu-dropdown-more under-bar panel).
-*/ -}}
+{{- /* One menu entry. A plain item renders as an inline link; when the item has native .Children it becomes a dropdown whose panel lists those children. Context: dict "item" MenuEntry "variant" ("desktop"|"hamburger") "mode" string. */ -}}
 {{- $item := .item -}}
 {{- $variant := .variant | default "desktop" -}}
 {{- $id := $item.Identifier -}}
-{{- $isHamburger := eq $variant "hamburger" -}}
-{{- $isMore := and (eq $id "more") (not $isHamburger) -}}
+{{- $isMore := and (eq $id "more") (eq $variant "desktop") -}}
 {{- $mode := .mode | default "hover" -}}
-{{- if $isHamburger -}}
-	{{- $mode = "click" -}}
-{{- end -}}
 
 {{- if not $item.HasChildren -}}
-	{{- $path := $item.Params.icon | default (printf "svg/ui-oval/%s.svg" $item.Identifier) -}}
-	{{- if $isHamburger -}}
+	{{- $path := $item.Params.icon | default "svg/ui-oval/placeholder.svg" -}}
+	{{- if eq $variant "hamburger" -}}
 <div class="hamburger-menu-item">
-	<span class="menu-icon menu-{{ $item.Identifier }}-icon" style="--menu-icon-mask: url({{ $path | relURL }})" aria-hidden="true"></span>
+	<svg class="menu-icon menu-{{ $id }}-icon" aria-hidden="true"><use href="{{ $path | relURL }}"/></svg>
 	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
 </div>
 	{{- else -}}
 <span class="menu-item">
-	<span class="menu-icon menu-{{ $item.Identifier }}-icon" style="--menu-icon-mask: url({{ $path | relURL }})" aria-hidden="true"></span>
+	<svg class="menu-icon menu-{{ $id }}-icon" aria-hidden="true"><use href="{{ $path | relURL }}"/></svg>
 	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
 </span>
 	{{- end -}}
 {{- else -}}
-	{{- $path := $item.Params.icon | default (printf "svg/ui-oval/%s.svg" $item.Identifier) -}}
-	{{- $icon := printf `<span class="menu-icon menu-%s-icon" style="--menu-icon-mask: url(%s)" aria-hidden="true"></span>` $item.Identifier ($path | relURL) -}}
+	{{- $path := $item.Params.icon | default "svg/ui-oval/placeholder.svg" -}}
+	{{- $icon := printf `<svg class="menu-icon menu-%s-icon" aria-hidden="true"><use href="%s"/></svg>` $id ($path | relURL) -}}
 	{{- $label := printf `%s<b><a href="%s">%s</a></b>` $icon ($item.URL | relURL) $item.Name -}}
 	{{- $lis := "" -}}
 	{{- range $item.Children -}}
-		{{- $childPath := .Params.icon | default (printf "svg/ui-oval/%s.svg" .Identifier) -}}
-		{{- $childIcon := printf `<span class="menu-icon menu-%s-icon" style="--menu-icon-mask: url(%s)" aria-hidden="true"></span>` .Identifier ($childPath | relURL) -}}
+		{{- $childPath := .Params.icon | default "svg/ui-oval/placeholder.svg" -}}
+		{{- $childIcon := printf `<svg class="menu-icon menu-%s-icon" aria-hidden="true"><use href="%s"/></svg>` .Identifier ($childPath | relURL) -}}
 		{{- $lis = printf `%s<li class="dropdown-menu-item">%s<b><a href="%s">%s</a></b></li>` $lis $childIcon (.URL | relURL) .Name -}}
 	{{- end -}}
 	{{- $panel := printf `<ul class="dropdown-menu">%s</ul>` $lis | safeHTML -}}
-	{{- $wrapperClass := cond $isHamburger "hamburger-menu-item menu-dropdown" (cond $isMore "menu-item menu-dropdown menu-dropdown-more" "menu-item menu-dropdown") -}}
+	{{- $wrapperClass := cond $isMore "menu-item menu-dropdown menu-dropdown-more" (cond (eq $variant "hamburger") "hamburger-menu-item menu-dropdown" "menu-item menu-dropdown") -}}
 	{{- partial "dropdown.html" (dict
 		"id" (printf "%s-dd-%s" $variant $id)
 		"label" $label
