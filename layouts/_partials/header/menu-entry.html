@@ -18,23 +18,26 @@
 {{- end -}}
 
 {{- if not $item.HasChildren -}}
+	{{- $path := $item.Params.icon | default (printf "svg/ui-oval/%s.svg" $item.Identifier) -}}
 	{{- if $isHamburger -}}
 <div class="hamburger-menu-item">
-	{{- partial "header/menu-icon.html" $item -}}
+	<span class="menu-icon menu-{{ $item.Identifier }}-icon" style="--menu-icon-mask: url({{ $path | relURL }})" aria-hidden="true"></span>
 	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
 </div>
 	{{- else -}}
 <span class="menu-item">
-	{{- partial "header/menu-icon.html" $item -}}
+	<span class="menu-icon menu-{{ $item.Identifier }}-icon" style="--menu-icon-mask: url({{ $path | relURL }})" aria-hidden="true"></span>
 	<b><a href="{{ $item.URL | relURL }}">{{ $item.Name }}</a></b>
 </span>
 	{{- end -}}
 {{- else -}}
-	{{- $icon := partial "header/menu-icon.html" $item -}}
+	{{- $path := $item.Params.icon | default (printf "svg/ui-oval/%s.svg" $item.Identifier) -}}
+	{{- $icon := printf `<span class="menu-icon menu-%s-icon" style="--menu-icon-mask: url(%s)" aria-hidden="true"></span>` $item.Identifier ($path | relURL) -}}
 	{{- $label := printf `%s<b><a href="%s">%s</a></b>` $icon ($item.URL | relURL) $item.Name -}}
 	{{- $lis := "" -}}
 	{{- range $item.Children -}}
-		{{- $childIcon := partial "header/menu-icon.html" . -}}
+		{{- $childPath := .Params.icon | default (printf "svg/ui-oval/%s.svg" .Identifier) -}}
+		{{- $childIcon := printf `<span class="menu-icon menu-%s-icon" style="--menu-icon-mask: url(%s)" aria-hidden="true"></span>` .Identifier ($childPath | relURL) -}}
 		{{- $lis = printf `%s<li class="dropdown-menu-item">%s<b><a href="%s">%s</a></b></li>` $lis $childIcon (.URL | relURL) .Name -}}
 	{{- end -}}
 	{{- $panel := printf `<ul class="dropdown-menu">%s</ul>` $lis | safeHTML -}}
