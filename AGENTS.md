@@ -67,7 +67,7 @@ Pages:
 - Chrome on every page:
   - `layouts/_partials/header.html`. Styles: `static/css/header.css`.
     - Menu entries: `layouts/_partials/header/menu-entry.html`, reused by the desktop `<nav id="menu">` (in `header.html`) and the mobile `layouts/_partials/header/hamburger-menu.html`.
-    - Menu icon: inline `<svg class="menu-icon"><use href="svg/svg-icon-sprite.svg#ui-oval_{file}"/></svg>`; `[menu.main.params.icon]` (`id` = sprite symbol id, `path` = full path relative to `static/`); when `icon` is omitted the default `ui-oval/placeholder` is used. See Building and Serving. Nested menus use the shared `dropdown` partial with Hugo native `parent` children (`menu-entry.html`).
+    - Menu icon: `layouts/_partials/svg-icon.html` resolves an icon to an href for the inline `<svg class="menu-icon"><use href="..."/></svg>`. It takes a flat dict (a menu entry's `[menu.main.params.icon]`; `id` = sprite symbol id like `ui-oval_home-03`, `path` = full file path relative to `static/` like `svg/ui-oval/home-03.svg`), and returns a site-root URL via `relURL`: `path` when it ends with `.svg`, else `sprite#<id>` when the sprite contains that symbol id, else the default `svg/placeholder.svg`. Menu entries use it through `layouts/_partials/header/menu-entry.html` (desktop `<nav id="menu">` in `header.html` and mobile `layouts/_partials/header/hamburger-menu.html`). See Building and Serving. Nested menus use the shared `dropdown` partial with Hugo native `parent` children (`menu-entry.html`).
   - `layouts/_partials/footer.html`. Styles: `static/css/footer.css`.
   - `layouts/_partials/head-extra.html`: empty hook called at the end of `<head>` in `baseof.html`. Sites override it to inject page CSS/JS without copying `baseof`.
 
