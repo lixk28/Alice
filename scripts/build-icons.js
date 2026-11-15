@@ -8,7 +8,7 @@
 // Usage:
 //   node scripts/build-icons.js                      # theme defaults
 //   node scripts/build-icons.js --src dir1,dir2,icon.svg  # add icon sources (dirs and/or svg files), comma-separated
-//   node scripts/build-icons.js --out <file>      # custom output; default: <theme>/static/svg/svg-icon-sprite.svg
+//   node scripts/build-icons.js --out <file>      # custom output; default: <theme>/static/svg/sprite
 //   node scripts/build-icons.js --watch            # rebuild whenever a source .svg changes (pair with `hugo server`)
 //
 // The sprite is committed; serving a Hugo site needs no Node. Rerun this only when icon sources change.
@@ -22,7 +22,7 @@ const SVGSpriter = require('svg-sprite');
 
 const DEFAULTS = {
   src: path.resolve(__dirname, '../static/svg/ui-oval'),
-  out: path.resolve(__dirname, '../static/svg/svg-icon-sprite.svg'),
+  out: path.resolve(__dirname, '../static/svg/sprite', 'svg-icon-sprite.svg'),
 };
 
 function valueOf(name, fallback) {

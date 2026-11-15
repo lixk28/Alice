@@ -13,7 +13,7 @@ Parameters (flat dict, e.g. a menu entry's .Params.icon):
     When present and ends with ".svg", it wins outright; the sprite is ignored.
   id   (string, optional): sprite symbol id, e.g. "ui-oval_home". Used only
     when "path" is absent; when "id" is missing or not in the sprite (from
-    site.Params.icons.sprite, default "svg/svg-icon-sprite.svg"), nothing
+    site.Params.icons.sprite, default "svg/sprite/svg-icon-sprite.svg"), nothing
     further happens and the default "svg/placeholder.svg" is returned.
 
 Return:
@@ -21,7 +21,7 @@ Return:
   root-relative: a "/…/icon.svg" path, a "/sprite.svg#id" fragment, or the
   "/svg/placeholder.svg" default when nothing resolved.
 */ -}}
-{{- $sprite := (site.Params.icons.sprite | default "svg/svg-icon-sprite.svg") -}}
+{{- $sprite := (site.Params.icons.sprite | default "svg/sprite/svg-icon-sprite.svg") -}}
 {{- $spriteIDs := hugo.Store.Get "alice-sprite-ids" -}}
 {{- if not $spriteIDs -}}
 	{{- $raw := os.ReadFile $sprite -}}
