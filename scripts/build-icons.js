@@ -32,6 +32,16 @@ const DEFAULTS = {
   spriteDir: 'sprite',     // output dir, relative to rootDir, for every sprite + the shared map.
   sprites: [{ srcList: ['ui-oval'], out: 'ui-oval-sprite.svg' }], // srcList = dirs inside rootDir; out = file NAME inside spriteDir.
   mapFile: 'sprite_map.json', // map file NAME inside spriteDir.
+
+  // Source traversal for each `sprites[].srcList` entry:
+  //   recursive : descend into subdirectories (default true). Set false to only read a dir's .svg files.
+  //   depth    : max traversal depth below a src dir. Default 0 = no limit.
+  //   exclude : exclude source paths by RegExp — a single pattern, or a comma-separated list / array of patterns.
+  //                A directory hit skips the whole subtree; a file hit skips that file (gitignore-flavored last-match-wins logic).
+  recursive: true,
+  depth: 0,
+  exclude: [],
+
   // SVGO 3 optimizer options passed straight through to svgo.optimize(). See
   // https://svgo.dev/docs/usage/node/ and https://svgo.dev/docs/preset-default/.
   svgo: {},
@@ -48,6 +58,9 @@ if (fs.existsSync(CONFIG_PATH)) {
   cfg.spriteDir = user.spriteDir || DEFAULTS.spriteDir;
   cfg.mapFile = user.mapFile || DEFAULTS.mapFile;
   cfg.svgo = user.svgo || {};
+  cfg.recursive = user.recursive !== undefined ? user.recursive : DEFAULTS.recursive;
+  cfg.depth = user.depth !== undefined ? user.depth : DEFAULTS.depth;
+  cfg.exclude = user.exclude !== undefined ? user.exclude : DEFAULTS.exclude;
   cfg.sprites = (user.sprites || []).map((s) => ({ ...s }));
 }
 
@@ -87,21 +100,47 @@ const sprites = (cfg.sprites || []).map((s) => ({
 
 function collectIconFiles(dirs) {
   const files = [];
+
+  // gitignore-style excluder from cfg.exclude (string: comma-separated, or array; `!` negates; RegExp per pattern).
+  const rules = [];
+  if (cfg.exclude != null) {
+    const list = Array.isArray(cfg.exclude)
+      ? cfg.exclude
+      : String(cfg.exclude).split(',').filter((s) => s.trim() !== '');
+    for (const raw of list) {
+      if (raw == null || raw === '') continue;
+      rules.push({ negate: raw.startsWith('!'), re: new RegExp(raw.replace(/^!/, '')) });
+    }
+  }
+  const excluded = rules.length
+    ? (rel) => {
+        let out = false;
+        for (const r of rules) if (r.re.test(rel)) out = !r.negate; // last matching pattern wins (gitignore-flavored)
+        return out;
+      }
+    : null;
+
   for (const p of dirs) {
     if (fs.statSync(p).isDirectory()) {
-      files.push(
-        ...fs
-          .readdirSync(p)
-          .filter((f) => f.endsWith('.svg'))
-          .sort()
-          .map((f) => path.join(p, f))
-      );
+      const walk = (absDir, relPrefix, depth) => {
+        if (cfg.depth > 0 && depth > cfg.depth) return;
+        for (const ent of fs.readdirSync(absDir, { withFileTypes: true })) {
+          const rel = relPrefix ? `${relPrefix}/${ent.name}` : ent.name;
+          if (ent.isDirectory()) {
+            if (cfg.recursive && !(excluded && excluded(rel))) walk(path.join(absDir, ent.name), rel, depth + 1);
+          } else if (ent.isFile() && ent.name.endsWith('.svg')) {
+            if (excluded && excluded(rel)) continue;
+            files.push(path.join(absDir, ent.name));
+          }
+        }
+      };
+      walk(p, path.basename(p), 1);
     } else {
-      // a single standalone svg file also works: --src svg/placeholder.svg
+      // a single standalone svg file also works: --src static/svg/placeholder.svg
       files.push(p);
     }
   }
-  return files;
+  return files.sort();
 }
 
 // Symbol id = "<dirName>_<basename>". Reject duplicates instead of silently overriding.

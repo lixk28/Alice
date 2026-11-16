@@ -38,6 +38,16 @@ module.exports = {
     // { srcList: ['minimal-ui'], out: 'minimal-ui-sprite.svg' },
   ],
 
+  // Source traversal for each `sprites[].srcList` entry:
+  //   recursive : descend into subdirectories (default true). Set false to only read a dir's top-level .svg files.
+  //   depth    : max traversal depth below a src dir. Default 0 = no limit.
+  //   exclude  : exclude source paths by RegExp — a single pattern, or a comma-separated string / array of patterns.
+  //                A matching directory is skipped along with its whole subtree; a matching file is skipped.
+  //                A pattern starting with `!` negates (last matching rule wins).
+  recursive: true,
+  depth: 0,
+  exclude: [],
+
   // Single shared lookup map (file name inside `spriteDir`): { "<icon path>": { "sprite": "<out>", "id": "<dirName>_<name>" } }.
   mapFile: 'sprite_map.json',
 
