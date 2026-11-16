@@ -12,14 +12,11 @@ Priority:
 Parameters (flat dict):
   path (string)                  : the icon's key relative to rootDir, e.g. "ui-oval/home-03.svg". This
                                doubles as the shared sprite_map.json lookup key.
-  class (string, optional)      : the class attribute on the outer `<svg>`.
+  class (string or list, optional): the class attribute on the outer `<svg>`; a list is joined with spaces.
   id (string, optional)        : the id attribute on the outer `<svg>`.
   attrs (string, optional)    : extra literal attributes appended to the outer `<svg>` (aria-hidden is always set).
-  url (bool, optional)        : if true, return ONLY the resolved URL string (for CSS-mask / background-image
-                             consumers that cannot use an inline <svg>).
 
-Return:  a full inline `<svg aria-hidden="true" ...><use href="..."/></svg>` (trusted HTML) by default, or
-the root-relative URL string when `url` is set.
+Return:  a full inline `<svg aria-hidden="true" ...><use href="..."/></svg>` (trusted HTML).
 */ -}}
 {{- $map := hugo.Store.Get "alice-sprite-map" -}}
 {{- if not $map -}}
@@ -33,14 +30,11 @@ the root-relative URL string when `url` is set.
 {{- if $entry -}}
 	{{- $iconURL = printf "%s#%s" ((index $entry "sprite") | relURL) (index $entry "id") -}}
 {{- end -}}
-{{- $result := $iconURL -}}
-{{- if not .url -}}
-	{{- $extra := "" -}}
-	{{- $class := "" -}}
-	{{- if reflect.IsSlice .class -}}{{- $class = delimit .class " " -}}{{- else -}}{{- $class = .class -}}{{- end -}}
-	{{- with $class -}}{{- $extra = printf ` class="%s"` . -}}{{- end -}}
-	{{- with .id -}}{{- $extra = printf `%s id="%s"` $extra . -}}{{- end -}}
-	{{- with .attrs -}}{{- $extra = printf `%s %s` $extra . -}}{{- end -}}
-	{{- $result = (printf `<svg aria-hidden="true"%s><use href="%s"/></svg>` $extra $iconURL) | safeHTML -}}
-{{- end -}}
-{{- return $result -}}
+{{- $class := "" -}}
+{{- if reflect.IsSlice .class -}}{{- $class = delimit .class " " -}}{{- else -}}{{- $class = .class -}}{{- end -}}
+{{- $extra := "" -}}
+{{- with $class -}}{{- $extra = printf ` class="%s"` . -}}{{- end -}}
+{{- with .id -}}{{- $extra = printf `%s id="%s"` $extra . -}}{{- end -}}
+{{- with .attrs -}}{{- $extra = printf `%s %s` $extra . -}}{{- end -}}
+{{- $svgHTML := printf `<svg aria-hidden="true"%s><use href="%s"/></svg>` $extra $iconURL -}}
+{{- $svgHTML | safeHTML -}}

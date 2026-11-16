@@ -188,10 +188,9 @@ themesDir = "../.."
 
 # Menu icons — params.icon is a map. Required:
 #   path = the icon's key relative to rootDir ("ui-oval/home-03.svg"), used to look up the sprite id.
-# Optional (passed to the rendered <svg>):
-#   class = extra classes (a list; joined with spaces for the <svg>); when omitted the header uses the
-#           default "menu-icon menu-<id>-icon".
-#   id    = an id for the <svg>.
+# Optional (applied to the rendered <svg>):
+#   class = extra classes (a string or a list; appended to the default "menu-icon menu-<id>-icon").
+#   id    = an id for the <svg> (overrides any default).
 #   attrs = raw literal attributes appended to the <svg> (aria-hidden="true" is always present).
 # To add a new icon, drop its svg into a sprite source dir (see sprite.config.js `sprites`) and rerun
 # `npm run build:icons`; the id is generated automatically.
@@ -203,7 +202,6 @@ themesDir = "../.."
         weight = 1
         [menu.main.params.icon]
             path = "ui-oval/home-03.svg"
-            class = ["menu-icon", "menu-home-icon"]
 
     [[menu.main]]
         identifier = "posts"
@@ -212,7 +210,6 @@ themesDir = "../.."
         weight = 2
         [menu.main.params.icon]
             path = "ui-oval/archive.svg"
-            class = ["menu-icon", "menu-posts-icon"]
 
     [[menu.main]]
         identifier = "categories"
@@ -221,7 +218,6 @@ themesDir = "../.."
         weight = 3
         [menu.main.params.icon]
             path = "ui-oval/folder.svg"
-            class = ["menu-icon", "menu-categories-icon"]
 
     [[menu.main]]
         identifier = "tags"
@@ -230,7 +226,6 @@ themesDir = "../.."
         weight = 4
         [menu.main.params.icon]
             path = "ui-oval/tag-01.svg"
-            class = ["menu-icon", "menu-tags-icon"]
 
     # More is a section hub (/more/); dropdown children can be section or taxonomy.
     [[menu.main]]
@@ -240,7 +235,6 @@ themesDir = "../.."
         weight = 5
         [menu.main.params.icon]
             path = "ui-oval/brackets-ellipses.svg"
-            class = ["menu-icon", "menu-more-icon"]
 
     [[menu.main]]
         identifier = "gallery"
@@ -253,7 +247,6 @@ themesDir = "../.."
             description = "…"
         [menu.main.params.icon]
             path = "ui-oval/image-01.svg"
-            class = ["menu-icon", "menu-gallery-icon"]
 
     [[menu.main]]
         identifier = "jokes"
@@ -263,7 +256,6 @@ themesDir = "../.."
         weight = 2
         [menu.main.params.icon]
             path = "ui-oval/message-smile-square.svg"
-            class = ["menu-icon", "menu-jokes-icon"]
 
     [[menu.main]]
         identifier = "friends"
@@ -272,7 +264,6 @@ themesDir = "../.."
         weight = 6
         [menu.main.params.icon]
             path = "ui-oval/users-01.svg"
-            class = ["menu-icon", "menu-friends-icon"]
 
     [[menu.main]]
         identifier = "about"
@@ -281,7 +272,6 @@ themesDir = "../.."
         weight = 7
         [menu.main.params.icon]
             path = "ui-oval/user-01.svg"
-            class = ["menu-icon", "menu-about-icon"]
 
     [[menu.main]]
         identifier = "rss"
@@ -290,7 +280,6 @@ themesDir = "../.."
         weight = 8
         [menu.main.params.icon]
             path = "ui-oval/rss-01.svg"
-            class = ["menu-icon", "menu-rss-icon"]
 
 [sitemap]
     changefreq = 'weekly'
