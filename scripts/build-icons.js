@@ -1,25 +1,22 @@
 'use strict';
 
-// Build one sprite from source icon directories.
+// Build one or more icon sprites from source icon directories, plus a shared path→id map.
 //
 // Pipeline:  svgo (optimize each *.svg) → svg-sprite (one <svg> with a <symbol id="<dir>_<name>"> per icon).
-// The <dir> prefix namespaces each source directory, so a site's custom icons never collide with the theme's "ui-oval_" ids.
+// The <dir> prefix namespaces each source directory, so a site's custom icon sets never collide with the theme's "ui-oval_" ids.
 //
 // Configuration is resolved in this precedence order (higher wins):
 //   1. Inline DEFAULTS (built in, used when sprite.config.js is absent or a key is missing).
 //   2. sprite.config.js at the theme/site root — the recommended place to set
-//      `enabled` / `srcList` / `spriteDir` / `outFile`.
-//   3. CLI flags.
+//      `enabled` / `sprites` (each `{ srcList, out }`) / `mapFile`.
+//   3. CLI flags (`--src` / `--out` override the LAST sprite entry; `--enabled=false` skips).
 //
-// Usage:
-//   node scripts/build-icons.js                      # sprite.config.js (or inline defaults)
-//   node scripts/build-icons.js --src dir1,dir2,icon.svg  # add icon sources (dirs and/or svg files), comma-separated
-//   node scripts/build-icons.js --out <file>      # custom output; overrides spriteDir + outFile
-//   node scripts/build-icons.js --watch            # rebuild whenever a source .svg changes (pair with `hugo server`)
-//   node scripts/build-icons.js --no-enabled      # CLI toggle to skip building (overrides config.enabled=true)
+// Output:
+//   * each sprite in `sprites[]` → its own `<symbol>` sprite file; and
+//   * one shared `sprite_map.json` pairing every configured icon `path` → { "sprite", "id" },
+//     which templates read once (cached in hugo.Store) to resolve `path` → "(sprite | relURL)#id".
 //
-// The sprite + path→id map are committed; serving a Hugo site needs no Node. Rerun only
-// when icon sources change.
+// Sprites + map are committed; serving a Hugo site needs no Node. Rerun only when icon sources change.
 
 const fs = require('fs');
 const path = require('path');
@@ -28,39 +25,36 @@ const SVGSpriter = require('svg-sprite');
 
 // --- Config resolution (defaults < sprite.config.js < CLI) --------------------------
 
-// Paths inside the config are relative to the config file; the script resolves them.
 const CONFIG_PATH = path.resolve(__dirname, '../sprite.config.js');
 const DEFAULTS = {
   enabled: true,
   rootDir: 'static/svg',
-  srcList: ['ui-oval'],
-  spriteDir: 'sprite',
-  outFile: 'svg-icon-sprite.svg',
-  mapFile: 'sprite_map.json',
+  sprites: [{ srcList: ['static/svg/ui-oval'], out: 'static/svg/ui-oval-sprite.svg' }],
+  mapFile: 'static/svg/sprite_map.json',
 };
 
 const root = path.dirname(CONFIG_PATH);
-function resolvePaths(cfg) {
-  return {
-    enabled: cfg.enabled,
-    root: path.resolve(root, cfg.rootDir),
-    src: cfg.srcList.map((p) => path.resolve(root, cfg.rootDir, p)),
-    out: path.resolve(root, cfg.rootDir, cfg.spriteDir, cfg.outFile),
-    map: path.resolve(root, cfg.rootDir, cfg.spriteDir, cfg.mapFile),
-    static: path.resolve(root, 'static'),
-  };
-}
 
 // Merge in this order (later keys win): DEFAULTS < sprite.config.js < CLI.
-let cfg = { ...DEFAULTS };
+let cfg = { ...DEFAULTS, sprites: (DEFAULTS.sprites || []).map((s) => ({ ...s })) };
 if (fs.existsSync(CONFIG_PATH)) {
-  cfg = { ...cfg, ...require(CONFIG_PATH) };
+  const user = require(CONFIG_PATH);
+  cfg.enabled = user.enabled;
+  cfg.rootDir = user.rootDir;
+  cfg.mapFile = user.mapFile;
+  cfg.sprites = (user.sprites || []).map((s) => ({ ...s }));
 }
-const resolved = resolvePaths(cfg);
+
+// Paths (root-relative keys in config are resolved against the theme/site root).
+const resolved = {
+  root: path.resolve(root, cfg.rootDir), // rootDir (icons resolved against, e.g. static/svg)
+  static: path.resolve(root, 'static'), // static dir (web-served root)
+  map: path.resolve(root, cfg.mapFile),
+};
 
 // --- CLI overrides -------------------------------------------------------------
 
-const srcDirs = [...resolved.src];
+const srcDirs = [];
 for (let i = 0; i < process.argv.length - 1; i++) {
   if (process.argv[i] === '--src') {
     for (const p of process.argv[i + 1].split(',')) srcDirs.push(path.resolve(p));
@@ -70,14 +64,16 @@ const outFileCli = (() => {
   const i = process.argv.indexOf('--out');
   return i >= 0 && i + 1 < process.argv.length ? path.resolve(process.argv[i + 1]) : null;
 })();
-const outFile = outFileCli || resolved.out;
 const watch = process.argv.includes('--watch');
-// --enabled=false / --no-enabled let a CI/deploy step skip the build without editing config.
 const enabled = process.argv.includes('--enabled=false')
   ? false
   : process.argv.includes('--enabled')
     ? true
     : cfg.enabled;
+const sprites = (cfg.sprites || []).map((s) => ({
+  src: srcDirs.length ? srcDirs : s.srcList.map((p) => path.resolve(root, p)),
+  out: outFileCli || path.resolve(path.dirname(CONFIG_PATH), s.out),
+}));
 
 // --- Icon collection + collision guard ----------------------------------------
 
@@ -127,42 +123,49 @@ function assertUniqueIDs(files) {
 // --- Build ------------------------------------------------------------
 
 async function build() {
-  const files = collectIconFiles(srcDirs);
-  assertUniqueIDs(files);
   const map = {};
-  const spriter = new SVGSpriter({ mode: { symbol: { dest: '.', sprite: 'icons.sprite.svg' } } });
 
-  for (const file of files) {
-    const { data } = await svgo.optimize(fs.readFileSync(file, 'utf8'), { path: file });
-    spriter.add(path.join(path.dirname(file), `${symbolId(file)}.svg`), null, data);
-  }
+  for (const sprite of sprites) {
+    if (sprite.src && sprite.src.length) {
+      const files = collectIconFiles(sprite.src);
+      assertUniqueIDs(files);
 
-  const { result } = await spriter.compileAsync();
-  fs.mkdirSync(path.dirname(outFile), { recursive: true });
-  fs.writeFileSync(outFile, String(result.symbol.sprite.contents) + '\n');
-  for (const dir of srcDirs) {
-    console.log(`Bundled ${dir} → ${outFile}`);
-  }
-  console.log(`Wrote ${outFile} (${files.length} symbols)`);
+      const srcDir = path.dirname(files[0]);
+      const spriter = new SVGSpriter({ mode: { symbol: { dest: '.', sprite: 'icons.sprite.svg' } } });
+      for (const file of files) {
+        const { data } = await svgo.optimize(fs.readFileSync(file, 'utf8'), { path: file });
+        spriter.add(path.join(path.dirname(file), `${symbolId(file)}.svg`), null, data);
+      }
+      const { result } = await spriter.compileAsync();
 
-  // Emit the path→id map (web-served path → sprite symbol id). Templates read this.
-  for (const file of files) {
-    const webPath = path.relative(resolved.root, file);
-    map[webPath.replace(/\\/g, '/')] = symbolId(file);
+      const outFile = path.resolve(path.dirname(CONFIG_PATH), sprite.out);
+      fs.mkdirSync(path.dirname(outFile), { recursive: true });
+      fs.writeFileSync(outFile, String(result.symbol.sprite.contents) + '\n');
+
+      for (const file of files) {
+        const key = path.relative(resolved.root, file).replace(/\\/g, '/'); // "ui-oval/home-03.svg" (matches config path)
+        const spriteWebPath = path.relative(resolved.static, outFile).replace(/\\/g, '/'); // "svg/ui-oval-sprite.svg"
+        map[key] = { sprite: spriteWebPath, id: symbolId(file) };
+      }
+      console.log(`Bundled ${sprite.src.join(', ')} → ${outFile} (${files.length} symbols)`);
+    }
   }
+  fs.mkdirSync(path.dirname(resolved.map), { recursive: true });
   fs.writeFileSync(resolved.map, JSON.stringify(map, null, 2) + '\n');
-  console.log(`Wrote ${resolved.map} (${files.length} entries)`);
+  console.log(`Wrote ${resolved.map} (${Object.keys(map).length} entries)`);
 }
 
 // --- Watch ------------------------------------------------------------
 
 function watchSources() {
-  for (const dir of srcDirs) {
-    fs.watch(dir, (event, filename) => {
-      if (filename && filename.endsWith('.svg')) build().catch(fail);
-    });
+  for (const sprite of sprites) {
+    for (const dir of sprite.src) {
+      fs.watch(dir, (event, filename) => {
+        if (filename && filename.endsWith('.svg')) build().catch(fail);
+      });
+    }
   }
-  console.log(`Watching ${srcDirs.join(', ')} (Ctrl-C to stop)`);
+  console.log(`Watching ${sprites.map((s) => s.src).join(', ')} (Ctrl-C to stop)`);
 }
 
 // --- Entry point --------------------------------------------------------
@@ -174,11 +177,13 @@ function fail(err) {
 
 async function main() {
   if (!enabled) {
-    console.log('Icon sprite build skipped (sprite.config.js: enabled = false).');
+    console.log('Sprite build skipped (sprite.config.js: enabled = false).');
     return;
   }
-  for (const dir of srcDirs) {
-    if (!fs.existsSync(dir)) throw new Error(`icon source dir not found: ${dir}`);
+  for (const sprite of sprites) {
+    for (const dir of sprite.src) {
+      if (!fs.existsSync(dir)) throw new Error(`icon source dir not found: ${dir}`);
+    }
   }
   await build();
   if (watch) watchSources();

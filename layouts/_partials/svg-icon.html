@@ -1,38 +1,32 @@
 {{- /*
-Resolve an icon reference. Config no
-longer carries a sprite `id`; the id is
-derived at build time and published in `<spriteDir>/sprite_map.json` (see
-scripts/build-icons.js). This partial reads that map ONCE and caches it globally in
-hugo.Store, then turns a configured svg `path` into a sprite `#<id>` reference.
+Resolve an icon reference. Config carries no
+sprite `id`; the id is
+derived at build time and published in `<mapFile>` (default `static/svg/sprite_map.json`).
+This partial reads that map ONCE and caches it globally in hugo.Store, then turns a configured
+svg `path` into a `<sprite>#<id>` reference.
 
 Priority:
-  1. `path` found in the sprite map → "<sprite>#<id>"  (uses the bundled sprite).
-  2. `path` that ends in ".svg" → the raw file itself (standalone icon / live preview).
-  3. "svg/placeholder.svg" (universal default).
+  1. `path` found in the shared sprite map → "<sprite>#<id>"  (relURL'd, uses the matching bundled sprite).
+  2. "svg/placeholder.svg" (universal default).
   Every returned value goes through relURL, so it resolves from any page depth (e.g. /posts/).
 
 Parameter (flat dict, e.g. a menu entry's `.Params.icon`):
-  path (string): the icon's key, e.g. "ui-oval/home-03.svg". This is
-    both the sprite-map lookup key and, failing that, the direct file URL.
+  path (string): the icon's key relative to rootDir, e.g. "ui-oval/home-03.svg". This
+    doubles as the shared sprite_map.json lookup key.
 
 Return:
   string $iconURL — for an inline `<use href="...">`, root-relative.
 */ -}}
-{{- $sprite := (site.Params.icons.sprite | default "svg/sprite/svg-icon-sprite.svg") -}}
 {{- $map := hugo.Store.Get "alice-sprite-map" -}}
 {{- if not $map -}}
-	{{- $mapPath := "static/svg/sprite/sprite_map.json" -}}
+	{{- $mapPath := "static/svg/sprite_map.json" -}}
 	{{- $map = $mapPath | os.ReadFile | transform.Unmarshal -}}
 	{{- hugo.Store.Set "alice-sprite-map" $map -}}
 {{- end -}}
 {{- $iconPath := .path -}}
 {{- $iconURL := "svg/placeholder.svg" | relURL -}}
-{{- $id := index $map $iconPath -}}
-{{- if $id -}}
-	{{- $iconURL = printf "%s#%s" ($sprite | relURL) $id -}}
-{{- else -}}
-	{{- if strings.HasSuffix $iconPath ".svg" -}}
-		{{- $iconURL = $iconPath | relURL -}}
-	{{- end -}}
+{{- $entry := index $map $iconPath -}}
+{{- if $entry -}}
+	{{- $iconURL = printf "%s#%s" ((index $entry "sprite") | relURL) (index $entry "id") -}}
 {{- end -}}
 {{- return $iconURL -}}

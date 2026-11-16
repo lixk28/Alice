@@ -181,10 +181,11 @@
 
 
 
-# Menu icons — params.icon is a map with two keys:
-#   id   = sprite symbol id ("ui-oval_home-03"; the source dir is prefixed to each filename so custom icons never collide)
-#   path = full file path relative to rootDir ("ui-oval/home-03.svg"), used to look up the sprite id.
-# Omit params.icon to use the placeholder icon.
+# Menu icons — params.icon is a map with one key:
+#   path = the icon's key relative to rootDir ("ui-oval/home-03.svg"), used to look up the sprite id
+#          in the shared sprite_map.json.
+# To add a new icon, drop its svg into a sprite source dir (see sprite.config.js `sprites`) and rerun
+# `npm run build:icons`; the id is generated automatically. Omit params.icon to use the placeholder icon.
 [menu]
     [[menu.main]]
         identifier = "home"

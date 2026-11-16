@@ -1,42 +1,38 @@
 'use strict';
 
-// Icon sprite build configuration — consumed by scripts/build-icons.js.
+// Sprite build configuration — consumed by scripts/build-icons.js.
 //
-// All paths are resolved against this file's directory (the theme/site root).
-// This file is optional: when absent, the defaults below (also baked into the
-// script) are used unchanged.
+// Multiple `src` → `out` sprites are supported: each `sprites` entry bundles its own source set
+// into one independent `<symbol>` sprite. So a site can ship several sprites, e.g. the
+// built-in `ui-oval` set → `ui-oval-sprite.svg` AND a custom `minimal-ui` set →
+// `minimal-ui-sprite.svg`.
 //
-// CLI flags override the matching key when given:
-//   --src  dir1,dir2,file.svg   additional sources (comma-separated; appended to `srcList`)
-//   --out  full/path/sprite.svg  full output path (overrides spriteDir + outFile)
-//   --watch                     rebuild whenever a source changes
+// Outputs (all relative to this file's dir, a.k.a. the theme/site root):
+//   `sprites[]`  each: .srcList = source icon dirs/single .svg files (root-relative);
+//                .out    = the sprite file (root-relative).
+//   `mapFile`   a single shared JSON pairing each configured icon `path` → a { "sprite", "id" }
+//              object, e.g. "static/svg/ui-oval/settings.svg" → { "sprite":
+//              "static/svg/ui-oval-sprite.svg", "id": "ui-oval_settings" }. Templates
+//              read it ONCE (cached in hugo.Store) and resolve `path` →
+//              "(sprite | relURL)#<id>".
 //
-// The sprite is committed, so serving a Hugo site needs no Node. Rerun this only
-// when icon sources change.
+// This file is optional (the inline defaults in the script are used when it's absent). CLI
+// `--src` / `--out` still override the LAST sprite entry.
 
 module.exports = {
-  // Set to false to skip building the sprite entirely (e.g. you commit a sprite, or
-  // host one elsewhere and only run `hugo` at deploy time).
+  // Set to false to skip building entirely (e.g. you commit generated sprites + map).
   enabled: true,
 
-  // Root that `srcList` and `spriteDir` below are resolved against (relative to this file's
-  // directory). Keeping both under one root makes the layout obvious, e.g. static/svg.
+  // Base dir that every `sprites[].srcList` is resolved against.
   rootDir: 'static/svg',
 
-  // Directory the sprite file is written to (created if missing), relative to `rootDir`.
-  spriteDir: 'sprite',
+  // One or more independent sprites. Each = { srcList, out }: source dirs (root-relative) →
+  // output sprite file (root-relative).
+  sprites: [
+    { srcList: ['static/svg/ui-oval'], out: 'static/svg/ui-oval-sprite.svg' },
+    // { srcList: ['static/svg/minimal-ui'], out: 'static/svg/minimal-ui-sprite.svg' },
+  ],
 
-  // JSON map of sprite path → generated symbol id, written next to the sprite. The
-  // templates read this once (cached in hugo.Store) to resolve a configured svg
-  // `path` into its sprite `id`.
-  mapFile: 'sprite_map.json',
-
-  // Source icon directories and/or single .svg files, relative to `rootDir`. Each
-  // directory's icons are prefixed by the directory name to form their sprite id
-  // ("<dir>_<basename>"), so custom icon sets never collide with the built-in
-  // "ui-oval_..." ids.
-  srcList: ['ui-oval'],
-
-  // Sprite output filename.
-  outFile: 'svg-icon-sprite.svg',
+  // Single shared lookup map (root-relative): { "<icon path>": { "sprite": "<out>", "id": "<dirName>_<name>" } }.
+  mapFile: 'static/svg/sprite_map.json',
 };
