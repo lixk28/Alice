@@ -28,9 +28,13 @@ const SVGSpriter = require('svg-sprite');
 const CONFIG_PATH = path.resolve(__dirname, '../sprite.config.js');
 const DEFAULTS = {
   enabled: true,
-  rootDir: 'static/svg',
-  sprites: [{ srcList: ['static/svg/ui-oval'], out: 'static/svg/ui-oval-sprite.svg' }],
-  mapFile: 'static/svg/sprite_map.json',
+  rootDir: 'static/svg',   // base source dir; every `sprites[].srcList` entry + `spriteDir` resolve against this.
+  spriteDir: 'sprite',     // output dir, relative to rootDir, for every sprite + the shared map.
+  sprites: [{ srcList: ['ui-oval'], out: 'ui-oval-sprite.svg' }], // srcList = dirs inside rootDir; out = file NAME inside spriteDir.
+  mapFile: 'sprite_map.json', // map file NAME inside spriteDir.
+  // SVGO 3 optimizer options passed straight through to svgo.optimize(). See
+  // https://svgo.dev/docs/usage/node/ and https://svgo.dev/docs/preset-default/.
+  svgo: {},
 };
 
 const root = path.dirname(CONFIG_PATH);
@@ -41,15 +45,19 @@ if (fs.existsSync(CONFIG_PATH)) {
   const user = require(CONFIG_PATH);
   cfg.enabled = user.enabled;
   cfg.rootDir = user.rootDir;
-  cfg.mapFile = user.mapFile;
+  cfg.spriteDir = user.spriteDir || DEFAULTS.spriteDir;
+  cfg.mapFile = user.mapFile || DEFAULTS.mapFile;
+  cfg.svgo = user.svgo || {};
   cfg.sprites = (user.sprites || []).map((s) => ({ ...s }));
 }
 
-// Paths (root-relative keys in config are resolved against the theme/site root).
+// Resolve config paths against the theme/site root: `rootDir` → every `sprites[].srcList` source dir;
+// `spriteDir` (inside rootDir) → output dir for sprite(s) + the map; `map` → the map file (inside spriteDir).
 const resolved = {
-  root: path.resolve(root, cfg.rootDir), // rootDir (icons resolved against, e.g. static/svg)
+  root: path.resolve(root, cfg.rootDir), // rootDir (source icons resolve against, e.g. static/svg)
   static: path.resolve(root, 'static'), // static dir (web-served root)
-  map: path.resolve(root, cfg.mapFile),
+  spriteDir: path.resolve(root, cfg.rootDir, cfg.spriteDir), // sprite + map output dir (rootDir → spriteDir)
+  map: path.resolve(root, cfg.rootDir, cfg.spriteDir, cfg.mapFile), // shared map file (inside spriteDir)
 };
 
 // --- CLI overrides -------------------------------------------------------------
@@ -57,12 +65,12 @@ const resolved = {
 const srcDirs = [];
 for (let i = 0; i < process.argv.length - 1; i++) {
   if (process.argv[i] === '--src') {
-    for (const p of process.argv[i + 1].split(',')) srcDirs.push(path.resolve(p));
+    for (const p of process.argv[i + 1].split(',')) srcDirs.push(path.resolve(resolved.root, p));
   }
 }
 const outFileCli = (() => {
   const i = process.argv.indexOf('--out');
-  return i >= 0 && i + 1 < process.argv.length ? path.resolve(process.argv[i + 1]) : null;
+  return i >= 0 && i + 1 < process.argv.length ? path.resolve(resolved.spriteDir, process.argv[i + 1]) : null;
 })();
 const watch = process.argv.includes('--watch');
 const enabled = process.argv.includes('--enabled=false')
@@ -71,8 +79,8 @@ const enabled = process.argv.includes('--enabled=false')
     ? true
     : cfg.enabled;
 const sprites = (cfg.sprites || []).map((s) => ({
-  src: srcDirs.length ? srcDirs : s.srcList.map((p) => path.resolve(root, p)),
-  out: outFileCli || path.resolve(path.dirname(CONFIG_PATH), s.out),
+  src: srcDirs.length ? srcDirs : s.srcList.map((p) => path.resolve(resolved.root, p)), // srcList = dirs inside rootDir
+  out: outFileCli || path.resolve(resolved.spriteDir, s.out), // file name inside spriteDir
 }));
 
 // --- Icon collection + collision guard ----------------------------------------
@@ -133,12 +141,12 @@ async function build() {
       const srcDir = path.dirname(files[0]);
       const spriter = new SVGSpriter({ mode: { symbol: { dest: '.', sprite: 'icons.sprite.svg' } } });
       for (const file of files) {
-        const { data } = await svgo.optimize(fs.readFileSync(file, 'utf8'), { path: file });
+        const { data } = await svgo.optimize(fs.readFileSync(file, 'utf8'), { ...cfg.svgo, path: file });
         spriter.add(path.join(path.dirname(file), `${symbolId(file)}.svg`), null, data);
       }
       const { result } = await spriter.compileAsync();
 
-      const outFile = path.resolve(path.dirname(CONFIG_PATH), sprite.out);
+      const outFile = path.resolve(resolved.spriteDir, sprite.out);
       fs.mkdirSync(path.dirname(outFile), { recursive: true });
       fs.writeFileSync(outFile, String(result.symbol.sprite.contents) + '\n');
 

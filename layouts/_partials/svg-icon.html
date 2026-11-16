@@ -1,7 +1,7 @@
 {{- /*
 Render an icon as a self-contained inline `<svg aria-hidden="true"><use href="..."/></svg>`. Config carries
-no sprite `id` — the id is derived at build time and published in `<mapFile>` (default
-`static/svg/sprite_map.json`). This partial reads that map ONCE and caches it globally in hugo.Store, then
+no sprite `id` — the id is derived at build time and published in `<mapFile>`
+  (`static/svg/sprite/sprite_map.json`). This partial reads that map ONCE and caches it globally in hugo.Store, then
 turns a configured svg `path` into a `<sprite>#<id>` reference.
 
 Priority:
@@ -10,17 +10,17 @@ Priority:
   Every resolved URL goes through relURL, so it resolves from any page depth (e.g. /posts/).
 
 Parameters (flat dict):
-  path (string)                  : the icon's key relative to rootDir, e.g. "ui-oval/home-03.svg". This
+  Parameters (flat dict):
+  path (string)                 : the icon's key relative to rootDir, e.g. "ui-oval/home-03.svg". This
                                doubles as the shared sprite_map.json lookup key.
   class (string or list, optional): the class attribute on the outer `<svg>`; a list is joined with spaces.
-  id (string, optional)        : the id attribute on the outer `<svg>`.
-  attrs (string, optional)    : extra literal attributes appended to the outer `<svg>` (aria-hidden is always set).
-
-Return:  a full inline `<svg aria-hidden="true" ...><use href="..."/></svg>` (trusted HTML).
+  id (string, optional)         : the id attribute on the outer `<svg>`.
+  mapPath (string, optional)    : path to the shared sprite_map.json. Defaults to "<rootDir>/<spriteDir>/sprite_map.json"
+                               (static/svg/sprite/sprite_map.json).
 */ -}}
 {{- $map := hugo.Store.Get "alice-sprite-map" -}}
 {{- if not $map -}}
-	{{- $mapPath := "static/svg/sprite_map.json" -}}
+	{{- $mapPath := .mapPath | default "static/svg/sprite/sprite_map.json" -}}
 	{{- $map = $mapPath | os.ReadFile | transform.Unmarshal -}}
 	{{- hugo.Store.Set "alice-sprite-map" $map -}}
 {{- end -}}
