@@ -50,19 +50,8 @@ const DEFAULTS = {
 const root = path.dirname(CONFIG_PATH);
 
 // Merge in this order (later keys win): DEFAULTS < sprite.config.js < CLI.
-let cfg = { ...DEFAULTS, sprites: (DEFAULTS.sprites || []).map((s) => ({ ...s })) };
-if (fs.existsSync(CONFIG_PATH)) {
-  const user = require(CONFIG_PATH);
-  cfg.enabled = user.enabled;
-  cfg.rootDir = user.rootDir;
-  cfg.spriteDir = user.spriteDir || DEFAULTS.spriteDir;
-  cfg.mapFile = user.mapFile || DEFAULTS.mapFile;
-  cfg.svgo = user.svgo || {};
-  cfg.recursive = user.recursive !== undefined ? user.recursive : DEFAULTS.recursive;
-  cfg.depth = user.depth !== undefined ? user.depth : DEFAULTS.depth;
-  cfg.exclude = user.exclude !== undefined ? user.exclude : DEFAULTS.exclude;
-  cfg.sprites = (user.sprites || []).map((s) => ({ ...s }));
-}
+const userCfg = fs.existsSync(CONFIG_PATH) ? require(CONFIG_PATH) : {};
+const cfg = { ...DEFAULTS, ...userCfg, sprites: (userCfg.sprites || []).map((s) => ({ ...s })) };
 
 // Resolve config paths against the theme/site root: `rootDir` → every `sprites[].srcList` source dir;
 // `spriteDir` (inside rootDir) → output dir for sprite(s) + the map; `map` → the map file (inside spriteDir).
@@ -98,27 +87,24 @@ const sprites = (cfg.sprites || []).map((s) => ({
 
 // --- Icon collection + collision guard ----------------------------------------
 
+// gitignore-flavored exclude compiled once from cfg.exclude (string: comma-separated, or array; `!` negates).
+function isExcluded() {
+  const raw = cfg.exclude == null ? [] : Array.isArray(cfg.exclude) ? cfg.exclude : String(cfg.exclude).split(',');
+  const rules = raw.filter((r) => r).map((r) => ({
+    negate: r.startsWith('!'),
+    re: new RegExp(r.replace(/^!/, '')),
+  }));
+  if (!rules.length) return null;
+  return (rel) => {
+    let out = false;
+    for (const r of rules) if (r.re.test(rel)) out = !r.negate; // last matching rule wins (gitignore-flavored)
+    return out;
+  };
+}
+const excluded = isExcluded();
+
 function collectIconFiles(dirs) {
   const files = [];
-
-  // gitignore-style excluder from cfg.exclude (string: comma-separated, or array; `!` negates; RegExp per pattern).
-  const rules = [];
-  if (cfg.exclude != null) {
-    const list = Array.isArray(cfg.exclude)
-      ? cfg.exclude
-      : String(cfg.exclude).split(',').filter((s) => s.trim() !== '');
-    for (const raw of list) {
-      if (raw == null || raw === '') continue;
-      rules.push({ negate: raw.startsWith('!'), re: new RegExp(raw.replace(/^!/, '')) });
-    }
-  }
-  const excluded = rules.length
-    ? (rel) => {
-        let out = false;
-        for (const r of rules) if (r.re.test(rel)) out = !r.negate; // last matching pattern wins (gitignore-flavored)
-        return out;
-      }
-    : null;
 
   for (const p of dirs) {
     if (fs.statSync(p).isDirectory()) {
@@ -177,23 +163,24 @@ async function build() {
       const files = collectIconFiles(sprite.src);
       assertUniqueIDs(files);
 
-      const srcDir = path.dirname(files[0]);
+      const outFile = path.resolve(resolved.spriteDir, sprite.out);
       const spriter = new SVGSpriter({ mode: { symbol: { dest: '.', sprite: 'icons.sprite.svg' } } });
       for (const file of files) {
+        const id = symbolId(file);
         const { data } = await svgo.optimize(fs.readFileSync(file, 'utf8'), { ...cfg.svgo, path: file });
-        spriter.add(path.join(path.dirname(file), `${symbolId(file)}.svg`), null, data);
+        spriter.add(path.join(path.dirname(file), `${id}.svg`), null, data);
+
+        const key = path.relative(resolved.root, file).replace(/\\/g, '/'); // "ui-oval/home-03.svg" (matches config path)
+        map[key] = {
+          sprite: path.relative(resolved.static, outFile).replace(/\\/g, '/'), // "svg/ui-oval-sprite.svg"
+          id,
+        };
       }
       const { result } = await spriter.compileAsync();
 
-      const outFile = path.resolve(resolved.spriteDir, sprite.out);
       fs.mkdirSync(path.dirname(outFile), { recursive: true });
       fs.writeFileSync(outFile, String(result.symbol.sprite.contents) + '\n');
 
-      for (const file of files) {
-        const key = path.relative(resolved.root, file).replace(/\\/g, '/'); // "ui-oval/home-03.svg" (matches config path)
-        const spriteWebPath = path.relative(resolved.static, outFile).replace(/\\/g, '/'); // "svg/ui-oval-sprite.svg"
-        map[key] = { sprite: spriteWebPath, id: symbolId(file) };
-      }
       console.log(`Bundled ${sprite.src.join(', ')} → ${outFile} (${files.length} symbols)`);
     }
   }
