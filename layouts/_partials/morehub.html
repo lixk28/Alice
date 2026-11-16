@@ -19,7 +19,7 @@
 				{{- if and (not $desc) $page -}}
 					{{- $desc = $page.Description | default $page.Params.description | default "" -}}
 				{{- end -}}
-	{{- $path := (.Params.icon.path | default (printf "ui-oval/%s.svg" $id)) -}}
+	{{- $path := (.Params.icon.path | default (printf "svg/ui-oval/%s.svg" $id)) -}}
 	<li>
 		{{ partial "svg-icon.html" (dict "path" $path "class" (printf "menu-icon menu-%s-icon" $id)) }}
 		<a href="{{ .URL | relURL }}">{{ .Name }}</a>

@@ -201,7 +201,7 @@ themesDir = "../.."
         url = "/"
         weight = 1
         [menu.main.params.icon]
-            path = "ui-oval/home-03.svg"
+            path = "svg/ui-oval/home-03.svg"
 
     [[menu.main]]
         identifier = "posts"
@@ -209,7 +209,7 @@ themesDir = "../.."
         url = "/posts/"
         weight = 2
         [menu.main.params.icon]
-            path = "ui-oval/archive.svg"
+            path = "svg/ui-oval/archive.svg"
 
     [[menu.main]]
         identifier = "categories"
@@ -217,7 +217,7 @@ themesDir = "../.."
         url = "/categories/"
         weight = 3
         [menu.main.params.icon]
-            path = "ui-oval/folder.svg"
+            path = "svg/ui-oval/folder.svg"
 
     [[menu.main]]
         identifier = "tags"
@@ -225,7 +225,7 @@ themesDir = "../.."
         url = "/tags/"
         weight = 4
         [menu.main.params.icon]
-            path = "ui-oval/tag-01.svg"
+            path = "svg/ui-oval/tag-01.svg"
 
     # More is a section hub (/more/); dropdown children can be section or taxonomy.
     [[menu.main]]
@@ -234,7 +234,7 @@ themesDir = "../.."
         url = "/more/"
         weight = 5
         [menu.main.params.icon]
-            path = "ui-oval/brackets-ellipses.svg"
+            path = "svg/ui-oval/brackets-ellipses.svg"
 
     [[menu.main]]
         identifier = "gallery"
@@ -246,7 +246,7 @@ themesDir = "../.."
         [menu.main.params]
             description = "…"
         [menu.main.params.icon]
-            path = "ui-oval/image-01.svg"
+            path = "svg/ui-oval/image-01.svg"
 
     [[menu.main]]
         identifier = "jokes"
@@ -255,7 +255,7 @@ themesDir = "../.."
         parent = "more"
         weight = 2
         [menu.main.params.icon]
-            path = "ui-oval/message-smile-square.svg"
+            path = "svg/ui-oval/message-smile-square.svg"
 
     [[menu.main]]
         identifier = "friends"
@@ -263,7 +263,7 @@ themesDir = "../.."
         url = "/friends/"
         weight = 6
         [menu.main.params.icon]
-            path = "ui-oval/users-01.svg"
+            path = "svg/ui-oval/users-01.svg"
 
     [[menu.main]]
         identifier = "about"
@@ -271,7 +271,7 @@ themesDir = "../.."
         url = "/about/"
         weight = 7
         [menu.main.params.icon]
-            path = "ui-oval/user-01.svg"
+            path = "svg/ui-oval/user-01.svg"
 
     [[menu.main]]
         identifier = "rss"
@@ -279,7 +279,7 @@ themesDir = "../.."
         url = "/index.xml"
         weight = 8
         [menu.main.params.icon]
-            path = "ui-oval/rss-01.svg"
+            path = "svg/ui-oval/rss-01.svg"
 
 [sitemap]
     changefreq = 'weekly'

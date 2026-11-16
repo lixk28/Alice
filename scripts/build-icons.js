@@ -13,8 +13,9 @@
 //
 // Output:
 //   * each sprite in `sprites[]` → its own `<symbol>` sprite file; and
-//   * one shared `sprite_map.json` pairing every configured icon `path` → { "sprite", "id" },
-//     which templates read once (cached in hugo.Store) to resolve `path` → "(sprite | relURL)#id".
+//   * one shared `sprites.json` (in `spriteDir`) → `{ "enabled", "map" }`, where `map` pairs every configured
+//     icon `path` → { "sprite", "id" }, read by templates once (cached in hugo.Store) to resolve `path` →
+//     "(sprite | relURL)#id".
 //
 // Sprites + map are committed; serving a Hugo site needs no Node. Rerun only when icon sources change.
 
@@ -31,7 +32,7 @@ const DEFAULTS = {
   rootDir: 'static/svg',   // base source dir; every `sprites[].srcList` entry + `spriteDir` resolve against this.
   spriteDir: 'sprite',     // output dir, relative to rootDir, for every sprite + the shared map.
   sprites: [{ srcList: ['ui-oval'], out: 'ui-oval-sprite.svg' }], // srcList = dirs inside rootDir; out = file NAME inside spriteDir.
-  mapFile: 'sprite_map.json', // map file NAME inside spriteDir.
+  mapFile: 'sprites.json', // map file NAME inside spriteDir.
 
   // Source traversal for each `sprites[].srcList` entry:
   //   recursive : descend into subdirectories (default true). Set false to only read a dir's .svg files.
@@ -153,13 +154,25 @@ function assertUniqueIDs(files) {
   }
 }
 
+// Simple ANSI color helpers. Colors are only emitted when stdout is a TTY; piped output stays plain.
+const C = process.stdout.isTTY ? {
+  dim: (s) => `\x1b[90m${s}\x1b[0m`,
+  dimBold: (s) => `\x1b[90;1m${s}\x1b[0m`,
+  green: (s) => `\x1b[32m${s}\x1b[0m`,
+  cyan: (s) => `\x1b[36m${s}\x1b[0m`,
+  red: (s) => `\x1b[31m${s}\x1b[0m`,
+  yellow: (s) => `\x1b[33m${s}\x1b[0m`,
+} : { dim: (s) => s, dimBold: (s) => s, green: (s) => s, cyan: (s) => s, red: (s) => s, yellow: (s) => s };
+
 // --- Build ------------------------------------------------------------
 
 async function build() {
   const map = {};
+  const overallStart = Date.now();
 
   for (const sprite of sprites) {
     if (sprite.src && sprite.src.length) {
+      const start = Date.now();
       const files = collectIconFiles(sprite.src);
       assertUniqueIDs(files);
 
@@ -178,15 +191,18 @@ async function build() {
       }
       const { result } = await spriter.compileAsync();
 
-      fs.mkdirSync(path.dirname(outFile), { recursive: true });
+      if (!fs.existsSync(path.dirname(outFile))) fs.mkdirSync(path.dirname(outFile), { recursive: true });
       fs.writeFileSync(outFile, String(result.symbol.sprite.contents) + '\n');
 
-      console.log(`Bundled ${sprite.src.join(', ')} → ${outFile} (${files.length} symbols)`);
+      console.log(
+        `${C.dimBold('✔')} ${C.green('bundled ' + files.length + ' icons')} ${C.dim(sprite.src.join(','))} → ${outFile} ${C.dim(`[${Date.now() - start} ms]`)}`
+      );
     }
   }
+
   fs.mkdirSync(path.dirname(resolved.map), { recursive: true });
-  fs.writeFileSync(resolved.map, JSON.stringify(map, null, 2) + '\n');
-  console.log(`Wrote ${resolved.map} (${Object.keys(map).length} entries)`);
+  fs.writeFileSync(resolved.map, JSON.stringify({ enabled, map }, null, 2) + '\n');
+  console.log(`${C.dimBold('✔')} ${C.cyan(`${Object.keys(map).length} icons → ${resolved.map}`)} ${C.dim(`[${Date.now() - overallStart} ms total]`)}`);
 }
 
 // --- Watch ------------------------------------------------------------
@@ -199,27 +215,35 @@ function watchSources() {
       });
     }
   }
-  console.log(`Watching ${sprites.map((s) => s.src).join(', ')} (Ctrl-C to stop)`);
+  console.log(`Watching ${C.yellow(sprites.map((s) => s.src).join(', '))} (Ctrl-C to stop)`);
 }
 
 // --- Entry point --------------------------------------------------------
 
 function fail(err) {
-  console.error(err.message);
-  process.exit(1);
+  // Print the stack (helps pinpoint which icon / config line failed), exit non-zero.
+  console.error(`${C.red('✖ error:')} ${err && err.stack ? err.stack : err}`);
+  process.exitCode = 1;
 }
 
 async function main() {
   if (!enabled) {
-    console.log('Sprite build skipped (sprite.config.js: enabled = false).');
+    // Disabled: still (re)write the config so the committed sprites.json reflects this state —
+    // Disabled: still (re)write the config so the committed sprites.json reflects this state —
+    // an empty map makes svg-icon.html fall back to the loose icon path (or the placeholder when path is unset).
+    fs.mkdirSync(path.dirname(resolved.map), { recursive: true });
+    fs.writeFileSync(resolved.map, JSON.stringify({ enabled, map: {} }, null, 2) + '\n');
+    console.log(C.dim(`Sprite build disabled — wrote ${resolved.map} with an empty map (site uses loose icon paths).`));
     return;
   }
+  const start = Date.now();
   for (const sprite of sprites) {
     for (const dir of sprite.src) {
       if (!fs.existsSync(dir)) throw new Error(`icon source dir not found: ${dir}`);
     }
   }
   await build();
+  console.log(`${C.dimBold('✔')} ${C.green(`done in ${Date.now() - start} ms`)}`);
   if (watch) watchSources();
 }
 

@@ -1,34 +1,36 @@
 {{- /*
 Render an icon as a self-contained inline `<svg aria-hidden="true"><use href="..."/></svg>`. Config carries
-no sprite `id` — the id is derived at build time and published in `<mapFile>`
-  (`static/svg/sprite/sprite_map.json`). This partial reads that map ONCE and caches it globally in hugo.Store, then
+no sprite `id` — the id is derived at build time and published in `sprites.json`
+(`static/svg/sprite/sprites.json`). This partial reads that file ONCE and caches it globally in hugo.Store, then
 turns a configured svg `path` into a `<sprite>#<id>` reference.
 
 Priority:
-  1. `path` found in the shared sprite map → "…/sprite.svg#<id>" (relURL'd, the matching bundled sprite).
-  2. "svg/placeholder.svg" (universal default).
+  1. `enabled` + `path` present in the shared sprite map → "…/sprite.svg#<id>" (relURL'd, the bundled sprite).
+  2. `enabled` but `path` missing from the map, OR `enabled` is falsy → the loose `path` file (relURL'd) when set.
+  3. "svg/placeholder.svg" (universal default).
   Every resolved URL goes through relURL, so it resolves from any page depth (e.g. /posts/).
 
 Parameters (flat dict):
-  Parameters (flat dict):
-  path (string)                 : the icon's key relative to rootDir, e.g. "ui-oval/home-03.svg". This
-                               doubles as the shared sprite_map.json lookup key.
+  path (string)                 : the icon's key relative to rootDir, e.g. "svg/ui-oval/home-03.svg". This
+                                doubles as the shared sprite map lookup key.
   class (string or list, optional): the class attribute on the outer `<svg>`; a list is joined with spaces.
   id (string, optional)         : the id attribute on the outer `<svg>`.
-  mapPath (string, optional)    : path to the shared sprite_map.json. Defaults to "<rootDir>/<spriteDir>/sprite_map.json"
-                               (static/svg/sprite/sprite_map.json).
+  mapPath (string, optional)    : path to the generated sprites.json (`{ "enabled", "map" }`). Defaults to
+                                "<rootDir>/<spriteDir>/sprites.json" (static/svg/sprite/sprites.json).
 */ -}}
-{{- $map := hugo.Store.Get "alice-sprite-map" -}}
-{{- if not $map -}}
-	{{- $mapPath := .mapPath | default "static/svg/sprite/sprite_map.json" -}}
-	{{- $map = $mapPath | os.ReadFile | transform.Unmarshal -}}
-	{{- hugo.Store.Set "alice-sprite-map" $map -}}
+{{- $config := hugo.Store.Get "alice-sprite-config" -}}
+{{- if not $config -}}
+	{{- $configPath := .mapPath | default "static/svg/sprite/sprites.json" -}}
+	{{- $config = $configPath | os.ReadFile | transform.Unmarshal -}}
+	{{- hugo.Store.Set "alice-sprite-config" $config -}}
 {{- end -}}
-{{- $iconPath := .path -}}
+{{- $iconPath := .path | default "" -}}
 {{- $iconURL := "svg/placeholder.svg" | relURL -}}
-{{- $entry := index $map $iconPath -}}
-{{- if $entry -}}
+{{- if and $config.enabled $iconPath (index $config.map $iconPath) -}}
+	{{- $entry := index $config.map $iconPath -}}
 	{{- $iconURL = printf "%s#%s" ((index $entry "sprite") | relURL) (index $entry "id") -}}
+{{- else if $iconPath -}}
+	{{- $iconURL = $iconPath | relURL -}}
 {{- end -}}
 {{- $class := "" -}}
 {{- if reflect.IsSlice .class -}}{{- $class = delimit .class " " -}}{{- else -}}{{- $class = .class -}}{{- end -}}

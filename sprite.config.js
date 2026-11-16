@@ -7,35 +7,34 @@
 // built-in `ui-oval` set → `ui-oval-sprite.svg` AND a custom `minimal-ui` set →
 // `minimal-ui-sprite.svg`.
 //
-// Outputs (paths resolve against the theme/site root; `rootDir` → `spriteDir`):
-//   `rootDir`   base source dir; `sprites[].srcList` entries and `spriteDir` resolve against it.
-//   `sprites[]`  each: .srcList = source icon dirs/single .svg files (inside `rootDir`);
+// Outputs (all relative to this file's dir, a.k.a. the theme/site root): `rootDir` (e.g. `static`) is the
+// base both source icons and built sprites live under; `spriteDir` (inside `rootDir`) holds every sprite + the map.
+//   `sprites[]`  each: .srcList = source icon dirs/single .svg files (relative to `rootDir`);
 //                .out    = the sprite file NAME (inside `spriteDir`).
-//   `mapFile`   the shared map file NAME (inside `spriteDir`), a single JSON pairing each configured
-//              icon `path` (relative to `rootDir`, e.g. "ui-oval/settings.svg") → { "sprite", "id" },
-//              e.g. "ui-oval/settings.svg" → { "sprite": "svg/[...]ui-oval-sprite.svg", "id":
-//              "[...]_settings" }. Templates read it ONCE (cached in hugo.Store) and resolve `path` →
-//              "(sprite | relURL)#<id>".
+//   `mapFile`   a single shared JSON (inside `spriteDir`), pairing each configured icon `path` (relative to `rootDir`,
+//              e.g. "svg/ui-oval/settings.svg") → { "sprite", "id" }, e.g. "svg/sprite/ui-oval-sprite.svg#ui-oval_settings".
+//              Templates read it ONCE (cached in hugo.Store) and resolve `path` → "(sprite | relURL)#<id>".
 //
 // This file is optional (the inline defaults in the script are used when it's absent). CLI
 // `--src` / `--out` still override the LAST sprite entry.
 
 module.exports = {
   // Set to false to skip building entirely (e.g. you commit generated sprites + map).
-  enabled: true,
+  enabled: false,
 
-  // Base dir that every `sprites[].srcList` is resolved against.
-  rootDir: 'static/svg',
+  // Base dir that every `sprites[].srcList` entry and `spriteDir` resolve against. `static` keeps every icon asset
+  // (sources AND built sprites) under the web-served static dir.
+  rootDir: 'static',
 
   // Output dir for the sprite file(s) AND the shared map — resolved against `rootDir`. `sprites[].out` and
   // `mapFile` are file names inside this dir.
-  spriteDir: 'sprite',
+  spriteDir: 'svg/sprite',
 
-  // One or more independent sprites. Each = { srcList, out }: source dirs (relative to `rootDir`; e.g. 'ui-oval'
-  // →  static/svg/ui-oval) → output sprite file name (inside `spriteDir`).
+  // One or more independent sprites. Each = { srcList, out }: source dirs (relative to `rootDir`; e.g. 'svg/ui-oval'
+  // → static/svg/ui-oval) → output sprite file name (inside `spriteDir`).
   sprites: [
-    { srcList: ['ui-oval'], out: 'ui-oval-sprite.svg' },
-    // { srcList: ['minimal-ui'], out: 'minimal-ui-sprite.svg' },
+    { srcList: ['svg/ui-oval'], out: 'ui-oval-sprite.svg' },
+    // { srcList: ['svg/minimal-ui'], out: 'minimal-ui-sprite.svg' },
   ],
 
   // Source traversal for each `sprites[].srcList` entry:
@@ -48,8 +47,8 @@ module.exports = {
   depth: 0,
   exclude: [],
 
-  // Single shared lookup map (file name inside `spriteDir`): { "<icon path>": { "sprite": "<out>", "id": "<dirName>_<name>" } }.
-  mapFile: 'sprite_map.json',
+  // Single shared lookup map (file name inside `spriteDir`): { "enabled": bool, "map": { "<icon path>": { "sprite", "id" } } }.
+  mapFile: 'sprites.json',
 
   // SVGO 3 optimizer options, passed straight through to svgo.optimize() (see svgo.dev/docs/introduction/).
   //   plugins        : the optimizer pipeline. `preset-default` runs the base set (convertPathData, convertShapeToPath,
