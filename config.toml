@@ -4,12 +4,6 @@
     dateFmt = "2006-01-02"
     license = ""
 
-    # Icons are served from one optimized sprite (see scripts/build-icons.js).
-    # Override this to point at your own bundled sprite.
-    [params.icons]
-        sprite = "svg/svg-icon-sprite.svg"
-
-    # Default meta information for SEO
     [params.seo]
         title = "Your site title"
         author = "Your name"
@@ -189,7 +183,7 @@
 
 # Menu icons — params.icon is a map with two keys:
 #   id   = sprite symbol id ("ui-oval_home-03"; the source dir is prefixed to each filename so custom icons never collide)
-#   path = full file path relative to static/ ("svg/ui-oval/home-03.svg"), used as-is by CSS mask consumers.
+#   path = full file path relative to rootDir ("ui-oval/home-03.svg"), used to look up the sprite id.
 # Omit params.icon to use the placeholder icon.
 [menu]
     [[menu.main]]
@@ -198,8 +192,7 @@
         url = "/"
         weight = 1
         [menu.main.params.icon]
-            id = "ui-oval_home-03"
-            path = "svg/ui-oval/home-03.svg"
+            path = "ui-oval/home-03.svg"
 
     [[menu.main]]
         identifier = "posts"
@@ -207,8 +200,7 @@
         url = "/posts/"
         weight = 2
         [menu.main.params.icon]
-            id = "ui-oval_archive"
-            path = "svg/ui-oval/archive.svg"
+            path = "ui-oval/archive.svg"
 
     [[menu.main]]
         identifier = "categories"
@@ -216,8 +208,7 @@
         url = "/categories/"
         weight = 3
         [menu.main.params.icon]
-            id = "ui-oval_folder"
-            path = "svg/ui-oval/folder.svg"
+            path = "ui-oval/folder.svg"
 
     [[menu.main]]
         identifier = "tags"
@@ -225,8 +216,7 @@
         url = "/tags/"
         weight = 4
         [menu.main.params.icon]
-            id = "ui-oval_tag-01"
-            path = "svg/ui-oval/tag-01.svg"
+            path = "ui-oval/tag-01.svg"
 
     # Optional More hub: content/more/_index.md + menu entry (section, not taxonomy).
     # Dropdown children use parent = "more" (section or taxonomy URLs both work).
@@ -236,8 +226,7 @@
     #     url = "/more/"
     #     weight = 5
     #     [menu.main.params.icon]
-    #         id = "ui-oval_brackets-ellipses"
-    #         path = "svg/ui-oval/brackets-ellipses.svg"
+    #         path = "ui-oval/brackets-ellipses.svg"
     # [[menu.main]]
     #     identifier = "gallery"
     #     name = "Gallery"
@@ -245,8 +234,7 @@
     #     parent = "more"
     #     weight = 1
     #     [menu.main.params.icon]
-    #         id = "ui-oval_image-01"
-    #         path = "svg/ui-oval/image-01.svg"
+    #         path = "ui-oval/image-01.svg"
     # [[menu.main]]
     #     identifier = "jokes"
     #     name = "Jokes"
@@ -254,8 +242,7 @@
     #     parent = "more"
     #     weight = 2
     #     [menu.main.params.icon]
-    #         id = "ui-oval_message-smile-square"
-    #         path = "svg/ui-oval/message-smile-square.svg"
+    #         path = "ui-oval/message-smile-square.svg"
 
     # [[menu.main]]
     #     identifier = "friends"
@@ -263,8 +250,7 @@
     #     url = "/friends/"
     #     weight = 6
     #     [menu.main.params.icon]
-    #         id = "ui-oval_users-01"
-    #         path = "svg/ui-oval/users-01.svg"
+    #         path = "ui-oval/users-01.svg"
 
     [[menu.main]]
         identifier = "about"
@@ -272,8 +258,7 @@
         url = "/about/"
         weight = 7
         [menu.main.params.icon]
-            id = "ui-oval_user-01"
-            path = "svg/ui-oval/user-01.svg"
+            path = "ui-oval/user-01.svg"
 
     [[menu.main]]
         identifier = "rss"
@@ -281,8 +266,7 @@
         url = "/index.xml"
         weight = 8
         [menu.main.params.icon]
-            id = "ui-oval_rss-01"
-            path = "svg/ui-oval/rss-01.svg"
+            path = "ui-oval/rss-01.svg"
 
 [sitemap]
     changefreq = 'weekly'

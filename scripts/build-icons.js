@@ -8,7 +8,7 @@
 // Configuration is resolved in this precedence order (higher wins):
 //   1. Inline DEFAULTS (built in, used when sprite.config.js is absent or a key is missing).
 //   2. sprite.config.js at the theme/site root — the recommended place to set
-//      `enabled` / `src` / `spriteDir` / `outFile`.
+//      `enabled` / `srcList` / `spriteDir` / `outFile`.
 //   3. CLI flags.
 //
 // Usage:
@@ -18,7 +18,8 @@
 //   node scripts/build-icons.js --watch            # rebuild whenever a source .svg changes (pair with `hugo server`)
 //   node scripts/build-icons.js --no-enabled      # CLI toggle to skip building (overrides config.enabled=true)
 //
-// The sprite is committed; serving a Hugo site needs no Node. Rerun this only when icon sources change.
+// The sprite + path→id map are committed; serving a Hugo site needs no Node. Rerun only
+// when icon sources change.
 
 const fs = require('fs');
 const path = require('path');
@@ -32,17 +33,21 @@ const CONFIG_PATH = path.resolve(__dirname, '../sprite.config.js');
 const DEFAULTS = {
   enabled: true,
   rootDir: 'static/svg',
-  src: ['ui-oval'],
+  srcList: ['ui-oval'],
   spriteDir: 'sprite',
   outFile: 'svg-icon-sprite.svg',
+  mapFile: 'sprite_map.json',
 };
 
 const root = path.dirname(CONFIG_PATH);
 function resolvePaths(cfg) {
   return {
     enabled: cfg.enabled,
-    src: cfg.src.map((p) => path.resolve(root, cfg.rootDir, p)),
+    root: path.resolve(root, cfg.rootDir),
+    src: cfg.srcList.map((p) => path.resolve(root, cfg.rootDir, p)),
     out: path.resolve(root, cfg.rootDir, cfg.spriteDir, cfg.outFile),
+    map: path.resolve(root, cfg.rootDir, cfg.spriteDir, cfg.mapFile),
+    static: path.resolve(root, 'static'),
   };
 }
 
@@ -124,6 +129,7 @@ function assertUniqueIDs(files) {
 async function build() {
   const files = collectIconFiles(srcDirs);
   assertUniqueIDs(files);
+  const map = {};
   const spriter = new SVGSpriter({ mode: { symbol: { dest: '.', sprite: 'icons.sprite.svg' } } });
 
   for (const file of files) {
@@ -138,6 +144,14 @@ async function build() {
     console.log(`Bundled ${dir} → ${outFile}`);
   }
   console.log(`Wrote ${outFile} (${files.length} symbols)`);
+
+  // Emit the path→id map (web-served path → sprite symbol id). Templates read this.
+  for (const file of files) {
+    const webPath = path.relative(resolved.root, file);
+    map[webPath.replace(/\\/g, '/')] = symbolId(file);
+  }
+  fs.writeFileSync(resolved.map, JSON.stringify(map, null, 2) + '\n');
+  console.log(`Wrote ${resolved.map} (${files.length} entries)`);
 }
 
 // --- Watch ------------------------------------------------------------
