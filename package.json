@@ -4,11 +4,11 @@
   "private": true,
   "description": "Build tools for the Alice Hugo theme: optimize SVG icons with svgo and bundle them into a single sprite served by Hugo.",
   "scripts": {
-    "build:icons": "node scripts/build-icons.js",
-    "build": "npm run build:icons && hugo",
-    "serve": "npm run build:icons -- --watch & hugo server --bind 0.0.0.0 --port 1313 --disableFastRender",
-    "build:docs": "npm run build:icons && hugo --source=docs",
-    "serve:docs": "npm run build:icons -- --watch & hugo server --source=docs --bind 127.0.0.1 --port 1314 --disableFastRender"
+    "build:icon": "node scripts/build-sprite.js",
+    "build": "npm run build:icon && hugo",
+    "serve": "npm run build:icon -- --watch & hugo server --bind 0.0.0.0 --port 1313 --disableFastRender",
+    "build:docs": "npm run build:icon && hugo --source=docs",
+    "serve:docs": "npm run build:icon -- --watch & hugo server --source=docs --bind 127.0.0.1 --port 1314 --disableFastRender"
   },
   "devDependencies": {
     "svgo": "^3.3.2",
