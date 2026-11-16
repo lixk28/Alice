@@ -80,13 +80,6 @@ body {
     --h3-font-size: 1.3rem;
     --h4-font-size: 1.2rem;
 
-    --svg-stroke-color: black;
-
-    --svg-stroke-width-thin: 1;
-    --svg-stroke-width-normal: 2;
-    --svg-stroke-width-thick: 3;
-
-    --svg-size-small: 0.8em;
     --svg-size-normal: 1em;
     --svg-size-large: 1.2em;
 
@@ -237,16 +230,10 @@ input {
     accent-color: var(--link-color);
 }
 
-/* svg icons */
-svg {
-    stroke: var(--svg-stroke-color);
-    stroke-width: var(--svg-stroke-width-normal);
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    width: var(--svg-size-normal);
-    height: var(--svg-size-normal);
-    fill: none;
-}
+/* No global `svg { ... }` default: user-provided inline SVGs and third-party SVGs (Waline,
+   Mermaid, diagrams) must keep their own fill/stroke/size. Each theme icon class/id carries
+   its own stroke-width, linecap/linejoin (and the sprite <symbol>s are self-contained:
+   fill="none", stroke="currentColor", stroke-width="2", round caps). */
 
 svg.copyleft-icon {
     position: relative;
