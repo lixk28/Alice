@@ -6,7 +6,7 @@
 {{- $mode := .mode | default "hover" -}}
 {{- $iconPath := $item.Params.icon.path -}}
 {{- $iconClass := printf "menu-icon menu-%s-icon" $id -}}
-{{- $icon := partial "svg-icon.html" (dict "path" $iconPath "class" $iconClass "attrs" `aria-hidden="true"`) -}}
+{{- $icon := partial "svg-icon.html" (dict "path" $iconPath "class" $iconClass) -}}
 
 {{- if not $item.HasChildren -}}
 	{{- if eq $variant "hamburger" -}}
@@ -24,7 +24,7 @@
 	{{- $label := printf `%s<b><a href="%s">%s</a></b>` $icon ($item.URL | relURL) $item.Name -}}
 	{{- $lis := "" -}}
 	{{- range $item.Children -}}
-		{{- $childIcon := partial "svg-icon.html" (dict "path" .Params.icon.path "class" (printf "menu-icon menu-%s-icon" .Identifier) "attrs" `aria-hidden="true"`) -}}
+		{{- $childIcon := partial "svg-icon.html" (dict "path" .Params.icon.path "class" (printf "menu-icon menu-%s-icon" .Identifier)) -}}
 		{{- $lis = printf `%s<li class="dropdown-menu-item">%s<b><a href="%s">%s</a></b></li>` $lis $childIcon (.URL | relURL) .Name -}}
 	{{- end -}}
 	{{- $panel := printf `<ul class="dropdown-menu">%s</ul>` $lis | safeHTML -}}
