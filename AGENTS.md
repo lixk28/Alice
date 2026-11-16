@@ -156,7 +156,21 @@ The theme looks classic and editorial, not like a modern SaaS dashboard. The sit
 - New features, pages, and shortcodes should be pluggable and configurable. Gate them with site params and page front matter the way tabs, TeX, lightbox, and Waline already are. Let the user turn the piece off, pick a vendor, or pass arguments. Do not hard-code a single path that every site must take.
 - Templates should be reusable. Extract shared markup into a partial (as admonitions share `details.html`) instead of copying a block into each shortcode. Prefer a small, composable template over a one-off that only works on one page.
 
-## Git commits
+## Git Workflow
+
+### Commit Discipline
+
+Never `git add` + `git commit` (or `--amend`, rebase, squash, `reset`) on your own. Make the file edits you're asked for and leave changes in the working tree; the user stages, commits, splits, and rebases. If the user later says "commit / amend / squash", only then run git.
+
+Friction that actually happened and the rules that avoid it:
+
+* **Don't silently rewrite history.** Only `--amend`, rebase, or squash when the user explicitly says so, and target exactly the commit/commits they name. Confirm the range before a multi-commit squash.
+* **Don't merge "the nearby commits" on a hunch** — when told to "merge the previous two", confirm WHICH two; naming the intended base avoids wrong squash ranges.
+* **`write` overwrites whole files.** A `write` replaces the entire file. Prefer `edit` for targeted changes so unrelated content (a header lede, `'use strict'`, or other keys) is never dropped.
+* **Don't expand scope** — when fixing one thing, change only that, and `--amend` into the intended commit; do not fold in unrelated commits.
+* **Keep `git add` scoped** — stage specific files, not a whole directory, so untracked-but-keep files and regenerated artifacts aren't swept in; `git checkout -- <file>` discards incidental build output.
+
+### Commit Message Conventions
 
 Write commit messages in [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) format:
 
