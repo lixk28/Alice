@@ -33,7 +33,7 @@ module.exports = {
   // One or more independent sprites. Each = { srcList, out }: source dirs (relative to `rootDir`; e.g. 'svg/ui-oval'
   // → static/svg/ui-oval) → output sprite file name (inside `spriteDir`).
   sprites: [
-    { srcList: ['svg/ui-oval'], out: 'ui-oval-sprite.svg' },
+    { srcList: ['svg/ui-oval'], out: 'svg-icon-sprite.svg' },
     // { srcList: ['svg/minimal-ui'], out: 'minimal-ui-sprite.svg' },
   ],
 
