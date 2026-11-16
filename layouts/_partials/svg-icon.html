@@ -36,7 +36,9 @@ the root-relative URL string when `url` is set.
 {{- $result := $iconURL -}}
 {{- if not .url -}}
 	{{- $extra := "" -}}
-	{{- with .class -}}{{- $extra = printf ` class="%s"` . -}}{{- end -}}
+	{{- $class := "" -}}
+	{{- if reflect.IsSlice .class -}}{{- $class = delimit .class " " -}}{{- else -}}{{- $class = .class -}}{{- end -}}
+	{{- with $class -}}{{- $extra = printf ` class="%s"` . -}}{{- end -}}
 	{{- with .id -}}{{- $extra = printf `%s id="%s"` $extra . -}}{{- end -}}
 	{{- with .attrs -}}{{- $extra = printf `%s %s` $extra . -}}{{- end -}}
 	{{- $result = (printf `<svg aria-hidden="true"%s><use href="%s"/></svg>` $extra $iconURL) | safeHTML -}}
