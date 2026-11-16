@@ -73,7 +73,10 @@ module.exports = {
         name: 'preset-default',
         params: {
           overrides: {
-            removeViewBox: false
+            removeViewBox: false,
+            // Fold black (#000 / named black) → `currentColor` so every sprite icon is themed via the CSS
+            // `color` property (see static/css/header.css). `currentColor` sources are kept as-is.
+            convertColors: { currentColor: true }
           }
         }
       },

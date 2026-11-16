@@ -261,7 +261,7 @@ a:hover {
 }
 
 svg.external-anchor-icon {
-    stroke: var(--link-color);
+    color: var(--link-color);
     stroke-width: 2;
     width: 1em;
     height: 1em;
@@ -271,7 +271,7 @@ svg.external-anchor-icon {
     transition: 0.2s ease;
 }
 a:hover svg.external-anchor-icon {
-    stroke: var(--link-active-color);
+    color: var(--link-active-color);
     transform: rotate(3deg);
 }
 

@@ -47,21 +47,21 @@ svg.admonition-icon.indicator {
     width: var(--admonition-indicator-size);
     height: var(--admonition-indicator-size);
 }
-svg.admonition-icon.indicator.note { stroke: var(--admonition-note-indicator-color); }
-svg.admonition-icon.indicator.info { stroke: var(--admonition-info-indicator-color); }
-svg.admonition-icon.indicator.tip { stroke: var(--admonition-tip-indicator-color); }
-svg.admonition-icon.indicator.help { stroke: var(--admonition-help-indicator-color); }
-svg.admonition-icon.indicator.alert { stroke: var(--admonition-alert-indicator-color); }
+svg.admonition-icon.indicator.note { color: var(--admonition-note-indicator-color); }
+svg.admonition-icon.indicator.info { color: var(--admonition-info-indicator-color); }
+svg.admonition-icon.indicator.tip { color: var(--admonition-tip-indicator-color); }
+svg.admonition-icon.indicator.help { color: var(--admonition-help-indicator-color); }
+svg.admonition-icon.indicator.alert { color: var(--admonition-alert-indicator-color); }
 
 svg.admonition-icon.marker {
     width: var(--admonition-marker-size);
     height: var(--admonition-marker-size);
 }
-svg.admonition-icon.marker.note { stroke: var(--admonition-note-marker-color); }
-svg.admonition-icon.marker.info { stroke: var(--admonition-info-marker-color); }
-svg.admonition-icon.marker.tip { stroke: var(--admonition-tip-marker-color); }
-svg.admonition-icon.marker.help { stroke: var(--admonition-help-marker-color); }
-svg.admonition-icon.marker.alert { stroke: var(--admonition-alert-marker-color); }
+svg.admonition-icon.marker.note { color: var(--admonition-note-marker-color); }
+svg.admonition-icon.marker.info { color: var(--admonition-info-marker-color); }
+svg.admonition-icon.marker.tip { color: var(--admonition-tip-marker-color); }
+svg.admonition-icon.marker.help { color: var(--admonition-help-marker-color); }
+svg.admonition-icon.marker.alert { color: var(--admonition-alert-marker-color); }
 
 details.admonition {
     /* border-radius: 1ch; */

@@ -8,7 +8,7 @@ svg.resource-icon {
     position: relative;
     top: .4em;
     padding-right: .1em;
-    stroke: royalblue;
+    color: royalblue;
     width: 1.3em;
     height: 1.3em;
     transition: 200ms ease;
@@ -21,7 +21,7 @@ span.resource-name {
 }
 
 a.resource-anchor:hover > svg.resource-icon {
-    stroke: blue;
+    color: blue;
     transform: rotate(3deg);
 }
 a.resource-anchor:hover > span.resource-name {

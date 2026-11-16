@@ -177,7 +177,7 @@ svg.post-categories-icon,
 svg.post-tags-icon {
     position: relative;
     top: .2em;
-    stroke: navy;
+    color: navy;
     width: var(--svg-size-large);
     height: var(--svg-size-large);
 }

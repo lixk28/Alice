@@ -1,6 +1,10 @@
 {
   "enabled": true,
   "map": {
+    "svg/ui-oval/alert-triangle.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_alert-triangle"
+    },
     "svg/ui-oval/align-left-01.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_align-left-01"
@@ -21,6 +25,14 @@
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_brackets-ellipses"
     },
+    "svg/ui-oval/calendar-plus-02.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_calendar-plus-02"
+    },
+    "svg/ui-oval/calendar.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_calendar"
+    },
     "svg/ui-oval/check.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_check"
@@ -28,6 +40,10 @@
     "svg/ui-oval/chevron-down.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_chevron-down"
+    },
+    "svg/ui-oval/chevron-left.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_chevron-left"
     },
     "svg/ui-oval/chevron-up.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
@@ -37,9 +53,29 @@
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_copy-01"
     },
+    "svg/ui-oval/cube-01.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_cube-01"
+    },
+    "svg/ui-oval/edit-05.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_edit-05"
+    },
+    "svg/ui-oval/file-05.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_file-05"
+    },
+    "svg/ui-oval/file-code-01.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_file-code-01"
+    },
     "svg/ui-oval/folder.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_folder"
+    },
+    "svg/ui-oval/help-circle.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_help-circle"
     },
     "svg/ui-oval/home-03.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
@@ -49,6 +85,18 @@
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_image-01"
     },
+    "svg/ui-oval/info-square.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_info-square"
+    },
+    "svg/ui-oval/lightbulb-05.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_lightbulb-05"
+    },
+    "svg/ui-oval/link-external-02.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_link-external-02"
+    },
     "svg/ui-oval/menu-01.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_menu-01"
@@ -56,6 +104,14 @@
     "svg/ui-oval/message-smile-square.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_message-smile-square"
+    },
+    "svg/ui-oval/pin-02.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_pin-02"
+    },
+    "svg/ui-oval/play.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_play"
     },
     "svg/ui-oval/rss-01.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",

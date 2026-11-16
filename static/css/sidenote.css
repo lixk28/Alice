@@ -50,7 +50,7 @@ span.sidenote-content {
 
 svg.sidenote-pin-icon {
     stroke-width: 2;
-    stroke: var(--font-color);
+    color: var(--font-color);
     width: var(--font-size);
     height: var(--font-size);
     float: left;
@@ -75,7 +75,7 @@ span.sidenote:hover > span.sidenote-content {
                 0 -8px 8px -6px slategray; */
 }
 span.sidenote:hover svg.sidenote-pin-icon {
-    stroke: var(--sidenote-color-hover);
+    color: var(--sidenote-color-hover);
 }
 
 @media screen and (max-width: 720px) {
