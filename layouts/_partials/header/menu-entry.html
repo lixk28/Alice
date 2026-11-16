@@ -4,9 +4,11 @@
 {{- $id := $item.Identifier -}}
 {{- $isMore := and (eq $id "more") (eq $variant "desktop") -}}
 {{- $mode := .mode | default "hover" -}}
-{{- $iconPath := $item.Params.icon.path -}}
-{{- $iconClass := printf "menu-icon menu-%s-icon" $id -}}
-{{- $icon := partial "svg-icon.html" (dict "path" $iconPath "class" $iconClass) -}}
+{{- $iconPath := $item.Params.icon.path | default "" -}}
+    {{- $iconClass := $item.Params.icon.class | default (printf "menu-icon menu-%s-icon" $id) -}}
+    {{- $iconID := $item.Params.icon.id -}}
+    {{- $iconAttrs := $item.Params.icon.attrs -}}
+    {{- $icon := partial "svg-icon.html" (dict "path" $iconPath "class" $iconClass "id" $iconID "attrs" $iconAttrs) -}}
 
 {{- if not $item.HasChildren -}}
 	{{- if eq $variant "hamburger" -}}
@@ -24,7 +26,7 @@
 	{{- $label := printf `%s<b><a href="%s">%s</a></b>` $icon ($item.URL | relURL) $item.Name -}}
 	{{- $lis := "" -}}
 	{{- range $item.Children -}}
-		{{- $childIcon := partial "svg-icon.html" (dict "path" .Params.icon.path "class" (printf "menu-icon menu-%s-icon" .Identifier)) -}}
+		{{- $childIcon := partial "svg-icon.html" (dict "path" (.Params.icon.path | default "") "class" (.Params.icon.class | default (printf "menu-icon menu-%s-icon" .Identifier)) "id" .Params.icon.id "attrs" .Params.icon.attrs) -}}
 		{{- $lis = printf `%s<li class="dropdown-menu-item">%s<b><a href="%s">%s</a></b></li>` $lis $childIcon (.URL | relURL) .Name -}}
 	{{- end -}}
 	{{- $panel := printf `<ul class="dropdown-menu">%s</ul>` $lis | safeHTML -}}

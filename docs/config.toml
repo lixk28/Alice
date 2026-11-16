@@ -186,8 +186,12 @@ themesDir = "../.."
 
 
 
-# Menu icons — params.icon is a map with one key:
+# Menu icons — params.icon is a map. Required:
 #   path = the icon's key relative to rootDir ("ui-oval/home-03.svg"), used to look up the sprite id.
+# Optional (passed to the rendered <svg>):
+#   class = extra class(es); when omitted the header uses the default "menu-icon menu-<id>-icon".
+#   id    = an id for the <svg>.
+#   attrs = raw literal attributes appended to the <svg> (aria-hidden="true" is always present).
 # To add a new icon, drop its svg into a sprite source dir (see sprite.config.js `sprites`) and rerun
 # `npm run build:icons`; the id is generated automatically.
 [menu]
