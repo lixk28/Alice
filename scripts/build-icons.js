@@ -5,11 +5,18 @@
 // Pipeline:  svgo (optimize each *.svg) → svg-sprite (one <svg> with a <symbol id="<dir>_<name>"> per icon).
 // The <dir> prefix namespaces each source directory, so a site's custom icons never collide with the theme's "ui-oval_" ids.
 //
+// Configuration is resolved in this precedence order (higher wins):
+//   1. Inline DEFAULTS (built in, used when sprite.config.js is absent or a key is missing).
+//   2. sprite.config.js at the theme/site root — the recommended place to set
+//      `enabled` / `src` / `spriteDir` / `outFile`.
+//   3. CLI flags.
+//
 // Usage:
-//   node scripts/build-icons.js                      # theme defaults
+//   node scripts/build-icons.js                      # sprite.config.js (or inline defaults)
 //   node scripts/build-icons.js --src dir1,dir2,icon.svg  # add icon sources (dirs and/or svg files), comma-separated
-//   node scripts/build-icons.js --out <file>      # custom output; default: <theme>/static/svg/sprite
+//   node scripts/build-icons.js --out <file>      # custom output; overrides spriteDir + outFile
 //   node scripts/build-icons.js --watch            # rebuild whenever a source .svg changes (pair with `hugo server`)
+//   node scripts/build-icons.js --no-enabled      # CLI toggle to skip building (overrides config.enabled=true)
 //
 // The sprite is committed; serving a Hugo site needs no Node. Rerun this only when icon sources change.
 
@@ -18,26 +25,54 @@ const path = require('path');
 const svgo = require('svgo');
 const SVGSpriter = require('svg-sprite');
 
-// --- CLI -------------------------------------------------------------
+// --- Config resolution (defaults < sprite.config.js < CLI) --------------------------
 
+// Paths inside the config are relative to the config file; the script resolves them.
+const CONFIG_PATH = path.resolve(__dirname, '../sprite.config.js');
 const DEFAULTS = {
-  src: path.resolve(__dirname, '../static/svg/ui-oval'),
-  out: path.resolve(__dirname, '../static/svg/sprite', 'svg-icon-sprite.svg'),
+  enabled: true,
+  rootDir: 'static/svg',
+  src: ['ui-oval'],
+  spriteDir: 'sprite',
+  outFile: 'svg-icon-sprite.svg',
 };
 
-function valueOf(name, fallback) {
-  const i = process.argv.indexOf(name);
-  return i >= 0 && i + 1 < process.argv.length ? path.resolve(process.argv[i + 1]) : fallback;
+const root = path.dirname(CONFIG_PATH);
+function resolvePaths(cfg) {
+  return {
+    enabled: cfg.enabled,
+    src: cfg.src.map((p) => path.resolve(root, cfg.rootDir, p)),
+    out: path.resolve(root, cfg.rootDir, cfg.spriteDir, cfg.outFile),
+  };
 }
 
-const srcDirs = [DEFAULTS.src];
+// Merge in this order (later keys win): DEFAULTS < sprite.config.js < CLI.
+let cfg = { ...DEFAULTS };
+if (fs.existsSync(CONFIG_PATH)) {
+  cfg = { ...cfg, ...require(CONFIG_PATH) };
+}
+const resolved = resolvePaths(cfg);
+
+// --- CLI overrides -------------------------------------------------------------
+
+const srcDirs = [...resolved.src];
 for (let i = 0; i < process.argv.length - 1; i++) {
   if (process.argv[i] === '--src') {
     for (const p of process.argv[i + 1].split(',')) srcDirs.push(path.resolve(p));
   }
 }
-const outFile = valueOf('--out', DEFAULTS.out);
+const outFileCli = (() => {
+  const i = process.argv.indexOf('--out');
+  return i >= 0 && i + 1 < process.argv.length ? path.resolve(process.argv[i + 1]) : null;
+})();
+const outFile = outFileCli || resolved.out;
 const watch = process.argv.includes('--watch');
+// --enabled=false / --no-enabled let a CI/deploy step skip the build without editing config.
+const enabled = process.argv.includes('--enabled=false')
+  ? false
+  : process.argv.includes('--enabled')
+    ? true
+    : cfg.enabled;
 
 // --- Icon collection + collision guard ----------------------------------------
 
@@ -124,6 +159,10 @@ function fail(err) {
 }
 
 async function main() {
+  if (!enabled) {
+    console.log('Icon sprite build skipped (sprite.config.js: enabled = false).');
+    return;
+  }
   for (const dir of srcDirs) {
     if (!fs.existsSync(dir)) throw new Error(`icon source dir not found: ${dir}`);
   }
