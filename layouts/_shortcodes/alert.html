@@ -1,13 +1,14 @@
+{{- $cfg := site.Params.admonition | default dict -}}
 {{- $params := dict
     "context" .
     "inner" .Inner
     "class" "admonition alert"
-    "summary" (.Get "title" | default (.Get 0) | default "WARN")
-    "collapsible" (.Get "collapsible" | default "no")
-    "open" (.Get "open")
-    "icon" (partial "svg-icon.html" (dict "path" "svg/ui-oval/alert-triangle.svg" "class" "admonition-icon indicator alert"))
-    "marker" (partial "svg-icon.html" (dict "path" "svg/ui-oval/chevron-left.svg" "class" "admonition-icon marker alert"))
-    "markerPosition" "end"
-    "markerRotation" "counter-clockwise"
+    "summary" (.Get "title" | default (.Get 0) | default ($cfg.alert.title | default ""))
+    "collapsible" (.Get "collapsible" | default ($cfg.alert.collapsible | default ($cfg.collapsible | default "no")))
+    "open" (.Get "open" | default ($cfg.alert.open | default ($cfg.open | default "")))
+    "icon" (partial "svg-icon.html" (dict "path" ($cfg.alert.icon | default "svg/placeholder.svg") "class" "admonition-icon indicator alert"))
+    "marker" (partial "svg-icon.html" (dict "path" ($cfg.alert.marker | default "svg/placeholder.svg") "class" "admonition-icon marker alert"))
+    "markerPosition" ($cfg.alert.markerPosition | default ($cfg.markerPosition | default "end"))
+    "markerRotation" ($cfg.alert.markerRotation | default ($cfg.markerRotation | default "counter-clockwise"))
 -}}
 {{- partial "details.html" $params -}}

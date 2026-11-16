@@ -25,6 +25,65 @@
         # "hover" (default) or "click"
         mode = "hover"
 
+    # Admonition shortcode defaults ({admonition, note, tip, info, help, alert}).
+    # All of these are fallbacks — any per-shortcode argument still wins.
+    [params.admonition]
+        # Default `type` when the admonition shortcode omits it: note|info|tip|help|alert
+        defaultType = "info"
+        # Whether the box is collapsible
+        collapsible = false
+        # When collapsible = true, whether it starts open
+        open = false
+        # Collapse-arrow placement: "begin" | "middle" | "end"
+        markerPosition = "end"
+        # Collapse-arrow direction: "clockwise" | "counter-clockwise"
+        markerRotation = "counter-clockwise"
+
+        [params.admonition.note]
+            title = "NOTE"
+            icon = "svg/ui-oval/edit-05.svg"
+            marker = "svg/ui-oval/chevron-left.svg"
+            collapsible = false
+            open = false
+            markerPosition = "end"
+            markerRotation = "counter-clockwise"
+
+        [params.admonition.info]
+            title = "INFO"
+            icon = "svg/ui-oval/info-square.svg"
+            marker = "svg/ui-oval/chevron-left.svg"
+            collapsible = false
+            open = false
+            markerPosition = "end"
+            markerRotation = "counter-clockwise"
+
+        [params.admonition.tip]
+            title = "TIP"
+            icon = "svg/ui-oval/lightbulb-05.svg"
+            marker = "svg/ui-oval/chevron-left.svg"
+            collapsible = false
+            open = false
+            markerPosition = "end"
+            markerRotation = "counter-clockwise"
+
+        [params.admonition.help]
+            title = "QUESTION"
+            icon = "svg/ui-oval/help-circle.svg"
+            marker = "svg/ui-oval/chevron-left.svg"
+            collapsible = false
+            open = false
+            markerPosition = "end"
+            markerRotation = "counter-clockwise"
+
+        [params.admonition.alert]
+            title = "WARN"
+            icon = "svg/ui-oval/alert-triangle.svg"
+            marker = "svg/ui-oval/chevron-left.svg"
+            collapsible = false
+            open = false
+            markerPosition = "end"
+            markerRotation = "counter-clockwise"
+
     [params.footer]
         # Should display site generator (Hugo) and theme (Alice) 🥰
         showHugoAlice = true

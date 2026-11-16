@@ -1,35 +1,32 @@
-{{- $type := .Get "type" | lower | default "info" -}}
-{{- $icon := "" -}}
-{{- $title := "" -}}
-{{- if eq $type "note" -}}
-    {{- $title = .Get "title" | default (.Get 0) | default "NOTE" -}}
-    {{- $icon = partial "svg-icon.html" (dict "path" "svg/ui-oval/edit-05.svg" "class" "admonition-icon indicator note") -}}
-{{- else if eq $type "info" -}}
-    {{- $title = .Get "title" | default (.Get 0) | default "INFO" -}}
-    {{- $icon = partial "svg-icon.html" (dict "path" "svg/ui-oval/info-square.svg" "class" "admonition-icon indicator info") -}}
-{{- else if eq $type "tip" -}}
-    {{- $title = .Get "title" | default (.Get 0) | default "TIP" -}}
-    {{- $icon = partial "svg-icon.html" (dict "path" "svg/ui-oval/lightbulb-05.svg" "class" "admonition-icon indicator tip") -}}
-{{- else if eq $type "help" -}}
-    {{- $title = .Get "title" | default (.Get 0) | default "QUESTION" -}}
-    {{- $icon = partial "svg-icon.html" (dict "path" "svg/ui-oval/help-circle.svg" "class" "admonition-icon indicator help") -}}
-{{- else if eq $type "alert" -}}
-    {{- $title = .Get "title" | default (.Get 0) | default "WARN" -}}
-    {{- $icon = partial "svg-icon.html" (dict "path" "svg/ui-oval/alert-triangle.svg" "class" "admonition-icon indicator alert") -}}
-{{- end -}}
+{{- $cfg := site.Params.admonition | default dict -}}
+{{- $type := .Get "type" | lower | default ($cfg.defaultType | default "info") -}}
 
-{{- $marker := partial "svg-icon.html" (dict "path" "svg/ui-oval/chevron-left.svg" "class" (printf "admonition-icon marker %s" $type)) -}}
+{{- $typeCfg := index $cfg $type -}}
+{{- $title := .Get "title" | default (.Get 0) | default ($typeCfg.title | default "") -}}
+{{- $markerPosition := .Get "markerPosition" | default ($typeCfg.markerPosition | default ($cfg.markerPosition | default "end")) -}}
+{{- $markerRotation := .Get "markerRotation" | default ($typeCfg.markerRotation | default ($cfg.markerRotation | default "counter-clockwise")) -}}
+{{- $collapsible := .Get "collapsible" | default ($typeCfg.collapsible | default ($cfg.collapsible | default "no")) -}}
+{{- $open := .Get "open" | default ($typeCfg.open | default ($cfg.open | default "")) -}}
+
+{{- $icon := partial "svg-icon.html" (dict
+    "path" ($typeCfg.icon | default "svg/placeholder.svg")
+    "class" (printf "admonition-icon indicator %s" $type)
+) -}}
+{{- $marker := partial "svg-icon.html" (dict
+    "path" ($typeCfg.marker | default "svg/placeholder.svg")
+    "class" (printf "admonition-icon marker %s" $type)
+) -}}
 
 {{- $params := dict
     "context" .
     "inner" .Inner
     "class" (printf "admonition %s" $type)
     "summary" $title
-    "collapsible" (.Get "collapsible" | default "no")
-    "open" (.Get "open")
+    "collapsible" $collapsible
+    "open" $open
     "icon" $icon
     "marker" $marker
-    "markerPosition" "end"
-    "markerRotation" "counter-clockwise"
+    "markerPosition" $markerPosition
+    "markerRotation" $markerRotation
 -}}
 {{- partial "details.html" $params -}}

@@ -1,13 +1,14 @@
+{{- $cfg := site.Params.admonition | default dict -}}
 {{- $params := dict
     "context" .
     "inner" .Inner
     "class" "admonition help"
-    "summary" (.Get "title" | default (.Get 0) | default "QUESTION")
-    "collapsible" (.Get "collapsible" | default "no")
-    "open" (.Get "open")
-    "icon" (partial "svg-icon.html" (dict "path" "svg/ui-oval/help-circle.svg" "class" "admonition-icon indicator help"))
-    "marker" (partial "svg-icon.html" (dict "path" "svg/ui-oval/chevron-left.svg" "class" "admonition-icon marker help"))
-    "markerPosition" "end"
-    "markerRotation" "counter-clockwise"
+    "summary" (.Get "title" | default (.Get 0) | default ($cfg.help.title | default ""))
+    "collapsible" (.Get "collapsible" | default ($cfg.help.collapsible | default ($cfg.collapsible | default "no")))
+    "open" (.Get "open" | default ($cfg.help.open | default ($cfg.open | default "")))
+    "icon" (partial "svg-icon.html" (dict "path" ($cfg.help.icon | default "svg/placeholder.svg") "class" "admonition-icon indicator help"))
+    "marker" (partial "svg-icon.html" (dict "path" ($cfg.help.marker | default "svg/placeholder.svg") "class" "admonition-icon marker help"))
+    "markerPosition" ($cfg.help.markerPosition | default ($cfg.markerPosition | default "end"))
+    "markerRotation" ($cfg.help.markerRotation | default ($cfg.markerRotation | default "counter-clockwise"))
 -}}
 {{- partial "details.html" $params -}}
