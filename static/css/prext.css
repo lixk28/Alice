@@ -63,7 +63,6 @@ p.post-next-title {
 
 svg.post-prev-icon,
 svg.post-next-icon {
-    stroke: currentColor;
     color: var(--link-color);
     stroke-width: 2;
     stroke-linecap: round;

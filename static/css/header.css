@@ -135,13 +135,12 @@ nav#menu > .menu-item {
     height: 100%;
 }
 
-/* and their icons (inline <svg><use>; sprite paths use stroke: currentColor, themed via the color property) */
+/* and their icons (inline <svg><use>; sprite paths use stroke="currentColor", themed via the color property) */
 svg.menu-icon {
     display: inline-block;
     width: var(--menu-font-size);
     height: var(--menu-font-size);
     vertical-align: -0.15em;
-    stroke: currentColor;
     color: var(--menu-icon-color);
 }
 
@@ -182,7 +181,6 @@ label#hamburger-btn-icon-wrapper {
 }
 
 svg#hamburger-btn-icon {
-    stroke: currentColor;
     color: Black;
     width: var(--hamburger-menu-icon-size);
     height: var(--hamburger-menu-icon-size);

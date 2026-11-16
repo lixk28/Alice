@@ -119,7 +119,6 @@ div.code-block-copy-icon-wrapper {
 }
 
 svg.code-block-copy-icon {
-    stroke: currentColor;
     color: royalblue;
     stroke-width: 1;
     stroke-linecap: round;
@@ -131,7 +130,6 @@ svg.code-block-copy-icon {
 
 svg.code-block-check-icon,
 svg.code-block-close-icon {
-    stroke: currentColor;
     color: navy;
     stroke-width: 1;
     stroke-linecap: round;

@@ -41,14 +41,12 @@
 .jump-btn svg {
     width: 24px;
     height: 24px;
-    stroke: currentColor;
     color: #333;
     stroke-width: 2;
     transition: stroke 0.3s ease;
 }
 
 .jump-btn:hover svg {
-    stroke: currentColor;
     color: #007acc;
 }
 
