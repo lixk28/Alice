@@ -1,5 +1,5 @@
 <label id="hamburger-btn-icon-wrapper" for="hamburger-btn">
-	<svg id="hamburger-btn-icon" aria-hidden="true"><use href="{{ partial "svg-icon.html" (dict "path" "ui-oval/menu-01.svg") }}"/></svg>
+	{{ partial "svg-icon.html" (dict "path" "ui-oval/menu-01.svg" "id" "hamburger-btn-icon" "attrs" `aria-hidden="true"`) }}
 </label>
 <input type="checkbox" id="hamburger-btn" name="hamburger-btn">
 <nav id="hamburger-menu">

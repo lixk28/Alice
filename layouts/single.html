@@ -87,10 +87,10 @@
 	<!-- Jump to top/bottom buttons -->
 	<div class="jump-buttons">
 		<button id="jump-top" class="jump-btn jump-top" title="Jump to top">
-			<svg class="jump-up-icon"><use href="{{ partial "svg-icon.html" (dict "path" "ui-oval/chevron-up.svg") }}"/></svg>
+			{{ partial "svg-icon.html" (dict "path" "ui-oval/chevron-up.svg" "class" "jump-up-icon") }}
 		</button>
 		<button id="jump-bottom" class="jump-btn jump-bottom" title="Jump to bottom">
-			<svg class="jump-bottom-icon"><use href="{{ partial "svg-icon.html" (dict "path" "ui-oval/chevron-down.svg") }}"/></svg>
+			{{ partial "svg-icon.html" (dict "path" "ui-oval/chevron-down.svg" "class" "jump-bottom-icon") }}
 		</button>
 	</div>
 	

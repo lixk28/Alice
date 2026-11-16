@@ -20,7 +20,7 @@
 					{{- $desc = $page.Description | default $page.Params.description | default "" -}}
 				{{- end -}}
 	{{- $path := (.Params.icon.path | default (printf "ui-oval/%s.svg" $id)) -}}
-	{{- $iconHref := partial "svg-icon.html" (dict "path" $path) -}}
+	{{- $iconHref := partial "svg-icon.html" (dict "path" $path "url" true) -}}
 	<li>
 		<span class="menu-icon menu-{{ $id }}-icon" style="--menu-icon-mask: url({{ $iconHref }})" aria-hidden="true"></span>
 		<a href="{{ .URL | relURL }}">{{ .Name }}</a>

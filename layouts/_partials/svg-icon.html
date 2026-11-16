@@ -1,21 +1,25 @@
 {{- /*
-Resolve an icon reference. Config carries no
-sprite `id`; the id is
-derived at build time and published in `<mapFile>` (default `static/svg/sprite_map.json`).
-This partial reads that map ONCE and caches it globally in hugo.Store, then turns a configured
-svg `path` into a `<sprite>#<id>` reference.
+Render an icon as a self-contained inline `<svg><use href="..."/></svg>`. Config carries no sprite `id`
+— the id is derived at build time and published in `<mapFile>` (default `static/svg/sprite_map.json`).
+This partial reads that map ONCE and caches it globally in hugo.Store, then turns a configured svg
+`path` into a `<sprite>#<id>` reference.
 
 Priority:
-  1. `path` found in the shared sprite map → "<sprite>#<id>"  (relURL'd, uses the matching bundled sprite).
+  1. `path` found in the shared sprite map → "…/sprite.svg#<id>" (relURL'd, the matching bundled sprite).
   2. "svg/placeholder.svg" (universal default).
-  Every returned value goes through relURL, so it resolves from any page depth (e.g. /posts/).
+  Every resolved URL goes through relURL, so it resolves from any page depth (e.g. /posts/).
 
-Parameter (flat dict, e.g. a menu entry's `.Params.icon`):
-  path (string): the icon's key relative to rootDir, e.g. "ui-oval/home-03.svg". This
-    doubles as the shared sprite_map.json lookup key.
+Parameters (flat dict):
+  path (string)                  : the icon's key relative to rootDir, e.g. "ui-oval/home-03.svg". This
+                               doubles as the shared sprite_map.json lookup key.
+  class (string, optional)      : the class attribute on the outer `<svg>`.
+  id (string, optional)        : the id attribute on the outer `<svg>`.
+  attrs (string, optional)    : extra literal attributes (e.g. `aria-hidden="true"`) appended to `<svg>`.
+  url (bool, optional)        : if true, return ONLY the resolved URL string (for CSS-mask / background-image
+                             consumers); otherwise a full inline `<svg><use href="..."/></svg>`.
 
-Return:
-  string $iconURL — for an inline `<use href="...">`, root-relative.
+Return:  a full inline `<svg ...><use href="..."/></svg>` (trusted HTML) by default, or the root-relative
+URL string when `url` is set.
 */ -}}
 {{- $map := hugo.Store.Get "alice-sprite-map" -}}
 {{- if not $map -}}
@@ -29,4 +33,12 @@ Return:
 {{- if $entry -}}
 	{{- $iconURL = printf "%s#%s" ((index $entry "sprite") | relURL) (index $entry "id") -}}
 {{- end -}}
-{{- return $iconURL -}}
+{{- $result := $iconURL -}}
+{{- if not .url -}}
+	{{- $extra := "" -}}
+	{{- with .class -}}{{- $extra = printf ` class="%s"` . -}}{{- end -}}
+	{{- with .id -}}{{- $extra = printf `%s id="%s"` $extra . -}}{{- end -}}
+	{{- with .attrs -}}{{- $extra = printf `%s %s` $extra . -}}{{- end -}}
+	{{- $result = (printf `<svg%s><use href="%s"/></svg>` $extra $iconURL) | safeHTML -}}
+{{- end -}}
+{{- return $result -}}
