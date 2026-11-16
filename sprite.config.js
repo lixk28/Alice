@@ -20,7 +20,7 @@
 
 module.exports = {
   // Set to false to skip building entirely (e.g. you commit generated sprites + map).
-  enabled: false,
+  enabled: true,
 
   // Base dir that every `sprites[].srcList` entry and `spriteDir` resolve against. `static` keeps every icon asset
   // (sources AND built sprites) under the web-served static dir.
