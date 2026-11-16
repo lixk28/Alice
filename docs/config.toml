@@ -89,6 +89,16 @@ themesDir = "../.."
         # pin icon (sprite path)
         icon = "svg/ui-oval/pin-02.svg"
 
+    [params.resource]
+        # Fallback icon (used for an unset/unknown type), default "file"
+        icon = "svg/ui-oval/file-05.svg"
+        [params.resource.code]
+            icon = "svg/ui-oval/file-code-01.svg"
+        [params.resource.image]
+            icon = "svg/ui-oval/image-01.svg"
+        [params.resource.tarball]
+            icon = "svg/ui-oval/cube-01.svg"
+
     [params.footer]
         # Should display site generator (Hugo) and theme (Alice) 🥰
         showHugoAlice = true

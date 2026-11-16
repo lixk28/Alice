@@ -16,13 +16,13 @@
     {{ errorf "Unknown resource location %q." $location }}
 {{ end }}
 
-{{ $iconMap := dict
-    "file" (partial "svg-icon.html" (dict "path" "svg/ui-oval/file-05.svg" "class" "resource-icon"))
-    "code" (partial "svg-icon.html" (dict "path" "svg/ui-oval/file-code-01.svg" "class" "resource-icon"))
-    "image" (partial "svg-icon.html" (dict "path" "svg/ui-oval/image-01.svg" "class" "resource-icon"))
-    "tarball" (partial "svg-icon.html" (dict "path" "svg/ui-oval/cube-01.svg" "class" "resource-icon"))
+{{ $cfg := site.Params.resource | default dict }}
+{{ $typeCfg := index $cfg $type }}
+{{ $iconPath := $typeCfg.icon | default ($cfg.icon | default "svg/placeholder.svg") }}
+{{ $icon := partial "svg-icon.html" (dict
+    "path" $iconPath
+    "class" "resource-icon")
 }}
-{{ $icon := index $iconMap $type }}
 
 <a class="resource-anchor" href="{{ $res.RelPermalink }}">
     {{- $icon | safeHTML -}}
