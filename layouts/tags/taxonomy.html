@@ -4,19 +4,21 @@
     <p class="tags">
     {{ $orderedTaxo := .Data.Terms.ByCount }}
     {{ $tagCnt := len $orderedTaxo }}
-    {{/* FIXME: bin count should be configurable */}}
-    {{ $binCnt := math.Min 10 $tagCnt | int }}
-    {{ $step := div $tagCnt $binCnt }}
+    {{ if gt $tagCnt 0 }}
+        {{/* FIXME: bin count should be configurable */}}
+        {{ $binCnt := math.Min 10 $tagCnt | int }}
+        {{ $step := div $tagCnt $binCnt }}
 
-    {{/* Map tag to bin index */}}
-    {{ $binMap := dict }}
-    {{ range $i, $taxo := $orderedTaxo }}
-        {{ $binIdx := div $i $step }}
-        {{ $binMap = merge $binMap (dict .Term $binIdx) }}
-    {{ end }}
+        {{/* Map tag to bin index */}}
+        {{ $binMap := dict }}
+        {{ range $i, $taxo := $orderedTaxo }}
+            {{ $binIdx := div $i $step }}
+            {{ $binMap = merge $binMap (dict .Term $binIdx) }}
+        {{ end }}
 
-    {{ range ($orderedTaxo | shuffle) }}
-        <span class="tag bin-{{ index $binMap .Term }}"><a href="{{ .Page.RelPermalink }}">#{{ .Page.Title }}</a><sup> ({{ .Count }})</sup></span>&emsp;
+        {{ range ($orderedTaxo | shuffle) }}
+            <span class="tag bin-{{ index $binMap .Term }}"><a href="{{ .Page.RelPermalink }}">#{{ .Page.Title }}</a><sup> ({{ .Count }})</sup></span>&emsp;
+        {{ end }}
     {{ end }}
     <!-- {{- range .Site.Taxonomies.tags -}}
         <span><a href="{{ .Page.RelPermalink }}">#{{ .Page.Title }}</a><sup> ({{ .Count }})</sup></span>&emsp;

@@ -4,6 +4,7 @@
     <ul class="categories">
         {{ $orderedTaxo := .Data.Terms.ByCount }}
         {{ $tagCnt := len $orderedTaxo }}
+        {{ if gt $tagCnt 0 }}
         {{/* FIXME: bin count should be configurable */}}
         {{ $binCnt := math.Min 10 $tagCnt | int }}
         {{ $step := div $tagCnt $binCnt }}
@@ -17,6 +18,7 @@
 
         {{ range ($orderedTaxo | shuffle) }}
         <li class="tag bin-{{ index $binMap .Term }}"><a href="{{ .Page.RelPermalink }}">[{{ .Page.Title }}]</a> ({{ .Count }})</li>
+        {{ end }}
         {{ end }}
         <!-- {{ range .Site.Taxonomies.categories }}
         <li><a href="{{ .Page.RelPermalink }}">[{{ .Page.Title }}]</a> ({{ .Count }})</li>
