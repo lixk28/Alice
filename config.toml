@@ -84,6 +84,11 @@
             markerPosition = "end"
             markerRotation = "counter-clockwise"
 
+    # Sidenote shortcode defaults
+    [params.sidenote]
+        # sidenote icon (sprite path)
+        icon = "svg/ui-oval/pin-02.svg"
+
     [params.footer]
         # Should display site generator (Hugo) and theme (Alice) 🥰
         showHugoAlice = true
