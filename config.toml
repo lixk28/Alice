@@ -122,6 +122,7 @@
     [params.post.meta.icons]
         date = "svg/ui-oval/calendar.svg"
         lastmod = "svg/ui-oval/calendar-plus-02.svg"
+        location = "svg/ui-oval/marker-pin-01.svg"
         category = "svg/ui-oval/folder.svg"
         tag = "svg/ui-oval/tag-01.svg"
 

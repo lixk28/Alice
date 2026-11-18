@@ -73,6 +73,10 @@
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_folder"
     },
+    "svg/ui-oval/globe-05.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_globe-05"
+    },
     "svg/ui-oval/help-circle.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_help-circle"
@@ -96,6 +100,14 @@
     "svg/ui-oval/link-external-02.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_link-external-02"
+    },
+    "svg/ui-oval/marker-pin-01.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_marker-pin-01"
+    },
+    "svg/ui-oval/marker-pin-04.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_marker-pin-04"
     },
     "svg/ui-oval/menu-01.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",

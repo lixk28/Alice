@@ -11,8 +11,10 @@
     {{- $lastmodDate := .page.Lastmod.Format $dateFormat -}}
     {{- printf `<%s class="post-meta-item dates">` $metaItemTag | safeHTML -}}
         {{- with $postDate -}}
-            {{ partial "svg-icon.html" (dict "path" ($postMetaIcons.date | default "svg/ui-oval/calendar.svg") "class" "post-date-icon") }}
-            <b><time class="post-date">{{ . }}</time></b>
+            {{- partial "svg-icon.html" (dict
+                "path" ($postMetaIcons.date | default "svg/ui-oval/calendar.svg")
+                "class" "post-date-icon"
+            ) -}}&nbsp;<b><time class="post-date">{{ . }}</time></b>
         {{- end -}}
         {{- with $lastmodDate -}}
             {{- if ne . $postDate -}}
@@ -25,6 +27,22 @@
                 <b><time class="lastmod-date">{{ . }}</time></b>
             {{- end -}}
         {{- end -}}
+    {{- printf `</%s>` $metaItemTag | safeHTML -}}
+{{- end -}}
+
+{{- $location := "" -}}
+{{- with .page.Params.location -}}
+    {{- $location = strings.TrimSpace . -}}
+{{- end -}}
+{{- with $location -}}
+    {{- with $metaItemSep -}}
+        <span>{{ . | safeHTML }}</span>
+    {{- end -}}
+    {{- printf `<%s class="post-meta-item location">` $metaItemTag | safeHTML -}}
+        {{- partial "svg-icon.html" (dict
+            "path" ($postMetaIcons.location | default "svg/ui-oval/marker-pin-01.svg")
+            "class" "post-location-icon"
+        ) -}}&nbsp;<span class="post-location">{{ . }}</span>
     {{- printf `</%s>` $metaItemTag | safeHTML -}}
 {{- end -}}
 
