@@ -20,6 +20,13 @@ span.attachment-name {
     transition: 200ms ease;
 }
 
+span.attachment-size {
+    color: SlateGray;
+    font-size: .85em;
+    white-space: nowrap;
+    transition: 200ms ease;
+}
+
 a.attachment-anchor:hover > svg.attachment-icon {
     color: blue;
     transform: rotate(3deg);
@@ -27,5 +34,8 @@ a.attachment-anchor:hover > svg.attachment-icon {
 a.attachment-anchor:hover > span.attachment-name {
     color: blue;
     box-shadow: inset 0 -0.15em 0 var(--link-active-color);
+}
+a.attachment-anchor:hover > span.attachment-size {
+    color: blue;
 }
 

@@ -1,31 +1,100 @@
-{{ $path := .Get "path" }}
-{{/* "file", "code", "image" or "tarball" */}}
-{{ $type := .Get "type" }}
-{{ $name := .Get "name" | default (path.Base $path) }}
-{{/* "page", "global" or "remote" */}}
-{{ $location := .Get "location" | default "page" }}
+{{- /*
+  Attachment shortcode — links to a page, global, or remote resource.
 
-{{ $res := false }}
-{{ if eq $location "page" }}
-    {{ $res = .Page.Resources.Get $path }}
-{{ else if eq $location "global" }}
-    {{ $res = resources.Get $path }}
-{{ else if eq $location "remote" }}
-    {{ $res = resources.GetRemote $path }}
-{{ else }}
-    {{ errorf "Unknown attachment location %q." $location }}
-{{ end }}
+  Args:
+    path     — resource path (required)
+    type     — icon key in params.attachment.iconmap (default: "default")
+    name     — link label (default: path.Base path)
+    location — "page" | "global" | "remote" (default: "page"); remote
+               files are linked directly instead of fetched at build time
+    icon     — show the icon (default: params.attachment.showIcon, else true)
+    size     — show file size (default: params.attachment.showSize, else true)
 
-{{ $cfg := site.Params.attachment | default dict }}
-{{- $icons := site.Params.icons | default dict -}}
-{{ $typeCfg := index $cfg $type }}
-{{ $iconPath := $typeCfg.icon | default ($cfg.icon | default ($icons.placeholder | default "svg/placeholder.svg")) }}
-{{ $icon := partial "svg-icon.html" (dict
-    "path" $iconPath
-    "class" "attachment-icon")
-}}
+  Page and global resources show their size in B, KB, MB, or GB. Remote
+  resources show no size because they are not fetched during the build.
+*/ -}}
 
-<a class="attachment-anchor" href="{{ $res.RelPermalink }}">
-    {{- $icon | safeHTML -}}
+{{- $path := .Get "path" -}}
+{{- $type := .Get "type" | default "default" | lower -}}
+{{- $name := .Get "name" | default (path.Base $path) -}}
+{{- $location := .Get "location" | default "page" -}}
+
+{{- $res := false -}}
+{{- $href := "" -}}
+{{- if eq $location "page" -}}
+    {{- $res = .Page.Resources.Get $path -}}
+{{- else if eq $location "global" -}}
+    {{- $res = resources.Get $path -}}
+{{- else if eq $location "remote" -}}
+    {{/* Link remote files directly; do not fetch them during the build. */}}
+    {{- $href = $path -}}
+{{- else -}}
+    {{- errorf "Unknown attachment location %q." $location -}}
+{{- end -}}
+{{- with $res -}}
+    {{- $href = .RelPermalink -}}
+{{- end -}}
+{{- if not $href -}}
+    {{- errorf "Attachment %q not found." $path -}}
+{{- end -}}
+
+{{- $cfg := site.Params.attachment | default dict -}}
+
+{{- $showIcon := true -}}
+{{- if isset $cfg "showicon" -}}
+    {{- $showIcon = $cfg.showIcon -}}
+{{- end -}}
+{{- $iconArg := .Get "icon" -}}
+{{- if or (eq $iconArg false) (eq $iconArg "false") (eq $iconArg "no") -}}
+    {{- $showIcon = false -}}
+{{- else if or (eq $iconArg true) (eq $iconArg "true") (eq $iconArg "yes") -}}
+    {{- $showIcon = true -}}
+{{- end -}}
+
+{{- $icon := "" -}}
+{{- if $showIcon -}}
+    {{- $icons := site.Params.icons | default dict -}}
+    {{- $iconMap := $cfg.iconmap | default dict -}}
+    {{- $iconPath := index $iconMap $type | default ($iconMap.default | default ($icons.placeholder | default "svg/placeholder.svg")) -}}
+    {{- $icon = partial "svg-icon.html" (dict
+        "path" $iconPath
+        "class" "attachment-icon") -}}
+{{- end -}}
+
+{{- $showSize := true -}}
+{{- if isset $cfg "showsize" -}}
+    {{- $showSize = $cfg.showSize -}}
+{{- end -}}
+{{- $sizeArg := .Get "size" -}}
+{{- if or (eq $sizeArg false) (eq $sizeArg "false") (eq $sizeArg "no") -}}
+    {{- $showSize = false -}}
+{{- else if or (eq $sizeArg true) (eq $sizeArg "true") (eq $sizeArg "yes") -}}
+    {{- $showSize = true -}}
+{{- end -}}
+
+{{- $sizeText := "" -}}
+{{- if and $showSize $res -}}
+    {{/* Hugo exposes no resource size; Content length is the byte count. */}}
+    {{- $size := len $res.Content -}}
+    {{- $units := slice "B" "KB" "MB" "GB" -}}
+    {{- $value := float $size -}}
+    {{- $unit := 0 -}}
+    {{- range seq 3 -}}
+        {{- if ge $value 1024.0 -}}
+            {{- $value = div $value 1024.0 -}}
+            {{- $unit = add $unit 1 -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if eq $unit 0 -}}
+        {{- $sizeText = printf "%d %s" $size (index $units $unit) -}}
+    {{- else -}}
+        {{- $number := strings.TrimSuffix ".0" (printf "%.1f" $value) -}}
+        {{- $sizeText = printf "%s %s" $number (index $units $unit) -}}
+    {{- end -}}
+{{- end -}}
+
+<a class="attachment-anchor" href="{{ $href }}">
+    {{- if $showIcon }}{{ $icon | safeHTML }}{{ end -}}
     <span class="attachment-name">{{- $name -}}</span>
+    {{- if $sizeText }} <span class="attachment-size">({{ $sizeText }})</span>{{ end -}}
 </a>

@@ -107,15 +107,19 @@ themesDir = "../.."
         # pin icon (sprite path)
         icon = "svg/ui-oval/pin-02.svg"
 
+    # Attachment shortcode defaults.
     [params.attachment]
-        # Fallback icon (used for an unset/unknown type), default "file"
-        icon = "svg/ui-oval/file-05.svg"
-        [params.attachment.code]
-            icon = "svg/ui-oval/file-code-01.svg"
-        [params.attachment.image]
-            icon = "svg/ui-oval/image-01.svg"
-        [params.attachment.tarball]
-            icon = "svg/ui-oval/cube-01.svg"
+        # Show the attachment icon.
+        showIcon = true
+        # Show the file size next to the attachment name.
+        showSize = true
+        # Icon for each attachment type. `default` is used for an unset,
+        # "file", or unknown type.
+        [params.attachment.iconmap]
+            default = "svg/ui-oval/file-05.svg"
+            code = "svg/ui-oval/file-code-01.svg"
+            image = "svg/ui-oval/image-01.svg"
+            tarball = "svg/ui-oval/cube-01.svg"
 
     # Post metadata icons
     [params.post.meta.icons]
