@@ -246,6 +246,16 @@
         thumbTarget = "posturl"
         showDescription = false
 
+    # Post list on /posts/, category and tag pages. A post with `pinned: true`
+    # in its front matter renders first, in its own group above the normal list.
+    # Pinned posts keep the list's normal order (weight, then date).
+    [params.postlist]
+        [params.postlist.pinned]
+            # Heading above the pinned group; set to "" to hide the heading
+            title = "Pinned"
+            # Pin icon (in the heading and next to each pinned post)
+            icon = "svg/ui-oval/pin-01.svg"
+
     # waline v3 comment system
     [params.waline]
         enable = false

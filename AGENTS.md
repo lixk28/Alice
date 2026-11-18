@@ -52,13 +52,14 @@ Pages:
   - Pieces: table of contents, featured image, title, `post-meta.html`, `post-tldr.html`, content, previous/next (`post-prext.html`), related posts (`post-related.html`), jump buttons. Front matter `prext` / `related` default on; set either to `false` to hide that block.
   - Styles: `static/css/post.css` (article layout), `static/css/toc.css`, `static/css/img.css` (featured image and figures), `static/css/prext.css`, `static/css/related.css`, `static/css/jump.css`.
 - `layouts/posts/section.html` renders `/posts/`.
-  - Grouped by year through `post-list.html` and `post-item.html`.
-  - `layouts/list.html` is the fallback list. List-item rules live in `style.css`.
+  - Calls `post-list.html` with `groupBy "PublishDate"` so pinned posts come first, then the rest under publish-year headings.
+  - `post-list.html` is generic: pass any page collection (`{{ partial "post-list.html" .Pages }}`), or a dict with `pages` plus optional `groupBy` / `groupSort` (Hugo's `GroupBy FIELD [SORT]` semantics; date fields group by year). Posts with `pinned: true` always render first; `params.postlist.pinned` sets that group's heading and icon.
+  - `layouts/list.html` is the fallback list (it paginates and does not pin). Post-list and pinned-group rules live in `static/css/style.css`.
 - Taxonomy pages:
   - `layouts/categories/taxonomy.html` renders `/categories/`. `layouts/tags/taxonomy.html` renders `/tags/`.
   - `layouts/more/section.html` renders `/more/` (section hub via `content/more/`); the link list is `layouts/_partials/morehub.html` (`menu.main` children of `identifier = "more"`).
   - Term-size bins: `static/css/taxo.css`. Tag and category link tilt: `style.css`.
-  - `layouts/categories/term.html` and `layouts/tags/term.html` render one category or one tag with `post-list.html`.
+  - `layouts/categories/term.html` and `layouts/tags/term.html` render one category or one tag with `post-list.html` (pinned posts first, like `/posts/`).
 - `layouts/friends.html` renders `/friends/`.
   - Cards come from the `friend` and `frienmily` shortcodes.
   - Styles: `static/css/friend.css`.

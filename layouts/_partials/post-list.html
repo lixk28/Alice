@@ -1,5 +1,88 @@
-<ul class="post-list">
-    {{- range .Pages -}}
-    {{- partial "post-item.html" . -}}
-    {{- end -}}
-</ul>
+{{- /*
+Render a page collection as a post list, pinned posts first.
+
+Context: a page collection, or a dict:
+
+  pages         (required) any page collection: .Pages, .RegularPages,
+                .Paginator.Pages, a page group's .Pages, ...
+  groupBy       (optional) Page field/method name to group the non-pinned
+                posts by, e.g. "Section", "Type", "PublishDate". Date fields
+                ("Date", "PublishDate", "Lastmod", "ExpiryDate") group by year.
+  groupSort     (optional) "asc" or "desc"; defaults to the method's own default
+                (asc for GroupBy, desc for the date grouping methods)
+
+    {{ partial "post-list.html" .Pages }}
+    {{ partial "post-list.html" (dict "pages" .RegularPages "groupBy" "PublishDate") }}
+    {{ partial "post-list.html" (dict "pages" .Pages "groupBy" "Section" "groupSort" "desc") }}
+
+Posts with `pinned: true` in their front matter form the first group; the rest
+is one flat list or one group per group key. `params.postlist.pinned`
+configures the pinned group's heading and icon.
+*/ -}}
+{{- $pages := . -}}
+{{- $groupBy := "" -}}
+{{- $groupSort := "" -}}
+{{- if reflect.IsMap . -}}
+	{{- $pages = .pages -}}
+	{{- $groupBy = .groupBy -}}
+	{{- $groupSort = .groupSort | default "" -}}
+{{- end -}}
+{{- $pinnedPostCfg := site.Params.postlist.pinned | default dict -}}
+{{- $pinnedPostTitle := "Pinned" -}}
+{{- if isset $pinnedPostCfg "title" -}}{{- $pinnedPostTitle = $pinnedPostCfg.title -}}{{- end -}}
+{{- $pinnedPostIcon := $pinnedPostCfg.icon | default "svg/ui-oval/pin-01.svg" -}}
+
+{{- /* Pinned posts are always the first group. */ -}}
+{{- $groups := slice -}}
+{{- with where $pages "Params.pinned" true -}}
+	{{- $groups = $groups | append (dict
+		"pages" .
+		"title" $pinnedPostTitle
+		"hasTitle" (ne $pinnedPostTitle "")
+		"titleClass" "pinned-post-title"
+		"listClass" "pinned-post"
+		"icon" $pinnedPostIcon
+	) -}}
+{{- end -}}
+
+{{- /* The rest is either one flat group or one group per groupBy key. */ -}}
+{{- $rest := where $pages "Params.pinned" "ne" true -}}
+{{- if $groupBy -}}
+	{{- $restGroups := slice -}}
+	{{- if eq $groupBy "Date" -}}
+		{{- $restGroups = $rest.GroupByDate "2006" $groupSort -}}
+	{{- else if eq $groupBy "PublishDate" -}}
+		{{- $restGroups = $rest.GroupByPublishDate "2006" $groupSort -}}
+	{{- else if eq $groupBy "Lastmod" -}}
+		{{- $restGroups = $rest.GroupByLastmod "2006" $groupSort -}}
+	{{- else if eq $groupBy "ExpiryDate" -}}
+		{{- $restGroups = $rest.GroupByExpiryDate "2006" $groupSort -}}
+	{{- else -}}
+		{{- $restGroups = $rest.GroupBy $groupBy $groupSort -}}
+	{{- end -}}
+	{{- range $restGroups -}}
+		{{- $groups = $groups | append (dict "pages" .Pages "title" .Key "hasTitle" true) -}}
+	{{- end -}}
+{{- else -}}
+	{{- with $rest -}}
+		{{- $groups = $groups | append (dict "pages" .) -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Render each group as an optional heading plus its list. */ -}}
+{{- range $groups -}}
+	{{- $group := . }}
+	{{- if $group.hasTitle }}
+	<h3{{ with $group.titleClass }} class="{{ . }}"{{ end }}>
+		{{- with $group.icon -}}
+		{{- partial "svg-icon.html" (dict "path" . "class" "pinned-post-icon") -}}
+		{{- end -}}
+		{{- $group.title -}}
+	</h3>
+	{{- end }}
+	<ul class="post-list{{ with $group.listClass }} {{ . }}{{ end }}">
+		{{- range $group.pages -}}
+		{{- partial "post-item.html" . -}}
+		{{- end -}}
+	</ul>
+{{- end -}}

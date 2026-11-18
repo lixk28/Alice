@@ -6,6 +6,8 @@ date: {{ .Date }}
 lastmod: {{ .Date }}
 type: posts
 draft: true
+# Show this post first on /posts/ and category/tag lists
+pinned: false
 categories: []
 tags: []
 tldr:

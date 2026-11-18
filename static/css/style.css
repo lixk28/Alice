@@ -342,11 +342,29 @@ main h4:hover a.heading-pilcrow {
     margin: .2em 0;
 }
 
-
 /* post item in Posts/Categories/Tags */
 li.post-item {
     font-family: var(--sans-font);
     margin-bottom: .4em;
+}
+
+/* pinned posts, stacked above the normal list */
+.pinned-post {
+    margin-bottom: 2em;
+}
+
+h3.pinned-post-title {
+    color: Navy;
+}
+
+/* pin marker in the pinned post group heading and next to each pinned item */
+svg.pinned-post-icon {
+    position: relative;
+    top: .15em;
+    color: Navy;
+    width: var(--svg-size-normal);
+    height: var(--svg-size-normal);
+    margin-right: .3em;
 }
 
 /* collapsible details for each series */

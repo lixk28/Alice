@@ -1,10 +1,7 @@
 {{- define "main" -}}
 <main>
     {{ with .Title -}}<h1>{{ . }}</h1>{{- end }}
-    {{- /* This section page only — not every mainSections type (e.g. gallery). */ -}}
-    {{- range .RegularPages.GroupByPublishDate "2006" }}
-        <h3>{{ .Key }}</h3>
-        {{ partial "post-list.html" . }}
-    {{ end -}}
+    {{- /* Pinned posts first, then the rest grouped by publish year. */ -}}
+    {{ partial "post-list.html" (dict "pages" .RegularPages "groupBy" "PublishDate") }}
 </main>
 {{- end -}}

@@ -1,4 +1,8 @@
-<li class="post-item">
+{{- $pinnedPostCfg := site.Params.postlist.pinned | default dict -}}
+<li class="post-item{{ if .Params.pinned }} pinned-post-item{{ end }}">
+    {{- if .Params.pinned -}}
+    {{- partial "svg-icon.html" (dict "path" ($pinnedPostCfg.icon | default "svg/ui-oval/pin-01.svg") "class" "pinned-post-icon") -}}
+    {{- end -}}
     <time>{{- .Date.Format "2006-01-02" -}}</time>
     <a href="{{ .RelPermalink }}">{{- .Page.Title | markdownify -}}</a>
 </li>

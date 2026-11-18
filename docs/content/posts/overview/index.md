@@ -4,6 +4,8 @@ description: ""
 keywords: []
 date: 2024-10-04T00:09:24+08:00
 lastmod: 2024-10-04T00:09:24+08:00
+# Show this post first, above the normal list on /posts/ and tag/category pages
+pinned: true
 categories: ["Documentation"]
 tags: ["Alice"]
 toc:
