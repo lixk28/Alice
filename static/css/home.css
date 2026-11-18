@@ -83,7 +83,8 @@ legend.home-sidebar-item-title {
     padding: .2em .4em;
 }
 
-fieldset#recent-updates > div.home-sidebar-item-content > ul {
+fieldset#recent-updates > div.home-sidebar-item-content > ul,
+fieldset#pinned > div.home-sidebar-item-content > ul {
     margin: .4em .4em .4em 0;
 }
 

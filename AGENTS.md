@@ -46,7 +46,7 @@ The build flow for a site in two steps:
 Pages:
 
 - `layouts/home.html` renders `/`.
-  - Partials: `post-card.html`, `paginator.html`, and `layouts/_partials/sidebar/` (`news`, `recent-updates`, `tag-list`, `category-list`).
+  - Partials: `post-card.html`, `paginator.html`, and `layouts/_partials/sidebar/` (`news`, `recent-updates`, `pinned`, `tag-list`, `category-list`).
   - Styles: `static/css/home.css`, `static/css/paginator.css`.
 - `layouts/single.html` renders one post.
   - Pieces: table of contents, featured image, title, `post-meta.html`, `post-tldr.html`, content, previous/next (`post-prext.html`), related posts (`post-related.html`), jump buttons. Front matter `prext` / `related` default on; set either to `false` to hide that block.

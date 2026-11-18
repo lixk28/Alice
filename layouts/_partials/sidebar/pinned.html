@@ -1,0 +1,10 @@
+{{- /* Pinned posts from every section, newest first. */ -}}
+{{- $pinnedPages := where .page.Site.RegularPages "Params.pinned" true -}}
+{{- $pinnedPages = $pinnedPages.ByDate.Reverse | first (.args.size | default 5) -}}
+{{- with $pinnedPages }}
+<ul>
+    {{- range . }}
+    {{- partial "post-item.html" . }}
+    {{- end }}
+</ul>
+{{- end }}

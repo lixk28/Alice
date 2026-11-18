@@ -190,9 +190,18 @@
                     delimiter = "&ensp;"
 
             [[params.home.sidebar.items]]
+                # Pinned posts from every section, newest first
+                id = "pinned"
+                title = "Pinned"
+                weight = 3
+                enable = true
+                [params.home.sidebar.items.args]
+                    size = 5
+
+            [[params.home.sidebar.items]]
                 id = "tag-list"
                 title = "Tags"
-                weight = 3
+                weight = 4
                 [params.home.sidebar.items.args]
                     size = 10
                     delimiter = "&emsp;"
@@ -202,7 +211,7 @@
             [[params.home.sidebar.items]]
                 id = "category-list"
                 title = "Categories"
-                weight = 4
+                weight = 5
                 [params.home.sidebar.items.args]
                     size = 5
                     delimiter = "&emsp;"
