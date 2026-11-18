@@ -3,6 +3,8 @@
 {{ $title := .Attributes.title }}
 {{ $copyable := .Attributes.copyable }}
 {{ $srcfile := .Attributes.srcfile }}
+{{ $codeblock := site.Params.codeblock | default dict }}
+{{ $codeblockIcons := $codeblock.icons | default dict }}
 
 {{ $codeWrapped := "" }}
 {{ if $srcfile }}
@@ -17,9 +19,9 @@
 {{ if $copyable }}
 
 
-    {{ $copySVG := partial "svg-icon.html" (dict "path" "svg/ui-oval/copy-01.svg" "class" "code-block-copy-icon") }}
-    {{ $checkSVG := partial "svg-icon.html" (dict "path" "svg/ui-oval/check.svg" "class" "code-block-check-icon") }}
-    {{ $closeSVG := partial "svg-icon.html" (dict "path" "svg/ui-oval/x-close.svg" "class" "code-block-close-icon") }}
+    {{ $copySVG := partial "svg-icon.html" (dict "path" ($codeblockIcons.copy | default "svg/ui-oval/copy-01.svg") "class" "code-block-copy-icon") }}
+    {{ $checkSVG := partial "svg-icon.html" (dict "path" ($codeblockIcons.check | default "svg/ui-oval/check.svg") "class" "code-block-check-icon") }}
+    {{ $closeSVG := partial "svg-icon.html" (dict "path" ($codeblockIcons.close | default "svg/ui-oval/x-close.svg") "class" "code-block-close-icon") }}
 
     {{ $noLineNumber := or (not (isset .Options "linenos")) (eq .Options.linenos false) }}
     {{ $chromaElement := cond $noLineNumber `<pre tabindex="0" class="chroma">` `<div class="chroma">` }}

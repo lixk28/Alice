@@ -1,5 +1,7 @@
+{{- $header := site.Params.header | default dict -}}
+{{- $hamburger := $header.hamburger | default dict -}}
 <label id="hamburger-btn-icon-wrapper" for="hamburger-btn">
-	{{ partial "svg-icon.html" (dict "path" "svg/ui-oval/menu-01.svg" "id" "hamburger-btn-icon") }}
+	{{ partial "svg-icon.html" (dict "path" ($hamburger.icon | default "svg/ui-oval/menu-01.svg") "id" "hamburger-btn-icon") }}
 </label>
 <input type="checkbox" id="hamburger-btn" name="hamburger-btn">
 <nav id="hamburger-menu">

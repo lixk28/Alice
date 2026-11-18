@@ -17,8 +17,9 @@
 {{ end }}
 
 {{ $cfg := site.Params.resource | default dict }}
+{{- $icons := site.Params.icons | default dict -}}
 {{ $typeCfg := index $cfg $type }}
-{{ $iconPath := $typeCfg.icon | default ($cfg.icon | default "svg/placeholder.svg") }}
+{{ $iconPath := $typeCfg.icon | default ($cfg.icon | default ($icons.placeholder | default "svg/placeholder.svg")) }}
 {{ $icon := partial "svg-icon.html" (dict
     "path" $iconPath
     "class" "resource-icon")

@@ -1,5 +1,8 @@
 {{- $metaItemTag := .metaItemTag | default "div" -}}
 {{- $metaItemSep := .metaItemSep | default "" -}}
+{{- $post := site.Params.post | default dict -}}
+{{- $postMeta := $post.meta | default dict -}}
+{{- $postMetaIcons := $postMeta.icons | default dict -}}
 
 <div class="post-meta">
 {{- if or .page.Date .page.Lastmod -}}
@@ -8,7 +11,7 @@
     {{- $lastmodDate := .page.Lastmod.Format $dateFormat -}}
     {{- printf `<%s class="post-meta-item dates">` $metaItemTag | safeHTML -}}
         {{- with $postDate -}}
-            {{ partial "svg-icon.html" (dict "path" "svg/ui-oval/calendar.svg" "class" "post-date-icon") }}
+            {{ partial "svg-icon.html" (dict "path" ($postMetaIcons.date | default "svg/ui-oval/calendar.svg") "class" "post-date-icon") }}
             <b><time class="post-date">{{ . }}</time></b>
         {{- end -}}
         {{- with $lastmodDate -}}
@@ -18,7 +21,7 @@
                 {{- else -}}
                     &emsp;
                 {{- end -}}
-                {{ partial "svg-icon.html" (dict "path" "svg/ui-oval/calendar-plus-02.svg" "class" "post-lastmod-date-icon") }}
+                {{ partial "svg-icon.html" (dict "path" ($postMetaIcons.lastmod | default "svg/ui-oval/calendar-plus-02.svg") "class" "post-lastmod-date-icon") }}
                 <b><time class="lastmod-date">{{ . }}</time></b>
             {{- end -}}
         {{- end -}}
@@ -30,7 +33,7 @@
         <span>{{ . | safeHTML }}</span>
     {{- end -}}
     {{- printf `<%s class="post-meta-item categories">` $metaItemTag | safeHTML -}}
-        {{ partial "svg-icon.html" (dict "path" "svg/ui-oval/folder.svg" "class" "post-categories-icon") }}
+        {{ partial "svg-icon.html" (dict "path" ($postMetaIcons.category | default "svg/ui-oval/folder.svg") "class" "post-categories-icon") }}
         {{- range $index, $cat := . -}}
             {{- if eq $index 0 }}&ensp;{{ else }}&emsp;{{ end -}}
             <a href="{{ "/categories/" | relLangURL }}{{ $cat | urlize }}">[{{ $cat }}]</a>
@@ -43,7 +46,7 @@
         <span>{{ . | safeHTML }}</span>
     {{- end -}}
     {{- printf `<%s class="post-meta-item tags">` $metaItemTag | safeHTML -}}
-        {{ partial "svg-icon.html" (dict "path" "svg/ui-oval/tag-01.svg" "class" "post-tags-icon") }}
+        {{ partial "svg-icon.html" (dict "path" ($postMetaIcons.tag | default "svg/ui-oval/tag-01.svg") "class" "post-tags-icon") }}
         {{- range $index, $tag := . -}}
             {{- if eq $index 0 }}&ensp;{{ else }}&emsp;{{ end -}}
             <a href="{{ "/tags/" | relLangURL }}{{ $tag | urlize }}">#{{ $tag }}</a>

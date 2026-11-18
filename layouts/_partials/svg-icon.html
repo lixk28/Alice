@@ -7,11 +7,11 @@ turns a configured svg `path` into a `<sprite>#<id>` reference.
 Priority:
   1. `enabled` + `path` present in the shared sprite map → "…/sprite.svg#<id>" (relURL'd, the bundled sprite).
   2. `enabled` but `path` missing from the map, OR `enabled` is falsy → the loose `path` file (relURL'd) when set.
-  3. "svg/placeholder.svg" (universal default).
+  3. `params.icons.placeholder` (default "svg/placeholder.svg").
   Every resolved URL goes through relURL, so it resolves from any page depth (e.g. /posts/).
 
 Parameters (flat dict):
-  path (string)                 : the icon's key relative to rootDir, e.g. "svg/ui-oval/home-03.svg". This
+  path (string)                 : the icon's key relative to rootDir, e.g. "svg/<set>/<name>.svg". This
                                 doubles as the shared sprite map lookup key.
   class (string or list, optional): the class attribute on the outer `<svg>`; a list is joined with spaces.
   id (string, optional)         : the id attribute on the outer `<svg>`.
@@ -25,12 +25,13 @@ Parameters (flat dict):
 	{{- hugo.Store.Set "alice-sprite-config" $config -}}
 {{- end -}}
 {{- $iconPath := .path | default "" -}}
-{{- $iconURL := "svg/placeholder.svg" | relURL -}}
-{{- if and $config.enabled $iconPath (index $config.map $iconPath) -}}
-	{{- $entry := index $config.map $iconPath -}}
+{{- $icons := site.Params.icons | default dict -}}
+{{- $placeholder := $icons.placeholder | default "svg/placeholder.svg" -}}
+{{- $resolvedPath := $iconPath | default $placeholder -}}
+{{- $iconURL := $resolvedPath | relURL -}}
+{{- if and $config.enabled (index $config.map $resolvedPath) -}}
+	{{- $entry := index $config.map $resolvedPath -}}
 	{{- $iconURL = printf "%s#%s" ((index $entry "sprite") | relURL) (index $entry "id") -}}
-{{- else if $iconPath -}}
-	{{- $iconURL = $iconPath | relURL -}}
 {{- end -}}
 {{- $class := "" -}}
 {{- if reflect.IsSlice .class -}}{{- $class = delimit .class " " -}}{{- else -}}{{- $class = .class -}}{{- end -}}

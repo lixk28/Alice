@@ -19,11 +19,21 @@
         # Header override for nested menu dropdowns (falls back to params.dropdown.mode)
         [params.header.dropdown]
             mode = "hover"
+        # TOC toggle icon
+        [params.header.sidetoc]
+            icon = "svg/ui-oval/align-left-02.svg"
+        # Hamburger menu icon
+        [params.header.hamburger]
+            icon = "svg/ui-oval/menu-01.svg"
 
     # Shared dropdown component / shortcode defaults
     [params.dropdown]
         # "hover" (default) or "click"
         mode = "hover"
+
+    # Link render hook
+    [params.link.icons]
+        external = "svg/ui-oval/link-external-02.svg"
 
     # Admonition shortcode defaults ({admonition, note, tip, info, help, alert}).
     # All of these are fallbacks — any per-shortcode argument still wins.
@@ -84,6 +94,14 @@
             markerPosition = "end"
             markerRotation = "counter-clockwise"
 
+    # Details shortcode defaults
+    [params.details.icons]
+        # Summary icon used when icon= is not passed.
+        icon = "svg/ui-oval/info-square.svg"
+        # Collapse marker used when marker= is not passed. Admonitions use
+        # params.admonition.<type>.marker instead.
+        marker = "svg/ui-oval/play.svg"
+
     # Sidenote shortcode defaults
     [params.sidenote]
         # sidenote icon (sprite path)
@@ -99,6 +117,27 @@
             icon = "svg/ui-oval/image-01.svg"
         [params.resource.tarball]
             icon = "svg/ui-oval/cube-01.svg"
+
+    # Post metadata icons
+    [params.post.meta.icons]
+        date = "svg/ui-oval/calendar.svg"
+        lastmod = "svg/ui-oval/calendar-plus-02.svg"
+        category = "svg/ui-oval/folder.svg"
+        tag = "svg/ui-oval/tag-01.svg"
+
+    # Previous/next post links
+    [params.post.prext.icons]
+        prev = "svg/ui-oval/align-left-01.svg"
+        next = "svg/ui-oval/align-right-01.svg"
+
+    # Jump to top/bottom buttons
+    [params.post.jump.icons]
+        up = "svg/ui-oval/chevron-up.svg"
+        down = "svg/ui-oval/chevron-down.svg"
+
+    # Only the universal fallback lives here; component icons live under their own params.
+    [params.icons]
+        placeholder = "svg/placeholder.svg"
 
     [params.footer]
         # Should display site generator (Hugo) and theme (Alice) 🥰
@@ -175,6 +214,11 @@
 
     [params.codeblock]
         maxLinesOfCode = 64
+
+        [params.codeblock.icons]
+            copy = "svg/ui-oval/copy-01.svg"
+            check = "svg/ui-oval/check.svg"
+            close = "svg/ui-oval/x-close.svg"
 
     [params.tex]
         # mathjax or katex

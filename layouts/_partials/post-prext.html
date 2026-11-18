@@ -1,15 +1,18 @@
 {{- /* I call it "prext" since it contains the previous and the next post :D */ -}}
+{{- $post := site.Params.post | default dict -}}
+{{- $postPrext := $post.prext | default dict -}}
+{{- $postPrextIcons := $postPrext.icons | default dict -}}
 <div class="post-prext">
     {{- with .Page.PrevInSection -}}
     <a class="post-prev" href="{{ .RelPermalink }}">
-        {{ partial "svg-icon.html" (dict "path" "svg/ui-oval/align-left-01.svg" "class" "post-prev-icon") }}
+        {{ partial "svg-icon.html" (dict "path" ($postPrextIcons.prev | default "svg/ui-oval/align-left-01.svg") "class" "post-prev-icon") }}
         <p class="post-prev-title">{{ .LinkTitle | markdownify }}</p>
     </a>
     {{- end -}}
     {{- with .Page.NextInSection -}}
     <a class="post-next" href="{{ .RelPermalink }}">
         <p class="post-next-title">{{ .LinkTitle | markdownify }}</p>
-        {{ partial "svg-icon.html" (dict "path" "svg/ui-oval/align-right-01.svg" "class" "post-next-icon") }}
+        {{ partial "svg-icon.html" (dict "path" ($postPrextIcons.next | default "svg/ui-oval/align-right-01.svg") "class" "post-next-icon") }}
     </a>
     {{- end -}}
 </div>

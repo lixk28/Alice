@@ -1,5 +1,7 @@
 {{/* stolen from https://danilafe.com/blog/sidenotes, with some modifications */}}
 
+{{- $icons := site.Params.icons | default dict -}}
+
 {{- $index := .Get "index" | default .Ordinal -}}
 {{- $label := .Get "label" -}}
 <span class="sidenote" id="sidenote-{{ $index }}">
@@ -7,7 +9,7 @@
     <input class="sidenote-checkbox" type="checkbox" id="sidenote-{{ $index }}-checkbox"></input>
     <span class="sidenote-content" id="sidenote-{{ $index }}-content">
         {{ partial "svg-icon.html" (dict
-            "path" (site.Params.sidenote.icon | default "svg/placeholder.svg")
+            "path" (site.Params.sidenote.icon | default ($icons.placeholder | default "svg/placeholder.svg"))
             "class" "sidenote-pin-icon"
         ) }}
         {{ trim .Inner "\n" | markdownify }}

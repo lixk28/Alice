@@ -1,4 +1,5 @@
 {{- $cfg := site.Params.admonition | default dict -}}
+{{- $icons := site.Params.icons | default dict -}}
 {{- $params := dict
     "context" .
     "inner" .Inner
@@ -6,8 +7,8 @@
     "summary" (.Get "title" | default (.Get 0) | default ($cfg.tip.title | default ""))
     "collapsible" (.Get "collapsible" | default ($cfg.tip.collapsible | default ($cfg.collapsible | default "no")))
     "open" (.Get "open" | default ($cfg.tip.open | default ($cfg.open | default "")))
-    "icon" (partial "svg-icon.html" (dict "path" ($cfg.tip.icon | default "svg/placeholder.svg") "class" "admonition-icon indicator tip"))
-    "marker" (partial "svg-icon.html" (dict "path" ($cfg.tip.marker | default "svg/placeholder.svg") "class" "admonition-icon marker tip"))
+    "icon" (partial "svg-icon.html" (dict "path" ($cfg.tip.icon | default ($icons.placeholder | default "svg/placeholder.svg")) "class" "admonition-icon indicator tip"))
+    "marker" (partial "svg-icon.html" (dict "path" ($cfg.tip.marker | default ($icons.placeholder | default "svg/placeholder.svg")) "class" "admonition-icon marker tip"))
     "markerPosition" ($cfg.tip.markerPosition | default ($cfg.markerPosition | default "end"))
     "markerRotation" ($cfg.tip.markerRotation | default ($cfg.markerRotation | default "counter-clockwise"))
 -}}

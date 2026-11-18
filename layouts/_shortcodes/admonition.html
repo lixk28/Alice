@@ -1,4 +1,5 @@
 {{- $cfg := site.Params.admonition | default dict -}}
+{{- $icons := site.Params.icons | default dict -}}
 {{- $type := .Get "type" | lower | default ($cfg.defaultType | default "info") -}}
 
 {{- $typeCfg := index $cfg $type -}}
@@ -9,11 +10,11 @@
 {{- $open := .Get "open" | default ($typeCfg.open | default ($cfg.open | default "")) -}}
 
 {{- $icon := partial "svg-icon.html" (dict
-    "path" ($typeCfg.icon | default "svg/placeholder.svg")
+    "path" ($typeCfg.icon | default ($icons.placeholder | default "svg/placeholder.svg"))
     "class" (printf "admonition-icon indicator %s" $type)
 ) -}}
 {{- $marker := partial "svg-icon.html" (dict
-    "path" ($typeCfg.marker | default "svg/placeholder.svg")
+    "path" ($typeCfg.marker | default ($icons.placeholder | default "svg/placeholder.svg"))
     "class" (printf "admonition-icon marker %s" $type)
 ) -}}
 
