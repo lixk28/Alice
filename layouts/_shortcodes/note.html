@@ -2,7 +2,7 @@
 {{- $icons := site.Params.icons | default dict -}}
 {{- $params := dict
     "context" .
-    "inner" .Inner
+    "inner" .InnerDeindent
     "class" "admonition note"
     "summary" (.Get "title" | default (.Get 0) | default ($cfg.note.title | default ""))
     "collapsible" (.Get "collapsible" | default ($cfg.note.collapsible | default ($cfg.collapsible | default "no")))

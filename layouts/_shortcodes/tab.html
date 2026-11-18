@@ -15,7 +15,7 @@
 
 {{- $panelScratch.Add "tabs" (dict
     "Title" $title
-    "Content" .Inner
+    "Content" .InnerDeindent
 ) -}}
 
 {{- else -}}
@@ -24,7 +24,7 @@
 {{- $title := .Get "title" | default (.Get 0) | default "" -}}
 <div class="tab">
     <div class="tab-title">{{ $title }}</div>
-    <div class="tab-content">{{ .Inner | chomp | markdownify }}</div>
+    <div class="tab-content">{{ .InnerDeindent | chomp | markdownify }}</div>
 </div>
 
 {{- end -}}

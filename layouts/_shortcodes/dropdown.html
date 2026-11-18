@@ -20,7 +20,7 @@
 	{{- $label = printf `<span class="dropdown-title">%s</span>` $titleHTML -}}
 	{{- $ariaTitle = . | markdownify | plainify | strings.TrimSpace -}}
 {{- end -}}
-{{- $panel := trim .Inner "\n" | markdownify -}}
+{{- $panel := trim .InnerDeindent "\n" | markdownify -}}
 
 {{- partial "dropdown.html" (dict
 	"id" $id

@@ -4,12 +4,12 @@
     {{ partial "editor/codemirror5.html" (dict
         "index" .Ordinal
         "language" $language
-        "code" .Inner
+        "code" .InnerDeindent
     ) }}
 {{ else if or (eq $vendor "codemirror6") (eq $vendor "cm6") }}
     {{ partial "editor/codemirror6.html" (dict
         "index" .Ordinal
         "language" $language
-        "code" .Inner
+        "code" .InnerDeindent
     ) }}
 {{ end }}

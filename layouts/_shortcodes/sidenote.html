@@ -12,6 +12,6 @@
             "path" (site.Params.sidenote.icon | default ($icons.placeholder | default "svg/placeholder.svg"))
             "class" "sidenote-pin-icon"
         ) }}
-        {{ trim .Inner "\n" | markdownify }}
+        {{ trim .InnerDeindent "\n" | markdownify }}
     </span>
 </span>

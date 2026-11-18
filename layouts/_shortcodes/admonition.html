@@ -20,7 +20,7 @@
 
 {{- $params := dict
     "context" .
-    "inner" .Inner
+    "inner" .InnerDeindent
     "class" (printf "admonition %s" $type)
     "summary" $title
     "collapsible" $collapsible
