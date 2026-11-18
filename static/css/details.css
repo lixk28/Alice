@@ -82,6 +82,6 @@ span.ai-summary-marker-wrapper > * {
 details.ai-details[open] > summary.ai-summary > span.ai-summary-marker-wrapper.clockwise > * {
     transform: rotate(90deg);
 }
-details.ai-details[open] > summary.ai-summary > span.ai-summary-marker-wrapper.counter-clockwise > * {
+details.ai-details[open] > summary.ai-summary > span.ai-summary-marker-wrapper.counterclockwise > * {
     transform: rotate(-90deg);
 }

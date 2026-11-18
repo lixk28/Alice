@@ -10,6 +10,6 @@
     "icon" (partial "svg-icon.html" (dict "path" ($cfg.alert.icon | default ($icons.placeholder | default "svg/placeholder.svg")) "class" "admonition-icon indicator alert"))
     "marker" (partial "svg-icon.html" (dict "path" ($cfg.alert.marker | default ($icons.placeholder | default "svg/placeholder.svg")) "class" "admonition-icon marker alert"))
     "markerPosition" ($cfg.alert.markerPosition | default ($cfg.markerPosition | default "end"))
-    "markerRotation" ($cfg.alert.markerRotation | default ($cfg.markerRotation | default "counter-clockwise"))
+    "markerRotation" ($cfg.alert.markerRotation | default ($cfg.markerRotation | default "counterclockwise"))
 -}}
 {{- partial "details.html" $params -}}

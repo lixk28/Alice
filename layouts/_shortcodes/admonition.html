@@ -5,7 +5,7 @@
 {{- $typeCfg := index $cfg $type -}}
 {{- $title := .Get "title" | default (.Get 0) | default ($typeCfg.title | default "") -}}
 {{- $markerPosition := .Get "markerPosition" | default ($typeCfg.markerPosition | default ($cfg.markerPosition | default "end")) -}}
-{{- $markerRotation := .Get "markerRotation" | default ($typeCfg.markerRotation | default ($cfg.markerRotation | default "counter-clockwise")) -}}
+{{- $markerRotation := .Get "markerRotation" | default ($typeCfg.markerRotation | default ($cfg.markerRotation | default "counterclockwise")) -}}
 {{- $collapsible := .Get "collapsible" | default ($typeCfg.collapsible | default ($cfg.collapsible | default "no")) -}}
 {{- $open := .Get "open" | default ($typeCfg.open | default ($cfg.open | default "")) -}}
 

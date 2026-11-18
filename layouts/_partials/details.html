@@ -31,8 +31,8 @@
 {{- end -}}
 
 {{- $markerRotation := .markerRotation | default "clockwise" -}}
-{{- if and (ne $markerRotation "clockwise") (ne $markerRotation "counter-clockwise") -}}
-    {{- errorf `The markerRotation argument in %s shortcode must be either "clockwise" or "counter-clockwise"! See %s` .Name .Position -}}
+{{- if and (ne $markerRotation "clockwise") (ne $markerRotation "counterclockwise") -}}
+    {{- errorf `The markerRotation argument in %s shortcode must be either "clockwise" or "counterclockwise"! See %s` .Name .Position -}}
 {{- end -}}
 
 {{- $markerElement := printf `<span class="ai-summary-marker-wrapper %s %s">%s</span>` $markerPosition $markerRotation $marker -}}

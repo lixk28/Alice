@@ -46,8 +46,8 @@ themesDir = "../.."
         open = false
         # Collapse-arrow placement: "begin" | "middle" | "end"
         markerPosition = "end"
-        # Collapse-arrow direction: "clockwise" | "counter-clockwise"
-        markerRotation = "counter-clockwise"
+        # Collapse-arrow direction: "clockwise" | "counterclockwise"
+        markerRotation = "counterclockwise"
 
         [params.admonition.note]
             title = "NOTE"
@@ -56,7 +56,7 @@ themesDir = "../.."
             collapsible = false
             open = false
             markerPosition = "end"
-            markerRotation = "counter-clockwise"
+            markerRotation = "counterclockwise"
 
         [params.admonition.info]
             title = "INFO"
@@ -65,7 +65,7 @@ themesDir = "../.."
             collapsible = false
             open = false
             markerPosition = "end"
-            markerRotation = "counter-clockwise"
+            markerRotation = "counterclockwise"
 
         [params.admonition.tip]
             title = "TIP"
@@ -74,7 +74,7 @@ themesDir = "../.."
             collapsible = false
             open = false
             markerPosition = "end"
-            markerRotation = "counter-clockwise"
+            markerRotation = "counterclockwise"
 
         [params.admonition.help]
             title = "QUESTION"
@@ -83,7 +83,7 @@ themesDir = "../.."
             collapsible = false
             open = false
             markerPosition = "end"
-            markerRotation = "counter-clockwise"
+            markerRotation = "counterclockwise"
 
         [params.admonition.alert]
             title = "WARN"
@@ -92,7 +92,7 @@ themesDir = "../.."
             collapsible = false
             open = false
             markerPosition = "end"
-            markerRotation = "counter-clockwise"
+            markerRotation = "counterclockwise"
 
     # Details shortcode defaults
     [params.details.icons]
