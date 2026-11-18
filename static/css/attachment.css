@@ -1,10 +1,10 @@
-a.resource-anchor {
+a.attachment-anchor {
     margin: 0 .3em;
     box-shadow: none !important;
     transition: none !important;
 }
 
-svg.resource-icon {
+svg.attachment-icon {
     position: relative;
     top: .4em;
     padding-right: .1em;
@@ -14,17 +14,17 @@ svg.resource-icon {
     transition: 200ms ease;
 }
 
-span.resource-name {
+span.attachment-name {
     color: royalblue;
     box-shadow: inset 0 -0.1em 0 var(--link-color);
     transition: 200ms ease;
 }
 
-a.resource-anchor:hover > svg.resource-icon {
+a.attachment-anchor:hover > svg.attachment-icon {
     color: blue;
     transform: rotate(3deg);
 }
-a.resource-anchor:hover > span.resource-name {
+a.attachment-anchor:hover > span.attachment-name {
     color: blue;
     box-shadow: inset 0 -0.15em 0 var(--link-active-color);
 }

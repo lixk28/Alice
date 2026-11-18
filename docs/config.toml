@@ -107,14 +107,14 @@ themesDir = "../.."
         # pin icon (sprite path)
         icon = "svg/ui-oval/pin-02.svg"
 
-    [params.resource]
+    [params.attachment]
         # Fallback icon (used for an unset/unknown type), default "file"
         icon = "svg/ui-oval/file-05.svg"
-        [params.resource.code]
+        [params.attachment.code]
             icon = "svg/ui-oval/file-code-01.svg"
-        [params.resource.image]
+        [params.attachment.image]
             icon = "svg/ui-oval/image-01.svg"
-        [params.resource.tarball]
+        [params.attachment.tarball]
             icon = "svg/ui-oval/cube-01.svg"
 
     # Post metadata icons

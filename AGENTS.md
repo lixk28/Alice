@@ -88,7 +88,7 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
 - `sidenote`: `static/css/sidenote.css`.
 - `mark`: `static/css/mark.css`.
 - `dropcap`: `static/css/dropcap.css`.
-- `resource`: `static/css/resource.css`.
+- `attachment`: `static/css/attachment.css`.
 - `friend` and `frienmily`: `static/css/friend.css`.
 - Fenced code blocks and the `highlight` shortcode:
   - Template: `layouts/_markup/render-codeblock.html`.

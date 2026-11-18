@@ -13,19 +13,19 @@
 {{ else if eq $location "remote" }}
     {{ $res = resources.GetRemote $path }}
 {{ else }}
-    {{ errorf "Unknown resource location %q." $location }}
+    {{ errorf "Unknown attachment location %q." $location }}
 {{ end }}
 
-{{ $cfg := site.Params.resource | default dict }}
+{{ $cfg := site.Params.attachment | default dict }}
 {{- $icons := site.Params.icons | default dict -}}
 {{ $typeCfg := index $cfg $type }}
 {{ $iconPath := $typeCfg.icon | default ($cfg.icon | default ($icons.placeholder | default "svg/placeholder.svg")) }}
 {{ $icon := partial "svg-icon.html" (dict
     "path" $iconPath
-    "class" "resource-icon")
+    "class" "attachment-icon")
 }}
 
-<a class="resource-anchor" href="{{ $res.RelPermalink }}">
+<a class="attachment-anchor" href="{{ $res.RelPermalink }}">
     {{- $icon | safeHTML -}}
-    <span class="resource-name">{{- $name -}}</span>
+    <span class="attachment-name">{{- $name -}}</span>
 </a>
