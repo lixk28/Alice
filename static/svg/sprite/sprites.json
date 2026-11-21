@@ -121,6 +121,10 @@
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_message-smile-square"
     },
+    "svg/ui-oval/pause.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_pause"
+    },
     "svg/ui-oval/pin-01.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_pin-01"

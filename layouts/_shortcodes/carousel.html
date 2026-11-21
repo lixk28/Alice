@@ -13,16 +13,16 @@
   Args (all optional; params.carousel provides the site defaults):
     class      — extra classes on the root
     label      — accessible name of the region
-    autoplay   — enable autoplay: true|false (default: false)
+    autoplay   — enable autoplay; a ring button at the top-right toggles it (default: false)
     interval   — autoplay delay in ms (default: 5000)
-    progressPosition — autoplay progress bar: top|bottom (default: top)
+    progressStyle — autoplay progress: both|bar|ring|none (default: both)
+    progressPosition — progress bar position: top|bottom (default: top)
     controls   — previous/next buttons: true|false
     controlsPosition — control bar placement: below|top|bottom (default: below)
     prevAlign  — previous button alignment: left|center|right (default: left)
     indicatorStyle — indicator style: dots|segments|counter|thumbnails (default: dots)
     indicatorAlign — indicator alignment: left|center|right (default: center)
     nextAlign  — next button alignment: left|center|right (default: right)
-    autoplayAlign — play/pause button alignment: left|center|right (default: right)
     perView    — number of slides visible at once (default: 1)
     counterSeparator — text between current and total (default: "/")
     loop       — circular navigation (last → first): true|false (default: true)
@@ -54,6 +54,7 @@
 	"label" "Carousel"
 	"autoplay" false
 	"interval" 5000
+	"progressStyle" "both"
 	"progressPosition" "top"
 	"controls" true
 	"controlsPosition" "below"
@@ -61,7 +62,6 @@
 	"indicatorStyle" "dots"
 	"indicatorAlign" "center"
 	"nextAlign" "right"
-	"autoplayAlign" "right"
 	"counterSeparator" "/"
 	"loop" true
 	"keyboard" true
@@ -117,10 +117,6 @@
 {{- with site.Params.carousel.nextAlign -}}{{- $nextAlign = lower (printf "%v" .) -}}{{- end -}}
 {{- with .Get "nextAlign" -}}{{- $nextAlign = lower (printf "%v" .) -}}{{- end -}}
 {{- if not (in (slice "left" "center" "right") $nextAlign) -}}{{- $nextAlign = "right" -}}{{- end -}}
-{{- $autoplayAlign := "right" -}}
-{{- with site.Params.carousel.autoplayAlign -}}{{- $autoplayAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- with .Get "autoplayAlign" -}}{{- $autoplayAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "left" "center" "right") $autoplayAlign) -}}{{- $autoplayAlign = "right" -}}{{- end -}}
 {{- $counterSeparator := "/" -}}
 {{- with site.Params.carousel.counterSeparator -}}{{- $counterSeparator = printf "%v" . -}}{{- end -}}
 {{- with .Get "counterSeparator" -}}{{- $counterSeparator = printf "%v" . -}}{{- end -}}
@@ -136,6 +132,10 @@
 
 {{- $autoplay := false -}}
 {{- if in $boolTrue (lower (printf "%v" $opts.autoplay)) -}}{{- $autoplay = true -}}{{- end -}}
+{{- $progressStyle := "both" -}}
+{{- with site.Params.carousel.progressStyle -}}{{- $progressStyle = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "progressStyle" -}}{{- $progressStyle = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "both" "bar" "ring" "none") $progressStyle) -}}{{- $progressStyle = "both" -}}{{- end -}}
 {{- $progressPosition := "top" -}}
 {{- with site.Params.carousel.progressPosition -}}{{- $progressPosition = lower (printf "%v" .) -}}{{- end -}}
 {{- with .Get "progressPosition" -}}{{- $progressPosition = lower (printf "%v" .) -}}{{- end -}}
@@ -194,11 +194,13 @@
 {{- $showIndicator := $interactive -}}
 {{- $thumbIndicator := and $showIndicator (eq $indicatorStyle "thumbnails") -}}
 {{- $showAutoplay := and $interactive (gt $effectiveInterval 0) -}}
-{{- $hasControlBar := or $showControls $showAutoplay $showIndicator -}}
+{{- $showProgressBar := and $showAutoplay (in (slice "both" "bar") $progressStyle) -}}
+{{- $showProgressRing := and $showAutoplay (in (slice "both" "ring") $progressStyle) -}}
 {{- $overlay := and $interactive (ne $controlsPosition "below") -}}
 {{- /* Overlay prev/next are full-height edge strips outside the bar. */ -}}
 {{- $barShowControls := and $showControls (not $overlay) -}}
-{{- $barHasContent := or $barShowControls $showAutoplay $showIndicator -}}
+{{- $barHasContent := or $barShowControls $showIndicator -}}
+{{- $hasBelowStrip := and $barHasContent (not $overlay) -}}
 
 {{- $counterHTML := "" -}}
 {{- if and $showIndicator (eq $indicatorStyle "counter") -}}
@@ -213,7 +215,7 @@
 	"prev" "svg/ui-oval/chevron-left.svg"
 	"next" "svg/ui-oval/chevron-right.svg"
 	"play" "svg/ui-oval/play.svg"
-	"pause" "svg/ui-oval/stop.svg"
+	"pause" "svg/ui-oval/pause.svg"
 -}}
 {{- $icons := merge $iconDefaults (site.Params.carousel.icons | default dict) -}}
 {{- $prevIcon := partial "svg-icon.html" (dict "path" ($icons.prev | default "svg/ui-oval/chevron-left.svg") "class" "carousel-control-icon") -}}
@@ -244,9 +246,13 @@
 	{{- end -}}
 {{- end -}}
 
+{{- $ringHTML := "" -}}
+{{- if $showProgressRing -}}
+	{{- $ringHTML = `<span class="carousel-autoplay-ring" aria-hidden="true"><svg viewBox="0 0 40 40" focusable="false"><circle cx="20" cy="20" r="18" pathLength="100"/></svg></span>` -}}
+{{- end -}}
 {{- $autoplayHTML := "" -}}
 {{- if $showAutoplay -}}
-	{{- $autoplayHTML = printf `<button type="button" class="carousel-autoplay" data-playing="true" aria-label="Pause autoplay" data-tooltip="Pause autoplay" aria-controls="%s"><span class="carousel-autoplay-icon carousel-autoplay-pause">%s</span><span class="carousel-autoplay-icon carousel-autoplay-play">%s</span></button>` $id $pauseIcon $playIcon -}}
+	{{- $autoplayHTML = printf `<button type="button" class="carousel-autoplay" data-playing="true" aria-label="Pause autoplay" aria-controls="%s" style="--carousel-autoplay-interval: %dms">%s<span class="carousel-autoplay-icon carousel-autoplay-pause">%s</span><span class="carousel-autoplay-icon carousel-autoplay-play">%s</span></button>` $id $effectiveInterval $ringHTML $pauseIcon $playIcon -}}
 {{- end -}}
 
 {{- $indicatorHTML := "" -}}
@@ -268,15 +274,12 @@
 		"position" $controlsPosition
 		"showControls" $barShowControls
 		"showIndicator" $showIndicator
-		"showAutoplay" $showAutoplay
 		"prevAlign" $prevAlign
 		"indicatorAlign" $indicatorAlign
 		"nextAlign" $nextAlign
-		"autoplayAlign" $autoplayAlign
 		"prevHTML" $prevHTML
 		"indicatorHTML" $indicatorHTML
 		"nextHTML" $nextHTML
-		"autoplayHTML" $autoplayHTML
 	) -}}
 {{- end -}}
 
@@ -287,9 +290,10 @@
 	{{- end -}}
 {{- end -}}
 
-<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $overlay }} is-overlay{{ end }}{{ if not $hasControlBar }} no-controls{{ end }}"
+<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $overlay }} is-overlay{{ end }}{{ if and $overlay (eq $controlsPosition "top") }} is-overlay-top{{ end }}{{ if $hasBelowStrip }} has-bottom{{ else }} no-controls{{ end }}"
 	id="{{ $id }}"
 	{{- if $thumbIndicator }} data-thumb-align="{{ $indicatorAlign }}"{{ end }}
+	{{- if $overlay }} data-v-align="{{ $vAlign }}"{{ end }}
 	{{ printf `style="--carousel-per-view: %d; --carousel-gap: %s; --carousel-slide-basis: %s"` $perView $slideGap $slideBasis | safeHTMLAttr }}
 	{{- if $interactive }} data-carousel
 	data-interval="{{ $effectiveInterval }}"
@@ -304,12 +308,13 @@
 	{{- if and $interactive $keyboard }} tabindex="0"{{ end }}>
 
 	<div class="carousel-viewport" id="{{ $id }}-viewport">
-		{{- if $showAutoplay }}
+		{{- if $showProgressBar }}
 		<div class="carousel-autoplay-progress" data-position="{{ $progressPosition }}" aria-hidden="true"
 			style="{{ printf `--carousel-autoplay-interval: %dms` $effectiveInterval | safeCSS }}">
 			<span class="carousel-autoplay-progress-fill"></span>
 		</div>
 		{{- end }}
+		{{- with $autoplayHTML }}{{ . | safeHTML }}{{ end }}
 		<div class="carousel-track">
 			{{- range $i, $s := $slides -}}
 			{{- $isVisible := and (ge $i $start) (lt $i (add $start $perView)) -}}
@@ -387,7 +392,7 @@
 			#{{ $id }} .carousel-track { display: block; transform: none !important; }
 			#{{ $id }} .carousel-item { display: block; position: static !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1em; }
 			#{{ $id }} .carousel-item:last-child { margin-bottom: 0; }
-			#{{ $id }} .carousel-controls, #{{ $id }} .carousel-edge { display: none !important; }
+			#{{ $id }} .carousel-controls, #{{ $id }} .carousel-edge, #{{ $id }} .carousel-autoplay { display: none !important; }
 		</style>
 	</noscript>
 	{{- end }}

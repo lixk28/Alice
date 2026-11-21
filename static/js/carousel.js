@@ -45,9 +45,6 @@
                 '.carousel-indicator-wrap[data-style="thumbnails"]'
             );
             this.autoplayButton = root.querySelector(".carousel-autoplay");
-            this.autoplayProgress = root.querySelector(
-                ".carousel-autoplay-progress"
-            );
             this.status = root.querySelector(".carousel-live");
 
             this.interval = Math.max(
@@ -497,7 +494,6 @@
             const playing = !this.userPaused;
             const label = playing ? "Pause autoplay" : "Start autoplay";
             this.autoplayButton.dataset.playing = String(playing);
-            this.autoplayButton.dataset.tooltip = label;
             this.autoplayButton.setAttribute("aria-label", label);
         }
 
@@ -545,15 +541,14 @@
         }
 
         startAutoplayProgress() {
-            if (!this.autoplayProgress) return;
-            this.autoplayProgress.classList.remove("is-running");
-            /* Force a reflow so restarting the class restarts the animation. */
-            void this.autoplayProgress.offsetWidth;
-            this.autoplayProgress.classList.add("is-running");
+            this.root.classList.remove("is-autoplay-running");
+            /* Force a reflow so restarting the class restarts both animations. */
+            void this.root.offsetWidth;
+            this.root.classList.add("is-autoplay-running");
         }
 
         stopAutoplayProgress() {
-            this.autoplayProgress?.classList.remove("is-running");
+            this.root.classList.remove("is-autoplay-running");
         }
 
         schedule() {

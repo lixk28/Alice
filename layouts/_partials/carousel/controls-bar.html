@@ -5,15 +5,12 @@
     position        — below|top|bottom
     showControls    — render prev/next
     showIndicator   — render indicator
-    showAutoplay    — render play/pause
     prevAlign       — left|center|right
     indicatorAlign  — left|center|right
     nextAlign       — left|center|right
-    autoplayAlign   — left|center|right
     prevHTML        — rendered prev button
     indicatorHTML   — rendered indicator
     nextHTML        — rendered next button
-    autoplayHTML    — rendered autoplay button
 */ -}}
 {{- $overlay := ne .position "below" -}}
 <div class="carousel-controls{{ if $overlay }} is-overlay{{ end }}" data-position="{{ .position }}">
@@ -21,18 +18,15 @@
 		{{- if and .showControls (eq .prevAlign "left") }}{{ .prevHTML | safeHTML }}{{ end }}
 		{{- if and .showIndicator (eq .indicatorAlign "left") }}{{ .indicatorHTML | safeHTML }}{{ end }}
 		{{- if and .showControls (eq .nextAlign "left") }}{{ .nextHTML | safeHTML }}{{ end }}
-		{{- if and .showAutoplay (eq .autoplayAlign "left") }}{{ .autoplayHTML | safeHTML }}{{ end }}
 	</div>
 	<div class="carousel-zone carousel-zone-center">
 		{{- if and .showControls (eq .prevAlign "center") }}{{ .prevHTML | safeHTML }}{{ end }}
 		{{- if and .showIndicator (eq .indicatorAlign "center") }}{{ .indicatorHTML | safeHTML }}{{ end }}
 		{{- if and .showControls (eq .nextAlign "center") }}{{ .nextHTML | safeHTML }}{{ end }}
-		{{- if and .showAutoplay (eq .autoplayAlign "center") }}{{ .autoplayHTML | safeHTML }}{{ end }}
 	</div>
 	<div class="carousel-zone carousel-zone-right">
 		{{- if and .showControls (eq .prevAlign "right") }}{{ .prevHTML | safeHTML }}{{ end }}
 		{{- if and .showIndicator (eq .indicatorAlign "right") }}{{ .indicatorHTML | safeHTML }}{{ end }}
 		{{- if and .showControls (eq .nextAlign "right") }}{{ .nextHTML | safeHTML }}{{ end }}
-		{{- if and .showAutoplay (eq .autoplayAlign "right") }}{{ .autoplayHTML | safeHTML }}{{ end }}
 	</div>
 </div>

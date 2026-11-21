@@ -21,6 +21,7 @@
     --carousel-per-view: 1;
     --carousel-gap: 0;
     --carousel-slide-basis: 100%;
+    --carousel-autoplay-inset: .8em;
     position: relative;
     margin: 1.5em 0;
     border: .1em solid var(--carousel-border-color);
@@ -33,7 +34,8 @@
     outline-offset: .15em;
 }
 
-/* Autoplay timer: a very thin line across the top of the frame. */
+/* Autoplay progress can be a thin bar (top or bottom), a ring around the
+ * corner button, both, or neither. One root class drives both animations. */
 .carousel-autoplay-progress {
     position: absolute;
     right: 0;
@@ -56,7 +58,7 @@
     bottom: 0;
 }
 
-.carousel-autoplay-progress.is-running {
+.carousel.is-autoplay-running .carousel-autoplay-progress {
     opacity: 1;
 }
 
@@ -69,7 +71,7 @@
     background-color: var(--link-color);
 }
 
-.carousel-autoplay-progress.is-running .carousel-autoplay-progress-fill {
+.carousel.is-autoplay-running .carousel-autoplay-progress-fill {
     animation: carousel-autoplay-progress
         var(--carousel-autoplay-interval, 5000ms) linear forwards;
 }
@@ -84,21 +86,70 @@
     }
 }
 
+/* Ring progress around the corner button. */
+.carousel-autoplay-ring {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-duration-fast) ease;
+}
+
+.carousel-autoplay-ring svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.carousel-autoplay-ring circle {
+    fill: none;
+    stroke: var(--carousel-control-color);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+}
+
+.carousel.is-autoplay-running .carousel-autoplay-ring {
+    opacity: 1;
+}
+
+.carousel.is-autoplay-running .carousel-autoplay-ring circle {
+    animation: carousel-autoplay-ring
+        var(--carousel-autoplay-interval, 5000ms) linear forwards;
+}
+
+@keyframes carousel-autoplay-ring {
+    from {
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dashoffset: 100;
+    }
+}
+
 /* The viewport clips the horizontal track. JS sets its height to the active
  * slide; without JS the track's tallest slide sets the height. */
 .carousel-viewport {
     position: relative;
     overflow: hidden;
-    border-radius: .3em .3em 0 0;
+    border-radius: .3em;
     background-color: var(--bgcolor);
     cursor: grab;
     touch-action: pan-y pinch-zoom;
 }
 
-.carousel.is-static .carousel-viewport,
-.carousel.no-controls .carousel-viewport,
-.carousel.is-overlay .carousel-viewport,
-.carousel:not(.is-ready) .carousel-viewport {
+/* Any strip below the viewport (thumbnail previews or the control bar) squares
+ * off the bottom corners while it is displayed. */
+.carousel.has-bottom .carousel-viewport {
+    border-radius: .3em .3em 0 0;
+}
+
+/* Strips stay hidden until the script has measured the carousel. */
+.carousel.has-bottom:not(.is-ready) .carousel-viewport {
     border-radius: .3em;
 }
 
@@ -346,7 +397,6 @@
 }
 
 .carousel-controls.is-overlay .carousel-control,
-.carousel-controls.is-overlay .carousel-autoplay,
 .carousel-controls.is-overlay .carousel-indicator-wrap {
     pointer-events: auto;
 }
@@ -359,24 +409,14 @@
     top: 0;
 }
 
-/* The floating indicator and play/pause sit on a frosted panel so they stay
- * legible over arbitrary photos. */
+/* The floating indicator sits on a frosted panel so it stays legible over
+ * arbitrary photos. */
 .carousel-controls.is-overlay .carousel-indicator-wrap {
     padding: .3em .6em;
     border-radius: .35em;
     background-color: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-}
-
-.carousel-controls.is-overlay .carousel-autoplay {
-    background-color: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-.carousel-controls.is-overlay .carousel-autoplay:hover {
-    background-color: rgba(255, 255, 255, 0.85);
 }
 
 .carousel-zone {
@@ -400,7 +440,9 @@
 
 /* Until the script has measured the first slide, the controls cannot work. */
 .carousel:not(.is-ready) .carousel-controls,
-.carousel:not(.is-ready) .carousel-edge {
+.carousel:not(.is-ready) .carousel-edge,
+.carousel:not(.is-ready) .carousel-autoplay,
+.carousel:not(.is-ready) .carousel-autoplay-progress {
     display: none;
 }
 
@@ -413,7 +455,7 @@
     min-width: 0;
 }
 
-/* Segmented bar indicator: short inactive bars, a wider active bar. */
+/* Segmented indicator: short inactive segments, a wider active segment. */
 .carousel-segments {
     display: flex;
     align-items: center;
@@ -504,6 +546,54 @@
 .carousel-segment:focus-visible {
     outline: .15em solid var(--link-active-color);
     outline-offset: .1em;
+}
+
+/* The autoplay control sits in the image corner, not in the control bar. */
+.carousel-autoplay {
+    position: absolute;
+    top: var(--carousel-autoplay-inset);
+    right: var(--carousel-autoplay-inset);
+    z-index: 8;
+    width: 2.4em;
+    height: 2.4em;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.carousel-autoplay:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Keep the ring opposite the overlay bar when the bar is at the top. */
+.carousel.is-overlay-top .carousel-autoplay {
+    top: auto;
+    bottom: var(--carousel-autoplay-inset);
+}
+
+/* If the ring's side also holds an edge prev/next chip, drop it clear of the
+ * chip: bar at the bottom + vAlign top, or bar at the top + vAlign bottom. */
+.carousel.is-overlay:not(.is-overlay-top)[data-v-align="top"] .carousel-autoplay {
+    top: calc(var(--carousel-autoplay-inset) + 3.2em);
+}
+
+.carousel.is-overlay-top[data-v-align="bottom"] .carousel-autoplay {
+    bottom: calc(var(--carousel-autoplay-inset) + 3.2em);
+}
+
+.carousel-autoplay:hover .carousel-autoplay-ring circle {
+    stroke: var(--carousel-control-hover-color);
+}
+
+.carousel-autoplay .carousel-control-icon {
+    width: 1.15em;
+    height: 1.15em;
+}
+
+.carousel-autoplay-icon {
+    position: relative;
+    z-index: 1;
 }
 
 .carousel-control[disabled] {
@@ -659,7 +749,6 @@
 
 /* Hover/focus tooltips for controls and indicators. */
 .carousel-control[data-tooltip]::after,
-.carousel-autoplay[data-tooltip]::after,
 .carousel-indicator[data-tooltip]::after,
 .carousel-segment[data-tooltip]::after {
     content: attr(data-tooltip);
@@ -695,10 +784,8 @@
 }
 
 .carousel-control[data-tooltip]:hover::after,
-.carousel-autoplay[data-tooltip]:hover::after,
 .carousel-indicator[data-tooltip]:hover::after,
 .carousel-control[data-tooltip]:focus-visible::after,
-.carousel-autoplay[data-tooltip]:focus-visible::after,
 .carousel-indicator[data-tooltip]:focus-visible::after {
     opacity: 1;
     visibility: visible;
@@ -786,6 +873,7 @@
 @media screen and (max-width: 480px) {
     .carousel {
         --carousel-caption-inset: .6em;
+        --carousel-autoplay-inset: .6em;
     }
 
     .carousel-controls {
@@ -796,6 +884,7 @@
     .carousel-slide-overlay {
         padding: .45em .6em;
     }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -804,6 +893,7 @@
     .carousel-segment,
     .carousel-segment::before,
     .carousel-edge-btn,
+    .carousel-thumbnail,
     .carousel[data-effect="fade"] .carousel-item {
         transition-duration: 0s !important;
     }
@@ -812,9 +902,16 @@
 @media print {
     .carousel-controls,
     .carousel-edge,
-    .carousel-live,
-    .carousel-autoplay-progress {
+    .carousel-autoplay,
+    .carousel-autoplay-progress,
+    .carousel-live {
         display: none !important;
+    }
+
+    .carousel-slide-overlay {
+        background-color: White;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
     }
 
     .carousel-viewport {
