@@ -174,7 +174,7 @@ By default, an image opens in the page lightbox when the page enables one. Set `
 
 This example shows two images at a time with a counter:
 
-{{< carousel label="Two images per view" perView=2 indicatorStyle="counter" counterSeparator="of" >}}
+{{< carousel label="Two images per view" perView=2 indicatorStyle="counter" >}}
 
 {{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
@@ -208,12 +208,12 @@ This example shows two images at a time with a counter:
 | --- | --- |
 | `dots` | Small dots; the active dot is larger and highlighted. Default. |
 | `segments` | Segmented bar; active bar 2× wide, 1.5× thick. |
-| `counter` | Text such as `1 / 4`; `counterSeparator` changes the middle text. |
+| `counter` | Text such as `1 / 4`. |
 | `thumbnails` | Preview images in the same row as previous/next. |
 
 Only one indicator is shown, and an interactive carousel always has one. This example hides previous/next and leaves the counter:
 
-{{< carousel label="No arrows, counter indicator" controls=false indicatorStyle="counter" counterSeparator="of" >}}
+{{< carousel label="No arrows, counter indicator" controls=false indicatorStyle="counter" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -416,7 +416,6 @@ All carousel and slide arguments are optional. `params.carousel` supplies site-w
 | `controlsPosition` | Prev/next placement. Below: `left`, `center`, `right`, `left-right` (default). Overlay: `bottom-left`, `bottom-center`, `bottom-right`, `top-left`, `top-center`, `top-right`, `left-right` (default). |
 | `indicatorStyle` | Indicator style: `dots` (default), `segments`, `counter`, or `thumbnails`. An interactive carousel always shows one. |
 | `indicatorPosition` | Indicator placement. Below: `left`, `center` (default), `right`. Overlay: `bottom-left`, `bottom-center` (default), `bottom-right`, `top-left`, `top-center`, `top-right`. |
-| `counterSeparator` | Text between current and total with `indicatorStyle="counter"`; default `/`. |
 
 **Autoplay**
 
@@ -470,7 +469,6 @@ Set defaults under `params.carousel` in the site configuration. Any shortcode ar
     indicatorStyle = "dots"
     indicatorPosition = "center"
     perView = 1
-    counterSeparator = "/"
     loop = true
     keyboard = true
     pause = false

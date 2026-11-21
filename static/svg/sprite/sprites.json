@@ -141,6 +141,10 @@
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_rss-01"
     },
+    "svg/ui-oval/slash-divider.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_slash-divider"
+    },
     "svg/ui-oval/stop.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_stop"

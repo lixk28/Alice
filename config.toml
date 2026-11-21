@@ -60,8 +60,6 @@
         # Number of slides visible at once (effect = "slide" only).
         # Screens up to 40em always show one slide.
         perView = 1
-        # Text between the current and total values when indicatorStyle = "counter".
-        counterSeparator = "/"
         # Circular navigation: last -> first, and first -> last.
         loop = true
         # Arrow keys move between slides while the carousel is focused.

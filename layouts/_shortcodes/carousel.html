@@ -29,7 +29,6 @@
                         overlay: bottom-left|bottom-center|bottom-right|
                                  top-left|top-center|top-right (default: bottom-center)
     perView    — number of slides visible at once (default: 1)
-    counterSeparator — text between current and total (default: "/")
     loop       — circular navigation (last → first): true|false (default: true)
     keyboard   — arrow-key navigation: true|false
     pause      — pause autoplay on hover/focus: true|false (default: false)
@@ -69,7 +68,6 @@
 	"controlsPosition" "left-right"
 	"indicatorStyle" "dots"
 	"indicatorPosition" ""
-	"counterSeparator" "/"
 	"loop" true
 	"keyboard" true
 	"pause" false
@@ -127,11 +125,6 @@
 {{- with .Get "indicatorStyle" -}}{{- $indicatorStyle = lower (printf "%v" .) -}}{{- end -}}
 {{- if eq $indicatorStyle "thumbnail" -}}{{- $indicatorStyle = "thumbnails" -}}{{- end -}}
 {{- if not (in (slice "dots" "segments" "counter" "thumbnails") $indicatorStyle) -}}{{- $indicatorStyle = "dots" -}}{{- end -}}
-{{- $counterSeparator := "/" -}}
-{{- with site.Params.carousel.counterSeparator -}}{{- $counterSeparator = printf "%v" . -}}{{- end -}}
-{{- with .Get "counterSeparator" -}}{{- $counterSeparator = printf "%v" . -}}{{- end -}}
-{{- $counterSeparator = strings.TrimSpace $counterSeparator -}}
-{{- if not $counterSeparator -}}{{- $counterSeparator = "/" -}}{{- end -}}
 
 {{- $loop := true -}}
 {{- if in $boolFalse (lower (printf "%v" $opts.loop)) -}}{{- $loop = false -}}{{- end -}}
@@ -244,7 +237,7 @@
 	{{- if gt $perView 1 -}}
 		{{- $counterCurrent = printf "%d–%d" (add $start 1) (add $start $perView) -}}
 	{{- end -}}
-	{{- $counterHTML = partial "carousel/counter.html" (dict "current" $counterCurrent "total" $n "separator" $counterSeparator) -}}
+	{{- $counterHTML = partial "carousel/counter.html" (dict "current" $counterCurrent "total" $n) -}}
 {{- end -}}
 
 {{- $iconDefaults := dict

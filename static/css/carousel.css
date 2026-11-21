@@ -912,10 +912,25 @@
 }
 
 .carousel-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: .18em;
     color: var(--carousel-counter-color);
-    font-size: var(--font-size-tiny);
+    font-family: var(--mono-font);
+    font-size: var(--font-size-normal);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+}
+
+.carousel-counter-current {
+    color: var(--carousel-indicator-active-color);
+}
+
+.carousel-counter-separator {
+    flex: 0 0 auto;
+    width: .9em;
+    height: .9em;
+    color: var(--carousel-counter-color);
 }
 
 /* Announced to screen readers, not painted. */
