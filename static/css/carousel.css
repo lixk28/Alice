@@ -572,16 +572,6 @@
     bottom: var(--carousel-autoplay-inset);
 }
 
-/* If the ring's side also holds an edge prev/next chip, drop it clear of the
- * chip: bar at the bottom + vAlign top, or bar at the top + vAlign bottom. */
-.carousel.is-overlay:not(.is-overlay-top)[data-v-align="top"] .carousel-autoplay {
-    top: calc(var(--carousel-autoplay-inset) + 3.2em);
-}
-
-.carousel.is-overlay-top[data-v-align="bottom"] .carousel-autoplay {
-    bottom: calc(var(--carousel-autoplay-inset) + 3.2em);
-}
-
 .carousel-autoplay:hover .carousel-autoplay-ring circle {
     stroke: var(--carousel-control-hover-color);
 }
@@ -624,18 +614,6 @@
     right: 0;
 }
 
-.carousel-control.carousel-edge.is-v-top {
-    align-items: flex-start;
-}
-
-.carousel-control.carousel-edge.is-v-center {
-    align-items: center;
-}
-
-.carousel-control.carousel-edge.is-v-bottom {
-    align-items: flex-end;
-}
-
 .carousel-edge-btn {
     display: flex;
     align-items: center;
@@ -649,18 +627,6 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     transition: background-color var(--transition-duration-fast) ease;
-}
-
-.carousel-control.carousel-edge.is-v-top .carousel-edge-btn {
-    align-items: flex-start;
-}
-
-.carousel-control.carousel-edge.is-v-center .carousel-edge-btn {
-    align-items: center;
-}
-
-.carousel-control.carousel-edge.is-v-bottom .carousel-edge-btn {
-    align-items: flex-end;
 }
 
 .carousel-control.carousel-edge:hover {

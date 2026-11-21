@@ -72,8 +72,6 @@
         captionPosition = "bottom"
         # Caption overlay alignment: left, center, or right.
         captionAlign = "left"
-        # Vertical place of the overlay prev/next icon: top, center, or bottom.
-        vAlign = "center"
         # Accessible name for the carousel region.
         label = "Carousel"
 

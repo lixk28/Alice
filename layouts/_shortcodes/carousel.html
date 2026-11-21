@@ -32,7 +32,6 @@
     contentMode — "scaleToFill" (default), "aspectFit", or "aspectFill"
     captionPosition — caption overlay position: top|bottom (default: bottom; slide can override)
     captionAlign — caption overlay alignment: left|center|right (default: left; slide can override)
-    vAlign     — vertical place of the overlay prev/next icon: top|center|bottom (default: center)
     start      — zero-based index of the initially active slide
 */ -}}
 
@@ -68,7 +67,6 @@
 	"pause" false
 	"effect" "slide"
 	"contentMode" "scaleToFill"
-	"vAlign" "center"
 	"captionPosition" "bottom"
 	"captionAlign" "left"
 	"start" 0
@@ -153,8 +151,6 @@
 {{- $fit := "fill" -}}
 {{- if eq $contentMode "aspectfit" -}}{{- $fit = "contain" -}}{{- else if eq $contentMode "aspectfill" -}}{{- $fit = "cover" -}}{{- end -}}
 
-{{- $vAlign := lower (printf "%v" $opts.vAlign) -}}
-{{- if not (in (slice "top" "center" "bottom") $vAlign) -}}{{- $vAlign = "center" -}}{{- end -}}
 
 {{- $captionPosition := "bottom" -}}
 {{- with site.Params.carousel.captionPosition -}}{{- $captionPosition = lower (printf "%v" .) -}}{{- end -}}
@@ -235,7 +231,7 @@
 {{- $prevHTML := "" -}}
 {{- if $showControls -}}
 	{{- if $overlay -}}
-		{{- $prevHTML = printf `<button type="button" class="carousel-control carousel-control-prev carousel-edge is-v-%s" aria-label="Previous slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $vAlign $id $prevIcon -}}
+		{{- $prevHTML = printf `<button type="button" class="carousel-control carousel-control-prev carousel-edge" aria-label="Previous slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $id $prevIcon -}}
 	{{- else -}}
 		{{- $prevHTML = printf `<button type="button" class="carousel-control carousel-control-prev" aria-label="Previous slide" aria-controls="%s" data-tooltip="Previous slide">%s</button>` $id $prevIcon -}}
 	{{- end -}}
@@ -244,7 +240,7 @@
 {{- $nextHTML := "" -}}
 {{- if $showControls -}}
 	{{- if $overlay -}}
-		{{- $nextHTML = printf `<button type="button" class="carousel-control carousel-control-next carousel-edge is-v-%s" aria-label="Next slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $vAlign $id $nextIcon -}}
+		{{- $nextHTML = printf `<button type="button" class="carousel-control carousel-control-next carousel-edge" aria-label="Next slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $id $nextIcon -}}
 	{{- else -}}
 		{{- $nextHTML = printf `<button type="button" class="carousel-control carousel-control-next" aria-label="Next slide" aria-controls="%s" data-tooltip="Next slide">%s</button>` $id $nextIcon -}}
 	{{- end -}}
@@ -297,7 +293,6 @@
 <div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $overlay }} is-overlay{{ end }}{{ if and $overlay (eq $overlayPosition "top") }} is-overlay-top{{ end }}{{ if $hasBelowStrip }} has-bottom{{ end }}{{ if not $barHasContent }} no-controls{{ end }}"
 	id="{{ $id }}"
 	{{- if $thumbIndicator }} data-thumb-align="{{ $indicatorAlign }}"{{ end }}
-	{{- if $overlay }} data-v-align="{{ $vAlign }}"{{ end }}
 	{{ printf `style="--carousel-per-view: %d; --carousel-gap: %s; --carousel-slide-basis: %s"` $perView $slideGap $slideBasis | safeHTMLAttr }}
 	{{- if $interactive }} data-carousel
 	data-interval="{{ $effectiveInterval }}"

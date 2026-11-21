@@ -260,7 +260,7 @@ This example moves prev/next to the left and puts the `segments` indicator on th
 
 #### Overlay placement
 
-`controlsPlacement` places the control bar below the image (`below`, the default) or overlays it on the image (`overlay-top` or `overlay-bottom`). In overlay mode, previous/next become full-height clickable strips on the left and right edges. The icon sits on a small frosted chip, centered horizontally and placed vertically by `vAlign` (`top`, `center` default, or `bottom`); hovering highlights the whole strip. The indicator floats on a matching frosted panel at the top or bottom so it stays readable over the photo. With the bar overlaid at the top, set `progressPosition="bottom"` so the autoplay bar stays clear of the controls. When autoplay is on, its corner button stays opposite the bar and shifts clear of an edge prev/next chip when `vAlign` places one in the same corner.
+`controlsPlacement` places the control bar below the image (`below`, the default) or overlays it on the image (`overlay-top` or `overlay-bottom`). In overlay mode, previous/next become full-height clickable strips on the left and right edges. The icon sits on a small frosted chip, centered both horizontally and vertically; hovering highlights the whole strip. The indicator floats on a matching frosted panel at the top or bottom so it stays readable over the photo. With the bar overlaid at the top, set `progressPosition="bottom"` so the autoplay bar stays clear of the controls. When autoplay is on, its corner button stays opposite the bar.
 
 **Overlay at the bottom**
 
@@ -407,7 +407,6 @@ All carousel and slide arguments are optional. `params.carousel` supplies site-w
 | `indicatorAlign` | Zone for the indicator: `left`, `center` (default), or `right`. |
 | `prevAlign` | Zone for the previous button in `below` mode; default `left`. |
 | `nextAlign` | Zone for the next button in `below` mode; default `right`. |
-| `vAlign` | Vertical place of the overlay previous/next icon: `top`, `center` (default), or `bottom`. |
 | `counterSeparator` | Text between current and total with `indicatorStyle="counter"`; default `/`. |
 
 **Autoplay**
@@ -472,7 +471,6 @@ Set defaults under `params.carousel` in the site configuration. Any shortcode ar
     contentMode = "scaleToFill"
     captionPosition = "bottom"
     captionAlign = "left"
-    vAlign = "center"
     label = "Carousel"
 
     [params.carousel.icons]
