@@ -1,0 +1,25 @@
+{{- /*
+  Thumbnail buttons used as the carousel indicator. They sit in the control
+  next to previous/next, inside the indicator wrapper, and scroll
+  horizontally when they overflow.
+
+  Context:
+    id       — carousel id
+    slides   — slide list
+    total    — slide count
+    start    — initial position
+    maxIndex — last valid position
+*/ -}}
+<ol class="carousel-thumbnails">
+	{{- range $i, $s := .slides }}
+	<li{{ if gt $i $.maxIndex }} hidden{{ end }}>
+		<button type="button" class="carousel-thumbnail"
+			data-carousel-goto="{{ $i }}"
+			aria-label="Go to slide {{ add $i 1 }} of {{ $.total }}"
+			aria-controls="{{ $.id }}"
+			{{- if eq $i $.start }} aria-current="true"{{ end }}>
+			{{- with $s.Src }}<img src="{{ . | safeURL }}" alt="" loading="lazy" decoding="async">{{ end }}
+		</button>
+	</li>
+	{{- end }}
+</ol>

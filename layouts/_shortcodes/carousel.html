@@ -19,7 +19,7 @@
     controls   — previous/next buttons: true|false
     controlsPosition — control bar placement: below|top|bottom (default: below)
     prevAlign  — previous button alignment: left|center|right (default: left)
-    indicatorStyle — indicator style: dots|bar|counter|none (default: dots)
+    indicatorStyle — indicator style: dots|segments|counter|thumbnails (default: dots)
     indicatorAlign — indicator alignment: left|center|right (default: center)
     nextAlign  — next button alignment: left|center|right (default: right)
     autoplayAlign — play/pause button alignment: left|center|right (default: right)
@@ -103,7 +103,8 @@
 {{- $indicatorStyle := "dots" -}}
 {{- with site.Params.carousel.indicatorStyle -}}{{- $indicatorStyle = lower (printf "%v" .) -}}{{- end -}}
 {{- with .Get "indicatorStyle" -}}{{- $indicatorStyle = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "dots" "segments" "counter") $indicatorStyle) -}}{{- $indicatorStyle = "dots" -}}{{- end -}}
+{{- if eq $indicatorStyle "thumbnail" -}}{{- $indicatorStyle = "thumbnails" -}}{{- end -}}
+{{- if not (in (slice "dots" "segments" "counter" "thumbnails") $indicatorStyle) -}}{{- $indicatorStyle = "dots" -}}{{- end -}}
 {{- $indicatorAlign := "center" -}}
 {{- with site.Params.carousel.indicatorAlign -}}{{- $indicatorAlign = lower (printf "%v" .) -}}{{- end -}}
 {{- with .Get "indicatorAlign" -}}{{- $indicatorAlign = lower (printf "%v" .) -}}{{- end -}}
@@ -178,6 +179,7 @@
 {{- $showControls := and $interactive $controls -}}
 {{- /* Every interactive carousel shows one of the indicator styles. */ -}}
 {{- $showIndicator := $interactive -}}
+{{- $thumbIndicator := and $showIndicator (eq $indicatorStyle "thumbnails") -}}
 {{- $showAutoplay := and $interactive (gt $effectiveInterval 0) -}}
 {{- $hasControlBar := or $showControls $showAutoplay $showIndicator -}}
 {{- $overlay := and $interactive (ne $controlsPosition "below") -}}
@@ -274,6 +276,7 @@
 
 <div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $overlay }} is-overlay{{ end }}{{ if not $hasControlBar }} no-controls{{ end }}"
 	id="{{ $id }}"
+	{{- if $thumbIndicator }} data-thumb-align="{{ $indicatorAlign }}"{{ end }}
 	{{ printf `style="--carousel-per-view: %d; --carousel-gap: %s; --carousel-slide-basis: %s"` $perView $slideGap $slideBasis | safeHTMLAttr }}
 	{{- if $interactive }} data-carousel
 	data-interval="{{ $effectiveInterval }}"

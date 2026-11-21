@@ -1,11 +1,11 @@
 {{- /*
   One indicator group for the carousel control bar. Styles are mutually
-  exclusive: dots, a progress bar, or a counter.
+  exclusive: dots, a progress bar, a counter, or thumbnails.
 
   Context:
-    style       — dots|segments|counter
+    style       — dots|segments|counter|thumbnails
     id          — carousel id
-    slides      — slide list (for dots)
+    slides      — slide list (for dots and thumbnails)
     total       — slide count
     start       — initial position
     maxIndex    — last valid position
@@ -41,5 +41,13 @@
 	</ol>
 	{{- else if eq $style "counter" }}
 	{{- .counterHTML | safeHTML -}}
+	{{- else if eq $style "thumbnails" }}
+	{{- partial "carousel/thumbnails.html" (dict
+		"id" .id
+		"slides" .slides
+		"total" .total
+		"start" .start
+		"maxIndex" .maxIndex
+	) -}}
 	{{- end }}
 </div>

@@ -41,6 +41,9 @@
                 root.querySelectorAll("[data-carousel-goto]")
             );
             this.counter = root.querySelector(".carousel-counter-current");
+            this.thumbnailStrip = root.querySelector(
+                '.carousel-indicator-wrap[data-style="thumbnails"]'
+            );
             this.autoplayButton = root.querySelector(".carousel-autoplay");
             this.autoplayProgress = root.querySelector(
                 ".carousel-autoplay-progress"
@@ -129,6 +132,7 @@
             this.updateLiveMode();
             this.updateStatus();
             this.root.classList.add("is-ready");
+            this.revealActiveThumbnail();
             this.observe();
 
             if (this.interval > 0) {
@@ -426,6 +430,27 @@
                 } else {
                     this.counter.textContent = String(this.index + 1);
                 }
+            }
+
+            this.revealActiveThumbnail();
+        }
+
+        /* Keep the active preview visible when the thumbnail strip scrolls. */
+        revealActiveThumbnail() {
+            const strip = this.thumbnailStrip;
+            if (!strip || strip.scrollWidth <= strip.clientWidth) return;
+            const active = strip.querySelector(
+                '.carousel-thumbnail[aria-current="true"]'
+            );
+            if (!active) return;
+
+            const stripRect = strip.getBoundingClientRect();
+            const activeRect = active.getBoundingClientRect();
+            const inset = 8;
+            if (activeRect.left < stripRect.left + inset) {
+                strip.scrollLeft -= stripRect.left + inset - activeRect.left;
+            } else if (activeRect.right > stripRect.right - inset) {
+                strip.scrollLeft += activeRect.right - stripRect.right + inset;
             }
         }
 
