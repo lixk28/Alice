@@ -61,6 +61,7 @@
                 this.effect === "slide" &&
                 this.perView < this.slides.length;
             this.looping = false;
+            this.previewIndex = null;
 
             const start = parseInt(root.dataset.start || "0", 10) || 0;
             this.index = this.circular
@@ -513,6 +514,8 @@
             const atStart = this.index <= 0;
             const atEnd = this.index >= maxIndex;
 
+            this.previewIndex = null;
+
             if (this.prevButton) {
                 this.prevButton.disabled =
                     maxIndex === 0 || (!this.loop && atStart);
@@ -522,11 +525,19 @@
                     maxIndex === 0 || (!this.loop && atEnd);
             }
 
+            this.updateIndicators(this.index);
+        }
+
+        updateIndicators(index) {
+            const maxIndex = this.maxIndex();
             this.indicators.forEach((button) => {
-                const index = parseInt(button.dataset.carouselGoto, 10);
+                const buttonIndex = parseInt(
+                    button.dataset.carouselGoto,
+                    10
+                );
                 const item = button.closest("li");
-                if (item) item.hidden = index > maxIndex;
-                if (index === this.index) {
+                if (item) item.hidden = buttonIndex > maxIndex;
+                if (buttonIndex === index) {
                     button.setAttribute("aria-current", "true");
                 } else {
                     button.removeAttribute("aria-current");
@@ -536,22 +547,35 @@
             if (this.counter) {
                 if (this.perView > 1) {
                     const last = this.circular
-                        ? ((this.index + this.perView - 1) %
+                        ? ((index + this.perView - 1) %
                               this.slides.length) +
                           1
                         : Math.min(
-                              this.index + this.perView,
+                              index + this.perView,
                               this.slides.length
                           );
-                    this.counter.textContent = `${
-                        this.index + 1
-                    }\u2013${last}`;
+                    this.counter.textContent = `${index + 1}\u2013${last}`;
                 } else {
-                    this.counter.textContent = String(this.index + 1);
+                    this.counter.textContent = String(index + 1);
                 }
             }
 
             this.revealActiveThumbnail();
+        }
+
+        previewIndicator(index) {
+            const target = index === this.index ? null : index;
+            if (this.previewIndex === target) return;
+            this.previewIndex = target;
+            this.updateIndicators(index);
+            this.updateStatus(index);
+        }
+
+        clearPreview() {
+            if (this.previewIndex === null) return;
+            this.previewIndex = null;
+            this.updateIndicators(this.index);
+            this.updateStatus(this.index);
         }
 
         /* Keep the active preview visible when the thumbnail strip scrolls. */
@@ -573,14 +597,12 @@
             }
         }
 
-        updateStatus() {
+        updateStatus(index = this.index) {
             if (!this.status) return;
-            const first = this.index + 1;
+            const first = index + 1;
             const last = this.circular
-                ? ((this.index + this.perView - 1) %
-                      this.slides.length) +
-                  1
-                : Math.min(this.index + this.perView, this.slides.length);
+                ? ((index + this.perView - 1) % this.slides.length) + 1
+                : Math.min(index + this.perView, this.slides.length);
             const range =
                 this.perView > 1
                     ? `Slides ${first} to ${last}`
@@ -754,11 +776,13 @@
             }
 
             let timer = null;
+            let previewTimer = null;
             const finish = () => {
                 if (!this.looping) return;
                 this.looping = false;
                 this.track.removeEventListener("transitionend", onEnd);
                 window.clearTimeout(timer);
+                window.clearTimeout(previewTimer);
 
                 this.track.style.transition = "none";
                 if (direction > 0) {
@@ -802,6 +826,14 @@
                     getComputedStyle(this.track).transitionDuration
                 ) * 1000 || 0;
             timer = window.setTimeout(finish, duration + 120);
+            if (duration > 0) {
+                previewTimer = window.setTimeout(() => {
+                    if (!this.looping) return;
+                    this.previewIndicator(
+                        (this.index + direction + count) % count
+                    );
+                }, duration * 0.5);
+            }
             if (this.prefersReducedMotion || !duration) {
                 requestAnimationFrame(finish);
             }
@@ -867,7 +899,6 @@
             this.pointerId = event.pointerId;
             this.startX = event.clientX;
             this.startY = event.clientY;
-            this.startTime = Date.now();
             this.deltaX = 0;
             this.dragging = false;
             this.dragRotated = false;
@@ -938,6 +969,27 @@
             this.track.style.transform = `translate3d(${
                 base + offset
             }px, 0, 0)`;
+
+            let destination = this.index;
+            if (this.circular) {
+                destination =
+                    dx < 0
+                        ? (this.index + 1) % this.slides.length
+                        : (this.index - 1 + this.slides.length) %
+                          this.slides.length;
+            } else if (dx < 0) {
+                destination = Math.min(
+                    this.index + 1,
+                    this.slides.length - 1
+                );
+            } else if (dx > 0) {
+                destination = Math.max(this.index - 1, 0);
+            }
+
+            const progress = step > 0 ? Math.abs(dx) / step : 0;
+            this.previewIndicator(
+                progress > 0.5 ? destination : this.index
+            );
         }
 
         prepareBackwardDrag() {
@@ -1059,18 +1111,11 @@
                 this.viewport.releasePointerCapture(event.pointerId);
             }
 
-            const elapsed = Math.max(1, Date.now() - this.startTime);
-            const velocity = this.deltaX / elapsed;
-            const threshold = Math.max(
-                36,
-                this.viewport.clientWidth * 0.12
-            );
-
-            const forward = this.deltaX < -threshold || velocity < -0.45;
-            const backward = this.deltaX > threshold || velocity > 0.45;
+            const step = this.getStep();
+            const halfway = step * 0.5;
 
             if (this.dragRotated) {
-                this.finishBackwardDrag(backward);
+                this.finishBackwardDrag(this.deltaX > halfway);
                 if (Math.abs(this.deltaX) > 8) {
                     this.suppressClickUntil = Date.now() + 350;
                 }
@@ -1080,11 +1125,17 @@
                 return;
             }
 
+            const forward = this.deltaX < -halfway;
+            const backward = this.deltaX > halfway;
+
             let moved = false;
             if (forward) moved = this.next();
             else if (backward) moved = this.prev();
 
-            if (!moved) this.updateTransform();
+            if (!moved) {
+                this.updateTransform();
+                this.clearPreview();
+            }
             if (Math.abs(this.deltaX) > 8) {
                 this.suppressClickUntil = Date.now() + 350;
             }
@@ -1118,6 +1169,7 @@
                 } else {
                     this.updateTransform();
                 }
+                this.clearPreview();
             }
 
             this.deltaX = 0;
