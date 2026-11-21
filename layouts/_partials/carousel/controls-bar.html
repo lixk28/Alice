@@ -1,32 +1,60 @@
 {{- /*
-  Carousel control bar, shared by the below-image and overlay placements.
+  Below-image control bar.
 
   Context:
-    position        — below|top|bottom
-    showControls    — render prev/next
-    showIndicator   — render indicator
-    prevAlign       — left|center|right
-    indicatorAlign  — left|center|right
-    nextAlign       — left|center|right
-    prevHTML        — rendered prev button
-    indicatorHTML   — rendered indicator
-    nextHTML        — rendered next button
+    showControls      — render prev/next
+    showIndicator     — render the indicator
+    controlsPosition  — left|center|right|left-right
+    indicatorPosition — left|center|right
+    prevHTML          — normal previous button
+    nextHTML          — normal next button
+    indicatorHTML     — rendered indicator
 */ -}}
-{{- $overlay := ne .position "below" -}}
-<div class="carousel-controls{{ if $overlay }} is-overlay{{ end }}" data-position="{{ .position }}">
-	<div class="carousel-zone carousel-zone-left">
-		{{- if and .showControls (eq .prevAlign "left") }}{{ .prevHTML | safeHTML }}{{ end }}
-		{{- if and .showIndicator (eq .indicatorAlign "left") }}{{ .indicatorHTML | safeHTML }}{{ end }}
-		{{- if and .showControls (eq .nextAlign "left") }}{{ .nextHTML | safeHTML }}{{ end }}
-	</div>
-	<div class="carousel-zone carousel-zone-center">
-		{{- if and .showControls (eq .prevAlign "center") }}{{ .prevHTML | safeHTML }}{{ end }}
-		{{- if and .showIndicator (eq .indicatorAlign "center") }}{{ .indicatorHTML | safeHTML }}{{ end }}
-		{{- if and .showControls (eq .nextAlign "center") }}{{ .nextHTML | safeHTML }}{{ end }}
-	</div>
-	<div class="carousel-zone carousel-zone-right">
-		{{- if and .showControls (eq .prevAlign "right") }}{{ .prevHTML | safeHTML }}{{ end }}
-		{{- if and .showIndicator (eq .indicatorAlign "right") }}{{ .indicatorHTML | safeHTML }}{{ end }}
-		{{- if and .showControls (eq .nextAlign "right") }}{{ .nextHTML | safeHTML }}{{ end }}
-	</div>
+{{- $left := "" -}}
+{{- $center := "" -}}
+{{- $right := "" -}}
+{{- $group := "" -}}
+{{- if .showControls -}}
+	{{- $group = printf `<div class="carousel-controls-group">%s%s</div>` .prevHTML .nextHTML -}}
+{{- end -}}
+
+{{- if eq .controlsPosition "left-right" -}}
+	{{- if .showControls -}}
+		{{- $left = .prevHTML -}}
+		{{- $right = .nextHTML -}}
+	{{- end -}}
+	{{- if .showIndicator -}}
+		{{- if eq .indicatorPosition "left" -}}
+			{{- $left = printf "%s%s" $left .indicatorHTML -}}
+		{{- else if eq .indicatorPosition "center" -}}
+			{{- $center = .indicatorHTML -}}
+		{{- else -}}
+			{{- $right = printf "%s%s" .indicatorHTML $right -}}
+		{{- end -}}
+	{{- end -}}
+{{- else -}}
+	{{- $merged := and .showControls .showIndicator (eq .controlsPosition .indicatorPosition) -}}
+	{{- if $merged -}}
+		{{- $group = printf `<div class="carousel-controls-group">%s%s%s</div>` .prevHTML .indicatorHTML .nextHTML -}}
+	{{- end -}}
+	{{- $block := $group -}}
+	{{- if and (not $merged) .showIndicator -}}
+		{{- $indicatorBlock := printf `<div class="carousel-controls-group carousel-controls-group-indicator">%s</div>` .indicatorHTML -}}
+		{{- if eq .controlsPosition .indicatorPosition -}}
+			{{- $block = printf "%s%s" $block $indicatorBlock -}}
+		{{- else -}}
+			{{- if eq .indicatorPosition "left" -}}{{- $left = $indicatorBlock -}}{{- end -}}
+			{{- if eq .indicatorPosition "center" -}}{{- $center = $indicatorBlock -}}{{- end -}}
+			{{- if eq .indicatorPosition "right" -}}{{- $right = $indicatorBlock -}}{{- end -}}
+		{{- end -}}
+	{{- end -}}
+	{{- if eq .controlsPosition "left" -}}{{- $left = printf "%s%s" $block $left -}}{{- end -}}
+	{{- if eq .controlsPosition "center" -}}{{- $center = printf "%s%s" $block $center -}}{{- end -}}
+	{{- if eq .controlsPosition "right" -}}{{- $right = printf "%s%s" $right $block -}}{{- end -}}
+{{- end -}}
+
+<div class="carousel-controls" data-position="below">
+	<div class="carousel-zone carousel-zone-left">{{ $left | safeHTML }}</div>
+	<div class="carousel-zone carousel-zone-center">{{ $center | safeHTML }}</div>
+	<div class="carousel-zone carousel-zone-right">{{ $right | safeHTML }}</div>
 </div>

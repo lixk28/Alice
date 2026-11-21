@@ -1,0 +1,86 @@
+{{- /*
+  Normalize a carousel position value.
+
+  Context:
+    value   — full or abbreviated position
+    kind    — indicator|controls|caption
+    overlay — whether controls float over the image
+
+  Returns a canonical value, or an empty string when invalid.
+*/ -}}
+{{- $raw := lower (trim (printf "%v" .value) " ") -}}
+{{- $raw = replace $raw "_" "-" -}}
+{{- $raw = replace $raw " " "-" -}}
+{{- $kind := .kind -}}
+{{- $overlay := .overlay -}}
+
+{{- $map := dict
+	"l" "left" "left" "left"
+	"r" "right" "right" "right"
+	"c" "center" "center" "center"
+	"m" "center" "middle" "center"
+	"b" "bottom" "bottom" "bottom"
+	"t" "top" "top" "top"
+-}}
+{{- $vertical := slice "top" "bottom" -}}
+{{- $horizontal := slice "left" "center" "right" -}}
+{{- $corners := slice
+	"top-left" "top-center" "top-right"
+	"bottom-left" "bottom-center" "bottom-right"
+-}}
+{{- $singles := slice "left" "center" "right" -}}
+
+{{- $result := "" -}}
+
+{{- if and (eq $kind "controls") (in (slice "left-right" "l-r" "lr" "leftright") $raw) -}}
+	{{- $result = "left-right" -}}
+{{- else -}}
+	{{- $parts := split $raw "-" -}}
+
+	{{- if eq (len $parts) 1 -}}
+		{{- $token := index $parts 0 -}}
+		{{- $first := substr $token 0 1 -}}
+		{{- $second := substr $token 1 1 -}}
+
+		{{- if and (eq (len $token) 2) (in $vertical (index $map $first)) (in $horizontal (index $map $second)) -}}
+			{{- $result = printf "%s-%s" (index $map $first) (index $map $second) -}}
+		{{- else if hasPrefix $token "bottom" -}}
+			{{- $rest := strings.TrimPrefix "bottom" $token -}}
+			{{- with index $map $rest -}}
+				{{- if in $horizontal . -}}{{- $result = printf "bottom-%s" . -}}{{- end -}}
+			{{- end -}}
+		{{- else if hasPrefix $token "top" -}}
+			{{- $rest := strings.TrimPrefix "top" $token -}}
+			{{- with index $map $rest -}}
+				{{- if in $horizontal . -}}{{- $result = printf "top-%s" . -}}{{- end -}}
+			{{- end -}}
+		{{- else -}}
+			{{- with index $map $token -}}{{- $result = . -}}{{- end -}}
+		{{- end -}}
+	{{- else if eq (len $parts) 2 -}}
+		{{- $v := index $map (index $parts 0) -}}
+		{{- $h := index $map (index $parts 1) -}}
+		{{- if and (in $vertical $v) (in $horizontal $h) -}}
+			{{- $result = printf "%s-%s" $v $h -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $valid := false -}}
+{{- if eq $kind "caption" -}}
+	{{- $valid = in $corners $result -}}
+{{- else if eq $kind "indicator" -}}
+	{{- if $overlay -}}
+		{{- $valid = in $corners $result -}}
+	{{- else -}}
+		{{- $valid = in $singles $result -}}
+	{{- end -}}
+{{- else if eq $kind "controls" -}}
+	{{- if $overlay -}}
+		{{- $valid = or (in $corners $result) (eq $result "left-right") -}}
+	{{- else -}}
+		{{- $valid = or (in $singles $result) (eq $result "left-right") -}}
+	{{- end -}}
+{{- end -}}
+{{- if not $valid -}}{{- $result = "" -}}{{- end -}}
+{{- $result -}}

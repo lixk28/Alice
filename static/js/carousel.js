@@ -159,6 +159,8 @@
             this.updateLiveMode();
             this.updateStatus();
             this.root.classList.add("is-ready");
+            this.updateCaptionClearance();
+            this.updateAutoplayCorner();
             this.revealActiveThumbnail();
             this.observe();
 
@@ -507,6 +509,74 @@
                     this.viewport.style.height = next;
                 }
             }
+            this.updateCaptionClearance();
+            this.updateAutoplayCorner();
+        }
+
+        /* Keep the autoplay control in the first free corner. */
+        updateAutoplayCorner() {
+            const button = this.root.querySelector(".carousel-autoplay");
+            if (!button) return;
+            const occupied = new Set();
+            this.root
+                .querySelectorAll(".carousel-overlay-group")
+                .forEach((group) => {
+                    if (/^(top|bottom)-(left|right)$/.test(group.dataset.position)) {
+                        occupied.add(group.dataset.position);
+                    }
+                });
+            this.root
+                .querySelectorAll(
+                    ".carousel-item.is-active .carousel-slide-overlay"
+                )
+                .forEach((caption) => {
+                    const position = caption.dataset.captionPosition;
+                    if (/^(top|bottom)-(left|right)$/.test(position)) {
+                        occupied.add(position);
+                    }
+                });
+            const corners = [
+                "top-right",
+                "bottom-right",
+                "top-left",
+                "bottom-left",
+            ];
+            const corner =
+                corners.find((position) => !occupied.has(position)) ||
+                "top-right";
+            button.dataset.position = corner;
+        }
+
+        /* Move a caption inward when an overlay group shares its position. */
+        updateCaptionClearance() {
+            const groups = this.root.querySelectorAll(
+                ".carousel-overlay-group"
+            );
+            if (!groups.length) return;
+            const groupHeights = new Map();
+            groups.forEach((group) => {
+                const position = group.dataset.position;
+                groupHeights.set(
+                    position,
+                    Math.max(
+                        groupHeights.get(position) || 0,
+                        group.offsetHeight
+                    )
+                );
+            });
+            this.root
+                .querySelectorAll(
+                    ".carousel-item.is-active .carousel-slide-overlay"
+                )
+                .forEach((caption) => {
+                    const height =
+                        groupHeights.get(caption.dataset.captionPosition) ||
+                        0;
+                    caption.style.setProperty(
+                        "--carousel-caption-clearance",
+                        height ? `${height + 10}px` : "0px"
+                    );
+                });
         }
 
         updateControls() {
@@ -845,7 +915,9 @@
             if (event.ctrlKey || this.dragging || this.looping) return;
             if (
                 event.target instanceof Element &&
-                event.target.closest(".carousel-controls, .carousel-autoplay")
+                event.target.closest(
+                    ".carousel-controls, .carousel-overlay-group, .carousel-autoplay"
+                )
             ) {
                 return;
             }
@@ -890,7 +962,9 @@
             if (event.button !== 0 || this.looping) return;
             if (
                 event.target instanceof Element &&
-                event.target.closest(".carousel-controls, .carousel-edge, .carousel-autoplay")
+                event.target.closest(
+                    ".carousel-controls, .carousel-overlay-group, .carousel-edge, .carousel-autoplay"
+                )
             ) {
                 return;
             }

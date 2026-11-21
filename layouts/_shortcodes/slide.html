@@ -6,8 +6,9 @@
     alt     — image alt text (falls back to the caption when omitted)
     caption — overlay title for the slide (inline Markdown)
     description — overlay description under the caption (inline Markdown)
-    captionPosition — per-slide caption position: top|bottom (default: carousel value)
-    captionAlign — per-slide caption alignment: left|center|right (default: carousel value)
+    captionPosition — per-slide caption position:
+                      bottom-left|bottom-center|bottom-right|
+                      top-left|top-center|top-right (default: carousel value)
     link    — make the image a link (overrides the page lightbox)
     target  — link target
     rel     — link rel (defaults to "noopener noreferrer" for _blank)
@@ -24,8 +25,14 @@
 {{- $image := .Get "image" -}}
 {{- $caption := .Get "caption" -}}
 {{- $description := .Get "description" -}}
-{{- $captionPosition := .Get "captionPosition" -}}
-{{- $captionAlign := .Get "captionAlign" -}}
+{{- $captionPosition := "" -}}
+{{- with .Get "captionPosition" -}}
+	{{- $captionPosition = partial "carousel/position.html" (dict
+		"value" .
+		"kind" "caption"
+		"overlay" false
+	) -}}
+{{- end -}}
 {{- $src := "" -}}
 {{- with $image -}}
 	{{- $u := urls.Parse . -}}
@@ -59,7 +66,6 @@
 	"Caption" $caption
 	"Description" $description
 	"CaptionPosition" $captionPosition
-	"CaptionAlign" $captionAlign
 	"Link" (.Get "link")
 	"Target" $target
 	"Rel" $rel

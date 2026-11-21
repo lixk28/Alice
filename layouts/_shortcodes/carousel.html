@@ -18,11 +18,16 @@
     progressStyle — autoplay progress: both|bar|ring|none (default: both)
     progressPosition — progress bar position: top|bottom (default: top)
     controls   — previous/next buttons: true|false
-    controlsPlacement — control bar placement: below|overlay-top|overlay-bottom (default: below)
-    prevAlign  — previous button alignment: left|center|right (default: left)
+    overlay    — float controls over the image: true|false (default: true)
+    controlsPosition — prev/next placement:
+                       below: left|center|right|left-right (default: left-right)
+                       overlay: bottom-left|bottom-center|bottom-right|
+                                top-left|top-center|top-right|left-right (default: left-right)
     indicatorStyle — indicator style: dots|segments|counter|thumbnails (default: dots)
-    indicatorAlign — indicator alignment: left|center|right (default: center)
-    nextAlign  — next button alignment: left|center|right (default: right)
+    indicatorPosition — indicator placement:
+                        below: left|center|right (default: center)
+                        overlay: bottom-left|bottom-center|bottom-right|
+                                 top-left|top-center|top-right (default: bottom-center)
     perView    — number of slides visible at once (default: 1)
     counterSeparator — text between current and total (default: "/")
     loop       — circular navigation (last → first): true|false (default: true)
@@ -30,9 +35,13 @@
     pause      — pause autoplay on hover/focus: true|false (default: false)
     effect     — "slide" or "fade"
     contentMode — "scaleToFill" (default), "aspectFit", or "aspectFill"
-    captionPosition — caption overlay position: top|bottom (default: bottom; slide can override)
-    captionAlign — caption overlay alignment: left|center|right (default: left; slide can override)
+    captionPosition — caption overlay position:
+                      bottom-left|bottom-center|bottom-right|
+                      top-left|top-center|top-right (default: bottom-center; slide can override)
     start      — zero-based index of the initially active slide
+
+  Position abbreviations: l/r/c (or m), b/t. Examples: bc = bottom-center,
+  tr = top-right, lr = left-right.
 */ -}}
 
 {{- /* Shortcodes only run their children when .Inner is evaluated. */ -}}
@@ -56,19 +65,17 @@
 	"progressStyle" "both"
 	"progressPosition" "top"
 	"controls" true
-	"controlsPlacement" "below"
-	"prevAlign" "left"
+	"overlay" false
+	"controlsPosition" "left-right"
 	"indicatorStyle" "dots"
-	"indicatorAlign" "center"
-	"nextAlign" "right"
+	"indicatorPosition" ""
 	"counterSeparator" "/"
 	"loop" true
 	"keyboard" true
 	"pause" false
 	"effect" "slide"
 	"contentMode" "scaleToFill"
-	"captionPosition" "bottom"
-	"captionAlign" "left"
+	"captionPosition" "bottom-center"
 	"start" 0
 -}}
 {{- $opts := merge $defaults (site.Params.carousel | default dict) -}}
@@ -94,27 +101,32 @@
 
 {{- $controls := true -}}
 {{- if in $boolFalse (lower (printf "%v" $opts.controls)) -}}{{- $controls = false -}}{{- end -}}
-{{- $controlsPlacement := "below" -}}
-{{- with site.Params.carousel.controlsPlacement -}}{{- $controlsPlacement = lower (printf "%v" .) -}}{{- end -}}
-{{- with .Get "controlsPlacement" -}}{{- $controlsPlacement = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "below" "overlay-top" "overlay-bottom") $controlsPlacement) -}}{{- $controlsPlacement = "below" -}}{{- end -}}
-{{- $prevAlign := "left" -}}
-{{- with site.Params.carousel.prevAlign -}}{{- $prevAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- with .Get "prevAlign" -}}{{- $prevAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "left" "center" "right") $prevAlign) -}}{{- $prevAlign = "left" -}}{{- end -}}
+{{- $overlay := false -}}
+{{- if in $boolTrue (lower (printf "%v" $opts.overlay)) -}}{{- $overlay = true -}}{{- end -}}
+
+{{- $controlsPosition := partial "carousel/position.html" (dict
+	"value" $opts.controlsPosition
+	"kind" "controls"
+	"overlay" $overlay
+) -}}
+{{- if not $controlsPosition -}}{{- $controlsPosition = "left-right" -}}{{- end -}}
+
+{{- $indicatorDefault := cond $overlay "bottom-center" "center" -}}
+{{- $indicatorPosition := "" -}}
+{{- with $opts.indicatorPosition -}}
+	{{- $indicatorPosition = partial "carousel/position.html" (dict
+		"value" .
+		"kind" "indicator"
+		"overlay" $overlay
+	) -}}
+{{- end -}}
+{{- if not $indicatorPosition -}}{{- $indicatorPosition = $indicatorDefault -}}{{- end -}}
+
 {{- $indicatorStyle := "dots" -}}
 {{- with site.Params.carousel.indicatorStyle -}}{{- $indicatorStyle = lower (printf "%v" .) -}}{{- end -}}
 {{- with .Get "indicatorStyle" -}}{{- $indicatorStyle = lower (printf "%v" .) -}}{{- end -}}
 {{- if eq $indicatorStyle "thumbnail" -}}{{- $indicatorStyle = "thumbnails" -}}{{- end -}}
 {{- if not (in (slice "dots" "segments" "counter" "thumbnails") $indicatorStyle) -}}{{- $indicatorStyle = "dots" -}}{{- end -}}
-{{- $indicatorAlign := "center" -}}
-{{- with site.Params.carousel.indicatorAlign -}}{{- $indicatorAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- with .Get "indicatorAlign" -}}{{- $indicatorAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "left" "center" "right") $indicatorAlign) -}}{{- $indicatorAlign = "center" -}}{{- end -}}
-{{- $nextAlign := "right" -}}
-{{- with site.Params.carousel.nextAlign -}}{{- $nextAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- with .Get "nextAlign" -}}{{- $nextAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "left" "center" "right") $nextAlign) -}}{{- $nextAlign = "right" -}}{{- end -}}
 {{- $counterSeparator := "/" -}}
 {{- with site.Params.carousel.counterSeparator -}}{{- $counterSeparator = printf "%v" . -}}{{- end -}}
 {{- with .Get "counterSeparator" -}}{{- $counterSeparator = printf "%v" . -}}{{- end -}}
@@ -152,14 +164,15 @@
 {{- if eq $contentMode "aspectfit" -}}{{- $fit = "contain" -}}{{- else if eq $contentMode "aspectfill" -}}{{- $fit = "cover" -}}{{- end -}}
 
 
-{{- $captionPosition := "bottom" -}}
-{{- with site.Params.carousel.captionPosition -}}{{- $captionPosition = lower (printf "%v" .) -}}{{- end -}}
-{{- with .Get "captionPosition" -}}{{- $captionPosition = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "top" "bottom") $captionPosition) -}}{{- $captionPosition = "bottom" -}}{{- end -}}
-{{- $captionAlign := "left" -}}
-{{- with site.Params.carousel.captionAlign -}}{{- $captionAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- with .Get "captionAlign" -}}{{- $captionAlign = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "left" "center" "right") $captionAlign) -}}{{- $captionAlign = "left" -}}{{- end -}}
+{{- $captionPosition := "" -}}
+{{- with $opts.captionPosition -}}
+	{{- $captionPosition = partial "carousel/position.html" (dict
+		"value" .
+		"kind" "caption"
+		"overlay" $overlay
+	) -}}
+{{- end -}}
+{{- if not $captionPosition -}}{{- $captionPosition = "bottom-center" -}}{{- end -}}
 
 {{- $perView := 1 -}}
 {{- with site.Params.carousel.perView -}}{{- $perView = int . -}}{{- end -}}
@@ -190,19 +203,40 @@
 {{- $showControls := and $interactive $controls -}}
 {{- /* Every interactive carousel shows one of the indicator styles. */ -}}
 {{- $showIndicator := $interactive -}}
-{{- $thumbIndicator := and $showIndicator (eq $indicatorStyle "thumbnails") -}}
 {{- $showAutoplay := and $interactive (gt $effectiveInterval 0) -}}
 {{- $showProgressBar := and $showAutoplay (in (slice "both" "bar") $progressStyle) -}}
 {{- $showProgressRing := and $showAutoplay (in (slice "both" "ring") $progressStyle) -}}
-{{- $overlay := and $interactive (ne $controlsPlacement "below") -}}
-{{- $overlayPosition := "" -}}
-{{- if $overlay -}}{{- $overlayPosition = strings.TrimPrefix "overlay-" $controlsPlacement -}}{{- end -}}
-{{- $barPosition := "below" -}}
-{{- if $overlay -}}{{- $barPosition = $overlayPosition -}}{{- end -}}
-{{- /* Overlay prev/next are full-height edge strips outside the bar. */ -}}
+{{- $overlay = and $interactive $overlay -}}
 {{- $barShowControls := and $showControls (not $overlay) -}}
-{{- $barHasContent := or $barShowControls $showIndicator -}}
-{{- $hasBelowStrip := and $barHasContent (not $overlay) -}}
+{{- $barHasContent := and (not $overlay) (or $barShowControls $showIndicator) -}}
+{{- $overlayHasContent := and $overlay (or $showControls $showIndicator) -}}
+{{- $hasBelowStrip := $barHasContent -}}
+{{- $hasContent := or $barHasContent $overlayHasContent -}}
+
+{{- /* Keep the autoplay control in a free corner. */ -}}
+{{- $occupiedCorners := slice -}}
+{{- $cornerPositions := slice
+	"top-left" "top-center" "top-right"
+	"bottom-left" "bottom-center" "bottom-right"
+-}}
+{{- if and $showControls (ne $controlsPosition "left-right") -}}
+	{{- if in $cornerPositions $controlsPosition -}}
+		{{- $occupiedCorners = $occupiedCorners | append $controlsPosition -}}
+	{{- end -}}
+{{- end -}}
+{{- if and $showIndicator (in $cornerPositions $indicatorPosition) -}}
+	{{- $occupiedCorners = $occupiedCorners | append $indicatorPosition -}}
+{{- end -}}
+{{- if in $cornerPositions $captionPosition -}}
+	{{- $occupiedCorners = $occupiedCorners | append $captionPosition -}}
+{{- end -}}
+{{- $autoplayPosition := "" -}}
+{{- range (slice "top-right" "bottom-right" "top-left" "bottom-left") -}}
+	{{- if and (not $autoplayPosition) (not (in $occupiedCorners .)) -}}
+		{{- $autoplayPosition = . -}}
+	{{- end -}}
+{{- end -}}
+{{- if not $autoplayPosition -}}{{- $autoplayPosition = "top-right" -}}{{- end -}}
 
 {{- $counterHTML := "" -}}
 {{- if and $showIndicator (eq $indicatorStyle "counter") -}}
@@ -230,22 +264,15 @@
 	{{- $pauseIcon = `<svg class="carousel-control-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5v14M15 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>` -}}
 {{- end -}}
 
-{{- $prevHTML := "" -}}
+{{- $prevButtonHTML := "" -}}
+{{- $nextButtonHTML := "" -}}
+{{- $prevEdgeHTML := "" -}}
+{{- $nextEdgeHTML := "" -}}
 {{- if $showControls -}}
-	{{- if $overlay -}}
-		{{- $prevHTML = printf `<button type="button" class="carousel-control carousel-control-prev carousel-edge" aria-label="Previous slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $id $prevIcon -}}
-	{{- else -}}
-		{{- $prevHTML = printf `<button type="button" class="carousel-control carousel-control-prev" aria-label="Previous slide" aria-controls="%s" data-tooltip="Previous slide">%s</button>` $id $prevIcon -}}
-	{{- end -}}
-{{- end -}}
-
-{{- $nextHTML := "" -}}
-{{- if $showControls -}}
-	{{- if $overlay -}}
-		{{- $nextHTML = printf `<button type="button" class="carousel-control carousel-control-next carousel-edge" aria-label="Next slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $id $nextIcon -}}
-	{{- else -}}
-		{{- $nextHTML = printf `<button type="button" class="carousel-control carousel-control-next" aria-label="Next slide" aria-controls="%s" data-tooltip="Next slide">%s</button>` $id $nextIcon -}}
-	{{- end -}}
+	{{- $prevButtonHTML = printf `<button type="button" class="carousel-control carousel-control-prev" aria-label="Previous slide" aria-controls="%s" data-tooltip="Previous slide">%s</button>` $id $prevIcon -}}
+	{{- $nextButtonHTML = printf `<button type="button" class="carousel-control carousel-control-next" aria-label="Next slide" aria-controls="%s" data-tooltip="Next slide">%s</button>` $id $nextIcon -}}
+	{{- $prevEdgeHTML = printf `<button type="button" class="carousel-control carousel-control-prev carousel-edge" aria-label="Previous slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $id $prevIcon -}}
+	{{- $nextEdgeHTML = printf `<button type="button" class="carousel-control carousel-control-next carousel-edge" aria-label="Next slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $id $nextIcon -}}
 {{- end -}}
 
 {{- $ringHTML := "" -}}
@@ -254,7 +281,7 @@
 {{- end -}}
 {{- $autoplayHTML := "" -}}
 {{- if $showAutoplay -}}
-	{{- $autoplayHTML = printf `<button type="button" class="carousel-autoplay" data-playing="true" aria-label="Pause autoplay" aria-controls="%s" style="--carousel-autoplay-interval: %dms">%s<span class="carousel-autoplay-icon carousel-autoplay-pause">%s</span><span class="carousel-autoplay-icon carousel-autoplay-play">%s</span></button>` $id $effectiveInterval $ringHTML $pauseIcon $playIcon -}}
+	{{- $autoplayHTML = printf `<button type="button" class="carousel-autoplay" data-playing="true" data-position="%s" aria-label="Pause autoplay" aria-controls="%s" style="--carousel-autoplay-interval: %dms">%s<span class="carousel-autoplay-icon carousel-autoplay-pause">%s</span><span class="carousel-autoplay-icon carousel-autoplay-play">%s</span></button>` $autoplayPosition $id $effectiveInterval $ringHTML $pauseIcon $playIcon -}}
 {{- end -}}
 
 {{- $indicatorHTML := "" -}}
@@ -273,16 +300,38 @@
 {{- $controlsBarHTML := "" -}}
 {{- if $barHasContent -}}
 	{{- $controlsBarHTML = partial "carousel/controls-bar.html" (dict
-		"position" $barPosition
 		"showControls" $barShowControls
 		"showIndicator" $showIndicator
-		"prevAlign" $prevAlign
-		"indicatorAlign" $indicatorAlign
-		"nextAlign" $nextAlign
-		"prevHTML" $prevHTML
+		"controlsPosition" $controlsPosition
+		"indicatorPosition" $indicatorPosition
+		"prevHTML" $prevButtonHTML
 		"indicatorHTML" $indicatorHTML
-		"nextHTML" $nextHTML
+		"nextHTML" $nextButtonHTML
 	) -}}
+{{- end -}}
+
+{{- $overlayHTML := "" -}}
+{{- if $overlay -}}
+	{{- if eq $controlsPosition "left-right" -}}
+		{{- if $showControls -}}
+			{{- $overlayHTML = printf "%s%s" $prevEdgeHTML $nextEdgeHTML -}}
+		{{- end -}}
+		{{- if $showIndicator -}}
+			{{- $overlayHTML = printf `%s<div class="carousel-overlay-group" data-position="%s">%s</div>` $overlayHTML $indicatorPosition $indicatorHTML -}}
+		{{- end -}}
+	{{- else -}}
+		{{- $merged := and $showControls $showIndicator (eq $controlsPosition $indicatorPosition) -}}
+		{{- if $merged -}}
+			{{- $overlayHTML = printf `<div class="carousel-overlay-group" data-position="%s">%s%s%s</div>` $controlsPosition $prevButtonHTML $indicatorHTML $nextButtonHTML -}}
+		{{- else -}}
+			{{- if $showControls -}}
+				{{- $overlayHTML = printf `<div class="carousel-overlay-group" data-position="%s">%s%s</div>` $controlsPosition $prevButtonHTML $nextButtonHTML -}}
+			{{- end -}}
+			{{- if $showIndicator -}}
+				{{- $overlayHTML = printf `%s<div class="carousel-overlay-group" data-position="%s">%s</div>` $overlayHTML $indicatorPosition $indicatorHTML -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
 {{- end -}}
 
 {{- $lightboxVendor := "none" -}}
@@ -292,9 +341,11 @@
 	{{- end -}}
 {{- end -}}
 
-<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $overlay }} is-overlay{{ end }}{{ if and $overlay (eq $overlayPosition "top") }} is-overlay-top{{ end }}{{ if $hasBelowStrip }} has-bottom{{ end }}{{ if not $barHasContent }} no-controls{{ end }}"
+<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $overlay }} is-overlay{{ end }}{{ if and $overlay $showControls (eq $controlsPosition "left-right") }} has-edge-controls{{ end }}{{ if $hasBelowStrip }} has-bottom{{ end }}{{ if not $hasContent }} no-controls{{ end }}"
 	id="{{ $id }}"
-	{{- if $thumbIndicator }} data-thumb-align="{{ $indicatorAlign }}"{{ end }}
+	data-controls-position="{{ $controlsPosition }}"
+	data-indicator-position="{{ $indicatorPosition }}"
+	data-caption-position="{{ $captionPosition }}"
 	{{ printf `style="--carousel-per-view: %d; --carousel-gap: %s; --carousel-slide-basis: %s"` $perView $slideGap $slideBasis | safeHTMLAttr }}
 	{{- if $interactive }} data-carousel
 	data-interval="{{ $effectiveInterval }}"
@@ -356,17 +407,15 @@
 					{{- if or $s.Caption $s.Description }}
 					{{- $slideCaptionPosition := $captionPosition -}}
 					{{- with $s.CaptionPosition -}}
-						{{- $value := lower (printf "%v" .) -}}
-						{{- if in (slice "top" "bottom") $value -}}{{- $slideCaptionPosition = $value -}}{{- end -}}
-					{{- end -}}
-					{{- $slideCaptionAlign := $captionAlign -}}
-					{{- with $s.CaptionAlign -}}
-						{{- $value := lower (printf "%v" .) -}}
-						{{- if in (slice "left" "center" "right") $value -}}{{- $slideCaptionAlign = $value -}}{{- end -}}
+						{{- $value := partial "carousel/position.html" (dict
+							"value" .
+							"kind" "caption"
+							"overlay" $overlay
+						) -}}
+						{{- if $value -}}{{- $slideCaptionPosition = $value -}}{{- end -}}
 					{{- end -}}
 					<div class="carousel-slide-overlay"
-						data-caption-position="{{ $slideCaptionPosition }}"
-						data-caption-align="{{ $slideCaptionAlign }}">
+						data-caption-position="{{ $slideCaptionPosition }}">
 						{{- with $s.Caption }}<div class="carousel-caption">{{ . | markdownify }}</div>{{ end }}
 						{{- with $s.Description }}<div class="carousel-description">{{ . | markdownify }}</div>{{ end }}
 					</div>
@@ -375,16 +424,10 @@
 			</div>
 			{{- end -}}
 		</div>
-		{{- if $overlay }}
-		{{- with $prevHTML }}{{ . | safeHTML }}{{ end }}
-		{{- with $nextHTML }}{{ . | safeHTML }}{{ end }}
-		{{- if $barHasContent }}{{ $controlsBarHTML | safeHTML }}{{ end }}
-		{{- end }}
+		{{- if $overlay }}{{ $overlayHTML | safeHTML }}{{ end }}
 	</div>
 
-	{{- if and $barHasContent (not $overlay) }}
-	{{ $controlsBarHTML | safeHTML }}
-	{{- end }}
+	{{- if $barHasContent }}{{ $controlsBarHTML | safeHTML }}{{ end }}
 	{{- if $interactive }}
 	<p class="carousel-live" role="status" aria-live="polite" aria-atomic="true"></p>
 	<noscript>
@@ -393,7 +436,7 @@
 			#{{ $id }} .carousel-track { display: block; transform: none !important; }
 			#{{ $id }} .carousel-item { display: block; position: static !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1em; }
 			#{{ $id }} .carousel-item:last-child { margin-bottom: 0; }
-			#{{ $id }} .carousel-controls, #{{ $id }} .carousel-edge, #{{ $id }} .carousel-autoplay { display: none !important; }
+			#{{ $id }} .carousel-controls, #{{ $id }} .carousel-overlay-group, #{{ $id }} .carousel-edge, #{{ $id }} .carousel-autoplay { display: none !important; }
 		</style>
 	</noscript>
 	{{- end }}

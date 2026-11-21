@@ -44,15 +44,19 @@
         progressPosition = "top"
         # Show previous/next buttons.
         controls = true
-        # Control bar placement: below, overlay-top, or overlay-bottom.
-        controlsPlacement = "below"
-        # Place prev/next and the indicator: left, center, right.
-        prevAlign = "left"
+        # Float the controls over the image. When false they sit below it.
+        overlay = false
+        # Prev/next placement. Below: left, center, right, or left-right.
+        # Overlay: bottom-left, bottom-center, bottom-right, top-left,
+        # top-center, top-right, or left-right.
+        controlsPosition = "left-right"
         # Indicator: dots, segments, counter, or thumbnails.
-        # "thumbnails" uses preview images in the control bar.
+        # "thumbnails" uses preview images in the control position.
         indicatorStyle = "dots"
-        indicatorAlign = "center"
-        nextAlign = "right"
+        # Indicator placement. Below: left, center, right.
+        # Overlay: bottom-left, bottom-center, bottom-right, top-left,
+        # top-center, or top-right.
+        indicatorPosition = "center"
         # Number of slides visible at once (effect = "slide" only).
         # Screens up to 40em always show one slide.
         perView = 1
@@ -68,10 +72,9 @@
         effect = "slide"
         # Image content mode: "scaleToFill" (default), "aspectFit", or "aspectFill".
         contentMode = "scaleToFill"
-        # Caption overlay position: bottom or top.
-        captionPosition = "bottom"
-        # Caption overlay alignment: left, center, or right.
-        captionAlign = "left"
+        # Caption overlay position: bottom-left, bottom-center, bottom-right,
+        # top-left, top-center, or top-right.
+        captionPosition = "bottom-center"
         # Accessible name for the carousel region.
         label = "Carousel"
 

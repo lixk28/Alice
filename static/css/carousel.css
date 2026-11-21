@@ -203,20 +203,27 @@
     pointer-events: none;
 }
 
-.carousel-slide-overlay[data-caption-position="bottom"] {
-    bottom: var(--carousel-caption-inset);
+.carousel-slide-overlay[data-caption-position^="bottom"] {
+    bottom: calc(
+        var(--carousel-caption-inset) +
+            var(--carousel-caption-clearance, 0px)
+    );
 }
 
-.carousel-slide-overlay[data-caption-position="top"] {
-    top: var(--carousel-caption-inset);
+.carousel-slide-overlay[data-caption-position^="top"] {
+    top: calc(
+        var(--carousel-caption-inset) +
+            var(--carousel-caption-clearance, 0px)
+    );
 }
 
-.carousel-slide-overlay[data-caption-align="left"] {
+.carousel-slide-overlay[data-caption-position$="left"] {
     right: auto;
     left: var(--carousel-caption-inset);
+    text-align: left;
 }
 
-.carousel-slide-overlay[data-caption-align="center"] {
+.carousel-slide-overlay[data-caption-position$="center"] {
     right: auto;
     left: 50%;
     width: max-content;
@@ -227,10 +234,59 @@
     text-align: center;
 }
 
-.carousel-slide-overlay[data-caption-align="right"] {
+.carousel-slide-overlay[data-caption-position$="right"] {
     right: var(--carousel-caption-inset);
     left: auto;
     text-align: right;
+}
+
+/* Full-height edge arrows sit on the left/right; keep side captions clear. */
+.carousel.has-edge-controls
+    .carousel-slide-overlay[data-caption-position$="left"] {
+    left: calc(3.5em + var(--carousel-caption-inset));
+    max-width: calc(
+        100% - 3.5em - var(--carousel-caption-inset) -
+            var(--carousel-caption-inset)
+    );
+}
+
+.carousel.has-edge-controls
+    .carousel-slide-overlay[data-caption-position$="right"] {
+    right: calc(3.5em + var(--carousel-caption-inset));
+    max-width: calc(
+        100% - 3.5em - var(--carousel-caption-inset) -
+            var(--carousel-caption-inset)
+    );
+}
+
+.carousel.has-edge-controls
+    .carousel-slide-overlay[data-caption-position$="center"] {
+    max-width: calc(
+        100% - 7em - var(--carousel-caption-inset) -
+            var(--carousel-caption-inset)
+    );
+}
+
+/* Edge arrows also claim the left/right corners; shift overlay groups and
+ * the autoplay button inside them. */
+.carousel.has-edge-controls
+    .carousel-overlay-group[data-position$="left"] {
+    left: calc(3.5em + var(--carousel-autoplay-inset));
+}
+
+.carousel.has-edge-controls
+    .carousel-overlay-group[data-position$="right"] {
+    right: calc(3.5em + var(--carousel-autoplay-inset));
+}
+
+.carousel.has-edge-controls
+    .carousel-autoplay[data-position$="left"] {
+    left: calc(3.5em + var(--carousel-autoplay-inset));
+}
+
+.carousel.has-edge-controls
+    .carousel-autoplay[data-position$="right"] {
+    right: calc(3.5em + var(--carousel-autoplay-inset));
 }
 
 .carousel-caption {
@@ -340,23 +396,6 @@
     outline-offset: .1em;
 }
 
-/* Thumbnail previews are wider than the other indicators, so give the zone
- * that holds them twice the width on a normal viewport. Side zones still hold
- * prev/next, and screens up to 480px stack the zones as before. */
-@media screen and (min-width: 481px) {
-    .carousel[data-thumb-align="left"] .carousel-controls {
-        grid-template-columns: 2fr 1fr 1fr;
-    }
-
-    .carousel[data-thumb-align="center"] .carousel-controls {
-        grid-template-columns: 1fr 2fr 1fr;
-    }
-
-    .carousel[data-thumb-align="right"] .carousel-controls {
-        grid-template-columns: 1fr 1fr 2fr;
-    }
-}
-
 /* --------------------------------------------------------------- controls */
 
 .carousel-controls {
@@ -368,38 +407,76 @@
     background-color: var(--bgcolor);
 }
 
-.carousel-controls.is-overlay {
+.carousel-overlay-group {
     position: absolute;
-    right: 0;
-    left: 0;
     z-index: 6;
-    border: 0;
-    border-radius: 0;
-    background-color: transparent;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: .35em;
+    max-width: calc(
+        100% - var(--carousel-autoplay-inset) - var(--carousel-autoplay-inset)
+    );
+    min-width: 0;
     pointer-events: none;
 }
 
-.carousel-controls.is-overlay .carousel-control,
-.carousel-controls.is-overlay .carousel-indicator-wrap {
+.carousel-overlay-group .carousel-control,
+.carousel-overlay-group .carousel-indicator-wrap {
     pointer-events: auto;
 }
 
-.carousel-controls.is-overlay[data-position="bottom"] {
-    bottom: 0;
+.carousel-overlay-group[data-position^="top"] {
+    top: var(--carousel-autoplay-inset);
 }
 
-.carousel-controls.is-overlay[data-position="top"] {
-    top: 0;
+.carousel-overlay-group[data-position^="bottom"] {
+    bottom: var(--carousel-autoplay-inset);
+}
+
+.carousel-overlay-group[data-position$="left"] {
+    left: var(--carousel-autoplay-inset);
+}
+
+.carousel-overlay-group[data-position$="center"] {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.carousel-overlay-group[data-position$="right"] {
+    right: var(--carousel-autoplay-inset);
+}
+
+.carousel-overlay-group .carousel-control {
+    flex: 0 0 auto;
+}
+
+/* Overlay controls stand on frosted chips, matching the edge strips. */
+.carousel.is-overlay .carousel-overlay-group .carousel-control {
+    background-color: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.carousel.is-overlay .carousel-overlay-group .carousel-control:hover {
+    background-color: rgba(255, 255, 255, 0.85);
 }
 
 /* The floating indicator sits on a frosted panel so it stays legible over
  * arbitrary photos. */
-.carousel-controls.is-overlay .carousel-indicator-wrap {
+.carousel.is-overlay .carousel-indicator-wrap {
     padding: .3em .6em;
     border-radius: .35em;
     background-color: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+}
+
+.carousel-controls-group {
+    display: flex;
+    align-items: center;
+    gap: .35em;
+    min-width: 0;
 }
 
 .carousel-zone {
@@ -423,6 +500,7 @@
 
 /* Until the script has measured the first slide, the controls cannot work. */
 .carousel:not(.is-ready) .carousel-controls,
+.carousel:not(.is-ready) .carousel-overlay-group,
 .carousel:not(.is-ready) .carousel-edge,
 .carousel:not(.is-ready) .carousel-autoplay,
 .carousel:not(.is-ready) .carousel-autoplay-progress {
@@ -445,8 +523,8 @@
 /* Dots and segments put the panel padding into the buttons themselves. */
 .carousel-indicator-wrap[data-style="dots"],
 .carousel-indicator-wrap[data-style="segments"],
-.carousel-controls.is-overlay .carousel-indicator-wrap[data-style="dots"],
-.carousel-controls.is-overlay .carousel-indicator-wrap[data-style="segments"] {
+.carousel.is-overlay .carousel-indicator-wrap[data-style="dots"],
+.carousel.is-overlay .carousel-indicator-wrap[data-style="segments"] {
     padding: 0;
 }
 
@@ -590,8 +668,6 @@
 /* The autoplay control sits in the image corner, not in the control bar. */
 .carousel-autoplay {
     position: absolute;
-    top: var(--carousel-autoplay-inset);
-    right: var(--carousel-autoplay-inset);
     z-index: 8;
     width: 2.4em;
     height: 2.4em;
@@ -601,14 +677,24 @@
     -webkit-backdrop-filter: blur(8px);
 }
 
-.carousel-autoplay:hover {
-    background-color: rgba(255, 255, 255, 0.85);
+.carousel-autoplay[data-position^="top"] {
+    top: var(--carousel-autoplay-inset);
 }
 
-/* Keep the ring opposite the overlay bar when the bar is at the top. */
-.carousel.is-overlay-top .carousel-autoplay {
-    top: auto;
+.carousel-autoplay[data-position^="bottom"] {
     bottom: var(--carousel-autoplay-inset);
+}
+
+.carousel-autoplay[data-position$="left"] {
+    left: var(--carousel-autoplay-inset);
+}
+
+.carousel-autoplay[data-position$="right"] {
+    right: var(--carousel-autoplay-inset);
+}
+
+.carousel-autoplay:hover {
+    background-color: rgba(255, 255, 255, 0.85);
 }
 
 .carousel-autoplay:hover .carousel-autoplay-ring circle {
@@ -888,6 +974,7 @@
 
 @media print {
     .carousel-controls,
+    .carousel-overlay-group,
     .carousel-edge,
     .carousel-autoplay,
     .carousel-autoplay-progress,

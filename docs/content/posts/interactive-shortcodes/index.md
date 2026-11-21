@@ -131,11 +131,11 @@ Give a slide a `caption` and/or `description`; both render in a frosted panel ov
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" caption="Kada **coast**" description="Wakayama, Japan. [More](/posts/)" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" caption="Lake Biwa" description="Shiga, Japan" captionPosition="top" captionAlign="right" >}}
+{{< slide image="IMG_5999.webp" alt="Lake Biwa" caption="Lake Biwa" description="Shiga, Japan" captionPosition="tr" >}}
 
 {{< /carousel >}}
 
-The panel sits at the bottom-left by default. Set `captionPosition` to `bottom` (default) or `top`, and `captionAlign` to `left` (default), `center`, or `right`; a slide can override either value with its own `captionPosition` / `captionAlign` (the second slide above uses the top-right corner). With an overlay control bar at the bottom, use `captionPosition="top"` so the caption stays clear of the controls.
+The panel sits at `bottom-center` by default. `captionPosition` accepts `bottom-left`, `bottom-center`, `bottom-right`, `top-left`, `top-center`, or `top-right`; a slide can override the carousel value (the second slide above uses `top-right`). When an overlay control group shares the caption's exact position, the caption moves inward, above/below the group, automatically.
 
 #### Common parameters
 
@@ -147,8 +147,7 @@ These are the options used most often; the full list is in [Carousel parameters]
 | `alt` | slide | Alternative text; use `alt=""` for a decorative image. |
 | `caption` | slide | Overlay title; supports inline Markdown. |
 | `description` | slide | Overlay description under the caption; supports inline Markdown. |
-| `captionPosition` | both | Caption panel position: `bottom` (default) or `top`; a slide overrides the carousel value. |
-| `captionAlign` | both | Caption panel alignment: `left` (default), `center`, or `right`; a slide overrides the carousel value. |
+| `captionPosition` | both | Caption panel position: `bottom-center` (default) or another corner/edge; a slide overrides the carousel value. |
 | `contentMode` | both | Image fit: `scaleToFill` (default), `aspectFit`, or `aspectFill`. |
 | `link` | slide | Wrap the image in a link; overrides the lightbox. |
 | `lightbox` | slide | Open the image in the page lightbox; on by default when the page enables one. |
@@ -203,7 +202,7 @@ This example shows two images at a time with a counter:
 
 #### Previous/next and indicators
 
-`controls` shows or hides the previous/next buttons; the indicator is independent. `indicatorStyle` chooses what appears in the control bar:
+`controls` shows or hides the previous/next buttons; the indicator is independent. `indicatorStyle` chooses what appears in the control area:
 
 | Style | Description |
 | --- | --- |
@@ -226,9 +225,9 @@ Only one indicator is shown, and an interactive carousel always has one. This ex
 
 #### Thumbnails
 
-`indicatorStyle="thumbnails"` replaces the indicator with a row of preview images in the control bar, in the same row as previous/next. Clicking a preview jumps to that slide and the active preview is outlined. If the previews overflow, their slot scrolls sideways and keeps the active one in view. `indicatorAlign` decides whether the slot sits on the left, in the center, or on the right; the slot also gets extra width so a few previews stay visible.
+`indicatorStyle="thumbnails"` replaces the indicator with a row of preview images. Clicking a preview jumps to that slide and the active preview is outlined. If the previews overflow, their slot scrolls sideways and keeps the active one in view. The preview row follows `indicatorPosition`, in the below bar or in an overlay group.
 
-Thumbnails work with `perView`, `loop`, and `fade`, and they join the overlay bar when `controlsPlacement` is `overlay-top` or `overlay-bottom`. With `perView`, every slide can be a starting position when `loop` is on; with `loop=false`, previews past the last starting position are hidden.
+Thumbnails work with `perView`, `loop`, and `fade`. With `perView`, every slide can be a starting position when `loop` is on; with `loop=false`, previews past the last starting position are hidden.
 
 {{< carousel label="Thumbnail indicator" indicatorStyle="thumbnails" >}}
 
@@ -242,13 +241,51 @@ Thumbnails work with `perView`, `loop`, and `fade`, and they join the overlay ba
 
 {{< /carousel >}}
 
-#### Alignment
+#### Positions
 
-Each control and the indicator picks a horizontal zone with `prevAlign`, `indicatorAlign`, and `nextAlign`; each accepts `left`, `center`, or `right`. Within a zone the order is prev → indicator → next. Defaults are prev `left`, indicator `center`, and next `right`. Set all three to `center` for one centered row, or give prev/next the same zone to group them on one side.
+`overlay` controls whether the controls float over the image. It defaults to `false`, so they sit in a bar below the image; set `overlay=true` to float them over it.
 
-This example moves prev/next to the left and puts the `segments` indicator on the right:
+The old `controlsPlacement`, `prevAlign`, `indicatorAlign`, `nextAlign`, and `captionAlign` arguments are replaced by `overlay`, `controlsPosition`, `indicatorPosition`, and `captionPosition`.
 
-{{< carousel label="Controls left, segments right" prevAlign="left" nextAlign="left" indicatorAlign="right" indicatorStyle="segments" >}}
+`controlsPosition` places previous/next:
+
+- Below the image: `left`, `center`, `right`, or `left-right` (default).
+- Over the image: `bottom-left`, `bottom-center`, `bottom-right`, `top-left`, `top-center`, `top-right`, or `left-right` (default).
+
+`left-right` separates prev and next into the left/right edge strips. Any other value groups prev and next together at that position.
+
+`indicatorPosition` places the indicator:
+
+- Below the image: `left`, `center` (default), or `right`.
+- Over the image: `bottom-left`, `bottom-center` (default), `bottom-right`, `top-left`, `top-center`, or `top-right`.
+
+When `controlsPosition` and `indicatorPosition` are the same, they merge into one group in the order prev → indicator → next. This example merges all three at the bottom center:
+
+{{< carousel label="Merged bottom-center overlay" overlay=true controlsPosition="bc" indicatorPosition="bc" >}}
+
+{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+
+{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+
+{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+
+{{< /carousel >}}
+
+Positions can be written in full or abbreviated. `l`/`r` = left/right, `c`/`m` = center, `b`/`t` = bottom/top; so `bc` = `bottom-center`, `tr` = `top-right`, and `lr` = `left-right`. This example puts the controls top-left and the indicator bottom-right:
+
+{{< carousel label="Split overlay positions" overlay=true controlsPosition="tl" indicatorPosition="br" >}}
+
+{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+
+{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+
+{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+
+{{< /carousel >}}
+
+With `overlay=false` the same positions use the below-image bar. Here prev/next are grouped in the center and the indicator sits on the right:
+
+{{< carousel label="Below bar with split positions" overlay=false controlsPosition="center" indicatorPosition="right" >}}
 
 {{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
@@ -258,37 +295,11 @@ This example moves prev/next to the left and puts the `segments` indicator on th
 
 {{< /carousel >}}
 
-#### Overlay placement
-
-`controlsPlacement` places the control bar below the image (`below`, the default) or overlays it on the image (`overlay-top` or `overlay-bottom`). In overlay mode, previous/next become full-height clickable strips on the left and right edges. The icon sits on a small frosted chip, centered both horizontally and vertically; hovering highlights the whole strip. The indicator floats on a matching frosted panel at the top or bottom so it stays readable over the photo. With the bar overlaid at the top, set `progressPosition="bottom"` so the autoplay bar stays clear of the controls. When autoplay is on, its corner button stays opposite the bar.
-
-**Overlay at the bottom**
-
-{{< carousel label="Overlay controls at the bottom" controlsPlacement="overlay-bottom" >}}
-
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
-
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
-
-{{< /carousel >}}
-
-**Overlay at the top**
-
-{{< carousel label="Overlay controls at the top" controlsPlacement="overlay-top" progressPosition="bottom" >}}
-
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
-
-{{< slide image="IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
-
-{{< slide image="IMG_3710.webp" alt="The Bund in Shanghai" >}}
-
-{{< /carousel >}}
+Caption panels are independent of the controls. If a caption and an overlay group share the same position, the caption is shifted inward so it does not cover the group; the controls stay at the chosen edge. The autoplay corner button also moves to a free corner when a control group or caption occupies its default corner. If a control group sits along the top edge, set `progressPosition="bottom"` so the autoplay progress bar stays clear of it.
 
 **Overlay with autoplay**
 
-Autoplay and overlay controls coexist: the corner button takes the top-right, the progress bar runs along the top edge, and the bottom overlay bar keeps prev/next and the indicator. If the overlay bar is at the top instead, the corner button moves to the bottom-right.
-
-{{< carousel label="Overlay controls with autoplay" autoplay=true pause=true controlsPlacement="overlay-bottom" >}}
+{{< carousel label="Overlay controls with autoplay" overlay=true autoplay=true pause=true controlsPosition="left-right" indicatorPosition="bc" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -298,9 +309,9 @@ Autoplay and overlay controls coexist: the corner button takes the top-right, th
 
 **Overlay with thumbnails**
 
-`indicatorStyle="thumbnails"` also works in the overlay bar: the preview strip sits on the bar's frosted panel, scrolls sideways when it overflows, and keeps the current preview in view. Because the strip is taller and wider than dots, it covers more of the image. If a caption also sits at the bottom, move it with `captionPosition="top"` or keep it clear of the strip horizontally. With autoplay on as well, the corner button still moves to the corner opposite the bar.
+`indicatorStyle="thumbnails"` also works over the image: the preview strip sits on its frosted indicator panel, scrolls sideways when it overflows, and keeps the current preview in view. Because the strip is taller and wider than dots, it covers more of the image; use `indicatorPosition` or a caption position that leaves room.
 
-{{< carousel label="Overlay controls with thumbnails" controlsPlacement="overlay-bottom" indicatorStyle="thumbnails" >}}
+{{< carousel label="Overlay controls with thumbnails" overlay=true indicatorStyle="thumbnails" indicatorPosition="bc" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -322,7 +333,7 @@ The gestures wrap at the ends when `loop` is on, and work with `perView` by movi
 
 #### Autoplay
 
-Set `autoplay=true` to advance automatically; `interval` sets the delay in milliseconds (default `5000`). The pause/play control is a small circular button in the top-right corner of the image; its label changes between Pause autoplay and Start autoplay. `pause=true` also pauses autoplay while the pointer or keyboard focus is inside. With `prefers-reduced-motion`, autoplay starts paused.
+Set `autoplay=true` to advance automatically; `interval` sets the delay in milliseconds (default `5000`). The pause/play control is a small circular button in a free image corner (top-right by default); its label changes between Pause autoplay and Start autoplay. `pause=true` also pauses autoplay while the pointer or keyboard focus is inside. With `prefers-reduced-motion`, autoplay starts paused.
 
 `progressStyle` chooses how the interval is shown:
 
@@ -335,7 +346,7 @@ Set `autoplay=true` to advance automatically; `interval` sets the delay in milli
 
 `progressPosition` puts the bar at the top (default) or bottom of the image. With `bar` or `none`, the corner button keeps working but has no progress ring.
 
-The control is self-contained: it never takes a slot in the control bar, so prev/next and the indicator keep their own layout. The ring sits in the top-right corner, or the bottom-right corner when the overlay control bar is at the top, so keep a caption out of that corner when both are enabled.
+The control is self-contained: it never takes a slot in the control position, so prev/next and the indicator keep their own layout. It picks the first free corner (top-right, bottom-right, top-left, bottom-left), so a control group or caption in the default corner moves it out of the way.
 
 {{< carousel label="Autoplay carousel" autoplay=true pause=true interval=4000 indicatorStyle="counter" >}}
 
@@ -394,19 +405,17 @@ All carousel and slide arguments are optional. `params.carousel` supplies site-w
 
 | Name | Description |
 | --- | --- |
-| `captionPosition` | Caption panel position: `bottom` (default) or `top`. A slide can override it. |
-| `captionAlign` | Caption panel alignment: `left` (default), `center`, or `right`. A slide can override it. |
+| `captionPosition` | Caption panel position: `bottom-left`, `bottom-center` (default), `bottom-right`, `top-left`, `top-center`, or `top-right`. A slide can override it. |
 
 **Controls**
 
 | Name | Description |
 | --- | --- |
 | `controls` | Show previous/next buttons; default `true`. |
-| `controlsPlacement` | Control bar placement: `below` (default), `overlay-top`, or `overlay-bottom`. |
+| `overlay` | Float the controls over the image; default `false`. Set `true` for overlay groups. |
+| `controlsPosition` | Prev/next placement. Below: `left`, `center`, `right`, `left-right` (default). Overlay: `bottom-left`, `bottom-center`, `bottom-right`, `top-left`, `top-center`, `top-right`, `left-right` (default). |
 | `indicatorStyle` | Indicator style: `dots` (default), `segments`, `counter`, or `thumbnails`. An interactive carousel always shows one. |
-| `indicatorAlign` | Zone for the indicator: `left`, `center` (default), or `right`. |
-| `prevAlign` | Zone for the previous button in `below` mode; default `left`. |
-| `nextAlign` | Zone for the next button in `below` mode; default `right`. |
+| `indicatorPosition` | Indicator placement. Below: `left`, `center` (default), `right`. Overlay: `bottom-left`, `bottom-center` (default), `bottom-right`, `top-left`, `top-center`, `top-right`. |
 | `counterSeparator` | Text between current and total with `indicatorStyle="counter"`; default `/`. |
 
 **Autoplay**
@@ -436,8 +445,7 @@ Carousel ids are generated from the shortcode's ordinal on the page and are not 
 | `alt` | Image alternative text; set `alt=""` for a decorative image. Defaults to the plain-text caption when omitted. |
 | `caption` | Overlay title; supports inline Markdown. |
 | `description` | Overlay description under the caption; supports inline Markdown. |
-| `captionPosition` | Per-slide caption position: `top` or `bottom`; defaults to the carousel value. |
-| `captionAlign` | Per-slide caption alignment: `left`, `center`, or `right`; defaults to the carousel value. |
+| `captionPosition` | Per-slide caption position: `bottom-left`, `bottom-center`, `bottom-right`, `top-left`, `top-center`, or `top-right`; defaults to the carousel value. |
 | `link` | Wrap the image in a link; overrides the lightbox. |
 | `target`, `rel` | Link attributes; `target="_blank"` defaults `rel` to `noopener noreferrer`. |
 | `width`, `height` | Image dimension attributes; the file itself is not resized. |
@@ -457,11 +465,10 @@ Set defaults under `params.carousel` in the site configuration. Any shortcode ar
     progressStyle = "both"
     progressPosition = "top"
     controls = true
-    controlsPlacement = "below"
-    prevAlign = "left"
+    overlay = false
+    controlsPosition = "left-right"
     indicatorStyle = "dots"
-    indicatorAlign = "center"
-    nextAlign = "right"
+    indicatorPosition = "center"
     perView = 1
     counterSeparator = "/"
     loop = true
@@ -469,8 +476,7 @@ Set defaults under `params.carousel` in the site configuration. Any shortcode ar
     pause = false
     effect = "slide"
     contentMode = "scaleToFill"
-    captionPosition = "bottom"
-    captionAlign = "left"
+    captionPosition = "bottom-center"
     label = "Carousel"
 
     [params.carousel.icons]
