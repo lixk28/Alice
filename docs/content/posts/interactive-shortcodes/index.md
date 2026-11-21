@@ -223,6 +223,18 @@ Only one indicator is shown, and an interactive carousel always has one. This ex
 
 {{< /carousel >}}
 
+This example uses the segmented indicator, with prev/next still visible:
+
+{{< carousel label="Segment indicator" indicatorStyle="segments" >}}
+
+{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+
+{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+
+{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+
+{{< /carousel >}}
+
 #### Thumbnails
 
 `indicatorStyle="thumbnails"` replaces the indicator with a row of preview images. Clicking a preview jumps to that slide and the active preview is outlined. If the previews overflow, their slot scrolls sideways and keeps the active one in view. The preview row follows `indicatorPosition`, in the below bar or in an overlay group.
