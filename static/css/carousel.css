@@ -1,15 +1,13 @@
 /*
  * Carousel shortcode — {{< carousel >}} + {{< slide >}}.
  *
- * The frame keeps the theme's thin border, background, and rounded corners,
- * but has no drop shadow. The below-image control bar shares the carousel
- * background; prev/next and the indicator sit on light panels. Typography
- * keeps the theme's Navy headings and short 150–200ms transitions. Each slide
- * is one image.
+ * The frame is a plain background block: no border, radius, or drop shadow.
+ * The below-image control bar shares the carousel background; prev/next and the
+ * indicator sit on light panels. Typography keeps the theme's Navy headings and
+ * short 150–200ms transitions. Each slide is one image.
  */
 
 :root {
-    --carousel-border-color: LightSlateGray;
     --carousel-control-color: var(--link-color);
     --carousel-control-hover-color: var(--link-active-color);
     --carousel-indicator-active-color: var(--link-color);
@@ -25,8 +23,6 @@
     --carousel-autoplay-inset: .8em;
     position: relative;
     margin: 1.5em 0;
-    border: .1em solid var(--carousel-border-color);
-    border-radius: .3em;
     background-color: var(--bgcolor);
 }
 
@@ -137,21 +133,9 @@
 .carousel-viewport {
     position: relative;
     overflow: hidden;
-    border-radius: .3em;
     background-color: var(--bgcolor);
     cursor: grab;
     touch-action: pan-y pinch-zoom;
-}
-
-/* Any strip below the viewport (thumbnail previews or the control bar) squares
- * off the bottom corners while it is displayed. */
-.carousel.has-bottom .carousel-viewport {
-    border-radius: .3em .3em 0 0;
-}
-
-/* Strips stay hidden until the script has measured the carousel. */
-.carousel.has-bottom:not(.is-ready) .carousel-viewport {
-    border-radius: .3em;
 }
 
 .carousel.is-ready .carousel-viewport {
