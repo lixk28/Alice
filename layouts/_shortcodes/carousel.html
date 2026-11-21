@@ -18,7 +18,7 @@
     progressStyle — autoplay progress: both|bar|ring|none (default: both)
     progressPosition — progress bar position: top|bottom (default: top)
     controls   — previous/next buttons: true|false
-    controlsPosition — control bar placement: below|top|bottom (default: below)
+    controlsPlacement — control bar placement: below|overlay-top|overlay-bottom (default: below)
     prevAlign  — previous button alignment: left|center|right (default: left)
     indicatorStyle — indicator style: dots|segments|counter|thumbnails (default: dots)
     indicatorAlign — indicator alignment: left|center|right (default: center)
@@ -57,7 +57,7 @@
 	"progressStyle" "both"
 	"progressPosition" "top"
 	"controls" true
-	"controlsPosition" "below"
+	"controlsPlacement" "below"
 	"prevAlign" "left"
 	"indicatorStyle" "dots"
 	"indicatorAlign" "center"
@@ -96,10 +96,10 @@
 
 {{- $controls := true -}}
 {{- if in $boolFalse (lower (printf "%v" $opts.controls)) -}}{{- $controls = false -}}{{- end -}}
-{{- $controlsPosition := "below" -}}
-{{- with site.Params.carousel.controlsPosition -}}{{- $controlsPosition = lower (printf "%v" .) -}}{{- end -}}
-{{- with .Get "controlsPosition" -}}{{- $controlsPosition = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "below" "top" "bottom") $controlsPosition) -}}{{- $controlsPosition = "below" -}}{{- end -}}
+{{- $controlsPlacement := "below" -}}
+{{- with site.Params.carousel.controlsPlacement -}}{{- $controlsPlacement = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "controlsPlacement" -}}{{- $controlsPlacement = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "below" "overlay-top" "overlay-bottom") $controlsPlacement) -}}{{- $controlsPlacement = "below" -}}{{- end -}}
 {{- $prevAlign := "left" -}}
 {{- with site.Params.carousel.prevAlign -}}{{- $prevAlign = lower (printf "%v" .) -}}{{- end -}}
 {{- with .Get "prevAlign" -}}{{- $prevAlign = lower (printf "%v" .) -}}{{- end -}}
@@ -196,7 +196,11 @@
 {{- $showAutoplay := and $interactive (gt $effectiveInterval 0) -}}
 {{- $showProgressBar := and $showAutoplay (in (slice "both" "bar") $progressStyle) -}}
 {{- $showProgressRing := and $showAutoplay (in (slice "both" "ring") $progressStyle) -}}
-{{- $overlay := and $interactive (ne $controlsPosition "below") -}}
+{{- $overlay := and $interactive (ne $controlsPlacement "below") -}}
+{{- $overlayPosition := "" -}}
+{{- if $overlay -}}{{- $overlayPosition = strings.TrimPrefix "overlay-" $controlsPlacement -}}{{- end -}}
+{{- $barPosition := "below" -}}
+{{- if $overlay -}}{{- $barPosition = $overlayPosition -}}{{- end -}}
 {{- /* Overlay prev/next are full-height edge strips outside the bar. */ -}}
 {{- $barShowControls := and $showControls (not $overlay) -}}
 {{- $barHasContent := or $barShowControls $showIndicator -}}
@@ -271,7 +275,7 @@
 {{- $controlsBarHTML := "" -}}
 {{- if $barHasContent -}}
 	{{- $controlsBarHTML = partial "carousel/controls-bar.html" (dict
-		"position" $controlsPosition
+		"position" $barPosition
 		"showControls" $barShowControls
 		"showIndicator" $showIndicator
 		"prevAlign" $prevAlign
@@ -290,7 +294,7 @@
 	{{- end -}}
 {{- end -}}
 
-<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $overlay }} is-overlay{{ end }}{{ if and $overlay (eq $controlsPosition "top") }} is-overlay-top{{ end }}{{ if $hasBelowStrip }} has-bottom{{ else }} no-controls{{ end }}"
+<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $overlay }} is-overlay{{ end }}{{ if and $overlay (eq $overlayPosition "top") }} is-overlay-top{{ end }}{{ if $hasBelowStrip }} has-bottom{{ end }}{{ if not $barHasContent }} no-controls{{ end }}"
 	id="{{ $id }}"
 	{{- if $thumbIndicator }} data-thumb-align="{{ $indicatorAlign }}"{{ end }}
 	{{- if $overlay }} data-v-align="{{ $vAlign }}"{{ end }}

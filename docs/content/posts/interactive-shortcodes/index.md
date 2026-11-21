@@ -228,7 +228,7 @@ Only one indicator is shown, and an interactive carousel always has one. This ex
 
 `indicatorStyle="thumbnails"` replaces the indicator with a row of preview images in the control bar, in the same row as previous/next. Clicking a preview jumps to that slide and the active preview is outlined. If the previews overflow, their slot scrolls sideways and keeps the active one in view. `indicatorAlign` decides whether the slot sits on the left, in the center, or on the right; the slot also gets extra width so a few previews stay visible.
 
-Thumbnails work with `perView`, `loop`, and `fade`, and they join the overlay bar when `controlsPosition="top"` or `"bottom"` is used. With `perView`, previews past the last starting position are hidden.
+Thumbnails work with `perView`, `loop`, and `fade`, and they join the overlay bar when `controlsPlacement` is `overlay-top` or `overlay-bottom`. With `perView`, previews past the last starting position are hidden.
 
 {{< carousel label="Thumbnail indicator" indicatorStyle="thumbnails" >}}
 
@@ -260,11 +260,11 @@ This example moves prev/next to the left and puts the `segments` indicator on th
 
 #### Overlay placement
 
-`controlsPosition` places the control bar below the image (`below`, the default) or overlays it on the image at `top` or `bottom`. In overlay mode, previous/next become full-height clickable strips on the left and right edges. The icon sits on a small frosted chip, centered horizontally and placed vertically by `vAlign` (`top`, `center` default, or `bottom`); hovering highlights the whole strip. The indicator floats on a matching frosted panel at the top or bottom so it stays readable over the photo. With the bar overlaid at the top, set `progressPosition="bottom"` so the autoplay bar stays clear of the controls. When autoplay is on, its corner button stays opposite the bar and shifts clear of an edge prev/next chip when `vAlign` places one in the same corner.
+`controlsPlacement` places the control bar below the image (`below`, the default) or overlays it on the image (`overlay-top` or `overlay-bottom`). In overlay mode, previous/next become full-height clickable strips on the left and right edges. The icon sits on a small frosted chip, centered horizontally and placed vertically by `vAlign` (`top`, `center` default, or `bottom`); hovering highlights the whole strip. The indicator floats on a matching frosted panel at the top or bottom so it stays readable over the photo. With the bar overlaid at the top, set `progressPosition="bottom"` so the autoplay bar stays clear of the controls. When autoplay is on, its corner button stays opposite the bar and shifts clear of an edge prev/next chip when `vAlign` places one in the same corner.
 
 **Overlay at the bottom**
 
-{{< carousel label="Overlay controls at the bottom" controlsPosition="bottom" >}}
+{{< carousel label="Overlay controls at the bottom" controlsPlacement="overlay-bottom" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -274,7 +274,7 @@ This example moves prev/next to the left and puts the `segments` indicator on th
 
 **Overlay at the top**
 
-{{< carousel label="Overlay controls at the top" controlsPosition="top" progressPosition="bottom" >}}
+{{< carousel label="Overlay controls at the top" controlsPlacement="overlay-top" progressPosition="bottom" >}}
 
 {{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
 
@@ -288,7 +288,7 @@ This example moves prev/next to the left and puts the `segments` indicator on th
 
 Autoplay and overlay controls coexist: the corner button takes the top-right, the progress bar runs along the top edge, and the bottom overlay bar keeps prev/next and the indicator. If the overlay bar is at the top instead, the corner button moves to the bottom-right.
 
-{{< carousel label="Overlay controls with autoplay" autoplay=true pause=true controlsPosition="bottom" >}}
+{{< carousel label="Overlay controls with autoplay" autoplay=true pause=true controlsPlacement="overlay-bottom" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -300,7 +300,7 @@ Autoplay and overlay controls coexist: the corner button takes the top-right, th
 
 `indicatorStyle="thumbnails"` also works in the overlay bar: the preview strip sits on the bar's frosted panel, scrolls sideways when it overflows, and keeps the current preview in view. Because the strip is taller and wider than dots, it covers more of the image. If a caption also sits at the bottom, move it with `captionPosition="top"` or keep it clear of the strip horizontally. With autoplay on as well, the corner button still moves to the corner opposite the bar.
 
-{{< carousel label="Overlay controls with thumbnails" controlsPosition="bottom" indicatorStyle="thumbnails" >}}
+{{< carousel label="Overlay controls with thumbnails" controlsPlacement="overlay-bottom" indicatorStyle="thumbnails" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -402,7 +402,7 @@ All carousel and slide arguments are optional. `params.carousel` supplies site-w
 | Name | Description |
 | --- | --- |
 | `controls` | Show previous/next buttons; default `true`. |
-| `controlsPosition` | Control bar placement: `below` (default), `top`, or `bottom`; top/bottom overlay the image. |
+| `controlsPlacement` | Control bar placement: `below` (default), `overlay-top`, or `overlay-bottom`. |
 | `indicatorStyle` | Indicator style: `dots` (default), `segments`, `counter`, or `thumbnails`. An interactive carousel always shows one. |
 | `indicatorAlign` | Zone for the indicator: `left`, `center` (default), or `right`. |
 | `prevAlign` | Zone for the previous button in `below` mode; default `left`. |
@@ -458,7 +458,7 @@ Set defaults under `params.carousel` in the site configuration. Any shortcode ar
     progressStyle = "both"
     progressPosition = "top"
     controls = true
-    controlsPosition = "below"
+    controlsPlacement = "below"
     prevAlign = "left"
     indicatorStyle = "dots"
     indicatorAlign = "center"

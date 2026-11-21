@@ -44,8 +44,8 @@
         progressPosition = "top"
         # Show previous/next buttons.
         controls = true
-        # Control bar placement: below, top, or bottom (top/bottom overlay the content).
-        controlsPosition = "below"
+        # Control bar placement: below, overlay-top, or overlay-bottom.
+        controlsPlacement = "below"
         # Place prev/next and the indicator: left, center, right.
         prevAlign = "left"
         # Indicator: dots, segments, counter, or thumbnails.
