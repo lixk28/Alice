@@ -458,12 +458,20 @@
     background-color: White;
 }
 
+/* Dots and segments put the panel padding into the buttons themselves. */
+.carousel-indicator-wrap[data-style="dots"],
+.carousel-indicator-wrap[data-style="segments"],
+.carousel-controls.is-overlay .carousel-indicator-wrap[data-style="dots"],
+.carousel-controls.is-overlay .carousel-indicator-wrap[data-style="segments"] {
+    padding: 0;
+}
+
 /* Segmented indicator: short inactive segments; the active one is scaled 2× wide and 1.5× thick. */
 .carousel-segments {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: .4em;
+    gap: 0;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -481,9 +489,10 @@
 
 .carousel-segment {
     position: relative;
+    box-sizing: content-box;
     width: 1.2em;
     height: 1em;
-    padding: 0;
+    padding: .3em .2em;
     appearance: none;
     border: 0;
     background-color: transparent;
@@ -495,8 +504,8 @@
     content: "";
     position: absolute;
     top: 50%;
-    right: 0;
-    left: 0;
+    right: .2em;
+    left: .2em;
     height: .4em;
     transform: translateY(-50%);
     border-radius: .2em;
@@ -516,6 +525,32 @@
 
 .carousel-segment:hover::before {
     background-color: var(--carousel-indicator-hover-color);
+}
+
+/* The panel has no padding: the first/last buttons add the outer .6em, and
+ * every button's padding is the click target without changing the visuals. */
+.carousel-indicators > li:first-child .carousel-indicator,
+.carousel-segments > li:first-child .carousel-segment {
+    padding-left: .6em;
+}
+
+.carousel-indicators > li:first-child .carousel-indicator::before,
+.carousel-segments > li:first-child .carousel-segment::before {
+    left: .6em;
+}
+
+.carousel-indicators > li:last-child .carousel-indicator,
+.carousel-segments > li:last-child .carousel-segment,
+.carousel-indicators > li:not(:has(~ li:not([hidden]))) .carousel-indicator,
+.carousel-segments > li:not(:has(~ li:not([hidden]))) .carousel-segment {
+    padding-right: .6em;
+}
+
+.carousel-indicators > li:last-child .carousel-indicator::before,
+.carousel-segments > li:last-child .carousel-segment::before,
+.carousel-indicators > li:not(:has(~ li:not([hidden]))) .carousel-indicator::before,
+.carousel-segments > li:not(:has(~ li:not([hidden]))) .carousel-segment::before {
+    right: .6em;
 }
 
 .carousel-control,
@@ -685,11 +720,12 @@
     display: inline-flex;
 }
 
+
 .carousel-indicators {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: .45em;
+    gap: 0;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -707,13 +743,13 @@
 
 .carousel-indicator {
     position: relative;
+    box-sizing: content-box;
     width: .7em;
     height: .7em;
-    padding: 0;
+    padding: .3em .225em;
     appearance: none;
     border: 0;
     font-size: var(--font-size-normal);
-    border-radius: 50%;
     background-color: transparent;
     cursor: pointer;
 }
@@ -722,7 +758,7 @@
 .carousel-indicator::before {
     content: "";
     position: absolute;
-    inset: 0;
+    inset: .3em .225em;
     border-radius: 50%;
     background-color: LightGray;
     transform: scale(1);
