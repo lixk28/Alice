@@ -1,9 +1,9 @@
 {{- /*
   One indicator group for the carousel control bar. Styles are mutually
-  exclusive: dots, a progress bar, or a counter. `none` renders nothing.
+  exclusive: dots, a progress bar, or a counter.
 
   Context:
-    style       — dots|bar|counter
+    style       — dots|segments|counter
     id          — carousel id
     slides      — slide list (for dots)
     total       — slide count
@@ -26,11 +26,11 @@
 		</li>
 		{{- end }}
 	</ol>
-	{{- else if eq $style "bar" }}
-	<ol class="carousel-bars">
+	{{- else if eq $style "segments" }}
+	<ol class="carousel-segments">
 		{{- range $i, $_ := .slides }}
 		<li{{ if gt $i $.maxIndex }} hidden{{ end }}>
-			<button type="button" class="carousel-bar"
+			<button type="button" class="carousel-segment"
 				data-carousel-goto="{{ $i }}"
 				aria-label="Go to slide {{ add $i 1 }} of {{ $.total }}"
 				data-tooltip="Go to slide {{ add $i 1 }} of {{ $.total }}"

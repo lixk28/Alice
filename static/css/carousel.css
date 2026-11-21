@@ -231,7 +231,7 @@
 }
 
 /* Segmented bar indicator: short inactive bars, a wider active bar. */
-.carousel-bars {
+.carousel-segments {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -241,17 +241,17 @@
     list-style: none;
 }
 
-.carousel-bars > li {
+.carousel-segments > li {
     display: flex;
     margin: 0;
     padding: 0;
 }
 
-.carousel-bars > li[hidden] {
+.carousel-segments > li[hidden] {
     display: none;
 }
 
-.carousel-bar {
+.carousel-segment {
     position: relative;
     width: 1.15em;
     height: 1em;
@@ -263,7 +263,7 @@
     transition: width var(--transition-duration-fast) ease;
 }
 
-.carousel-bar::before {
+.carousel-segment::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -276,15 +276,15 @@
     transition: background-color var(--transition-duration-fast) ease;
 }
 
-.carousel-bar[aria-current="true"] {
+.carousel-segment[aria-current="true"] {
     width: 2.3em;
 }
 
-.carousel-bar[aria-current="true"]::before {
+.carousel-segment[aria-current="true"]::before {
     background-color: var(--carousel-indicator-active-color);
 }
 
-.carousel-bar:hover::before {
+.carousel-segment:hover::before {
     background-color: var(--carousel-indicator-hover-color);
 }
 
@@ -318,7 +318,7 @@
 .carousel-control:focus-visible,
 .carousel-autoplay:focus-visible,
 .carousel-indicator:focus-visible,
-.carousel-bar:focus-visible {
+.carousel-segment:focus-visible {
     outline: .15em solid var(--link-active-color);
     outline-offset: .1em;
 }
@@ -478,7 +478,7 @@
 .carousel-control[data-tooltip]::after,
 .carousel-autoplay[data-tooltip]::after,
 .carousel-indicator[data-tooltip]::after,
-.carousel-bar[data-tooltip]::after {
+.carousel-segment[data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
     bottom: calc(100% + .45em);
@@ -610,8 +610,8 @@
 @media (prefers-reduced-motion: reduce) {
     .carousel.is-ready .carousel-viewport,
     .carousel-track,
-    .carousel-bar,
-    .carousel-bar::before,
+    .carousel-segment,
+    .carousel-segment::before,
     .carousel-edge-btn,
     .carousel[data-effect="fade"] .carousel-item {
         transition-duration: 0s !important;

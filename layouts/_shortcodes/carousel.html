@@ -103,7 +103,7 @@
 {{- $indicatorStyle := "dots" -}}
 {{- with site.Params.carousel.indicatorStyle -}}{{- $indicatorStyle = lower (printf "%v" .) -}}{{- end -}}
 {{- with .Get "indicatorStyle" -}}{{- $indicatorStyle = lower (printf "%v" .) -}}{{- end -}}
-{{- if not (in (slice "dots" "bar" "counter" "none") $indicatorStyle) -}}{{- $indicatorStyle = "dots" -}}{{- end -}}
+{{- if not (in (slice "dots" "segments" "counter") $indicatorStyle) -}}{{- $indicatorStyle = "dots" -}}{{- end -}}
 {{- $indicatorAlign := "center" -}}
 {{- with site.Params.carousel.indicatorAlign -}}{{- $indicatorAlign = lower (printf "%v" .) -}}{{- end -}}
 {{- with .Get "indicatorAlign" -}}{{- $indicatorAlign = lower (printf "%v" .) -}}{{- end -}}
@@ -176,7 +176,8 @@
 {{- $maxIndex := sub $n $perView -}}
 {{- $interactive := gt $maxIndex 0 -}}
 {{- $showControls := and $interactive $controls -}}
-{{- $showIndicator := and $interactive (ne $indicatorStyle "none") -}}
+{{- /* Every interactive carousel shows one of the indicator styles. */ -}}
+{{- $showIndicator := $interactive -}}
 {{- $showAutoplay := and $interactive (gt $effectiveInterval 0) -}}
 {{- $hasControlBar := or $showControls $showAutoplay $showIndicator -}}
 {{- $overlay := and $interactive (ne $controlsPosition "below") -}}
