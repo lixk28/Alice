@@ -34,22 +34,25 @@
     # Carousel shortcode defaults ({{< carousel >}} + {{< slide >}}).
     # Every key is a fallback; a shortcode argument still wins.
     [params.carousel]
-        # Enable autoplay. The pause button appears when this is true.
+        # Enable autoplay. A ring button at the top-right shows progress and toggles it.
         autoplay = false
         # Autoplay delay in milliseconds (used when autoplay is true).
         interval = 5000
-        # Autoplay progress bar position: top or bottom.
+        # Autoplay progress: "both" (bar + ring), "bar", "ring", or "none".
+        progressStyle = "both"
+        # Position of the progress bar when it is shown: top or bottom.
         progressPosition = "top"
         # Show previous/next buttons.
         controls = true
         # Control bar placement: below, top, or bottom (top/bottom overlay the content).
         controlsPosition = "below"
-        # Place each control and the indicator: left, center, right.
+        # Place prev/next and the indicator: left, center, right.
         prevAlign = "left"
+        # Indicator: dots, segments, counter, or thumbnails.
+        # "thumbnails" uses preview images in the control bar.
         indicatorStyle = "dots"
         indicatorAlign = "center"
         nextAlign = "right"
-        autoplayAlign = "right"
         # Number of slides visible at once (effect = "slide" only).
         # Screens up to 40em always show one slide.
         perView = 1
@@ -65,6 +68,10 @@
         effect = "slide"
         # Image content mode: "scaleToFill" (default), "aspectFit", or "aspectFill".
         contentMode = "scaleToFill"
+        # Caption overlay position: bottom or top.
+        captionPosition = "bottom"
+        # Caption overlay alignment: left, center, or right.
+        captionAlign = "left"
         # Vertical place of the overlay prev/next icon: top, center, or bottom.
         vAlign = "center"
         # Accessible name for the carousel region.
@@ -74,7 +81,7 @@
             prev = "svg/ui-oval/chevron-left.svg"
             next = "svg/ui-oval/chevron-right.svg"
             play = "svg/ui-oval/play.svg"
-            pause = "svg/ui-oval/stop.svg"
+            pause = "svg/ui-oval/pause.svg"
 
     # Link render hook
     [params.link.icons]
