@@ -95,11 +95,11 @@ A minimal carousel with the default navigator and dots:
 
 {{< carousel label="Carousel shortcode demo" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
-{{< slide image="IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
+{{< slide image="/img/IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
 
 {{< /carousel >}}
 
@@ -117,9 +117,9 @@ Set it on the carousel for a shared default, or on an individual slide to overri
 
 {{< carousel label="Aspect fill" contentMode="aspectFill" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
 {{< /carousel >}}
 
@@ -129,9 +129,9 @@ Give a slide a `caption` and/or `description`; both render in a frosted panel ov
 
 {{< carousel label="Slide captions" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" caption="Kada **coast**" description="Wakayama, Japan. [More](/posts/)" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" caption="Kada **coast**" description="Wakayama, Japan. [More](/posts/)" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" caption="Lake Biwa" description="Shiga, Japan" captionPosition="tr" >}}
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" caption="Lake Biwa" description="Shiga, Japan" captionPosition="tr" >}}
 
 {{< /carousel >}}
 
@@ -176,13 +176,13 @@ This example shows two images at a time with a counter:
 
 {{< carousel label="Two images per view" perView=2 indicatorStyle="counter" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
-{{< slide image="IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
+{{< slide image="/img/IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
 
-{{< slide image="IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
+{{< slide image="/img/IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
 
-{{< slide image="IMG_3710.webp" alt="The Bund in Shanghai" >}}
+{{< slide image="/img/IMG_3710.webp" alt="The Bund in Shanghai" >}}
 
 {{< /carousel >}}
 
@@ -192,11 +192,11 @@ This example shows two images at a time with a counter:
 
 {{< carousel label="Scroll hint" scrollHint=true navigatorOverlay=false >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
 {{< /carousel >}}
 
@@ -206,9 +206,9 @@ This example shows two images at a time with a counter:
 
 {{< carousel label="Fade carousel" effect="fade" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" >}}
 
 {{< /carousel >}}
 
@@ -229,11 +229,11 @@ Only one indicator is shown, and an interactive carousel always has one. This ex
 
 {{< carousel label="No arrows, counter indicator" navigator=false indicatorStyle="counter" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
 {{< /carousel >}}
 
@@ -241,11 +241,11 @@ This example uses the segmented indicator, with prev/next still visible:
 
 {{< carousel label="Segment indicator" indicatorStyle="segments" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
 {{< /carousel >}}
 
@@ -257,13 +257,13 @@ Thumbnails work with `perView`, `loop`, and `fade`. With `perView`, every slide 
 
 {{< carousel label="Thumbnail indicator" indicatorStyle="thumbnails" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
-{{< slide image="IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
+{{< slide image="/img/IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
 
 {{< /carousel >}}
 
@@ -289,11 +289,11 @@ When both are overlaid and `navigatorPosition` equals `indicatorPosition`, they 
 
 {{< carousel label="Merged bottom-center overlay" navigatorOverlay=true indicatorOverlay=true navigatorPosition="bc" indicatorPosition="bc" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" >}}
 
 {{< /carousel >}}
 
@@ -301,11 +301,11 @@ Positions can be written in full or abbreviated. `l`/`r` = left/right, `c`/`m` =
 
 {{< carousel label="Split overlay positions" navigatorOverlay=true indicatorOverlay=true navigatorPosition="tl" indicatorPosition="br" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" >}}
 
 {{< /carousel >}}
 
@@ -313,11 +313,11 @@ With both overlays off, the same positions use the below-image bar. Here prev/ne
 
 {{< carousel label="Below bar with split positions" navigatorOverlay=false indicatorOverlay=false navigatorPosition="right" indicatorPosition="left" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
-{{< slide image="IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
+{{< slide image="/img/IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
 
-{{< slide image="IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
+{{< slide image="/img/IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
 
 {{< /carousel >}}
 
@@ -327,9 +327,9 @@ Caption panels are independent of the navigator. If a caption and an overlay gro
 
 {{< carousel label="Overlay navigator with autoplay" navigatorOverlay=true indicatorOverlay=true autoplay=true pause=true navigatorPosition="left-right" indicatorPosition="bc" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
 {{< /carousel >}}
 
@@ -339,13 +339,13 @@ Caption panels are independent of the navigator. If a caption and an overlay gro
 
 {{< carousel label="Overlay navigator with thumbnails" navigatorOverlay=true indicatorOverlay=true indicatorStyle="thumbnails" indicatorPosition="bc" >}}
 
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
-{{< slide image="IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
+{{< slide image="/img/IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
 
 {{< /carousel >}}
 
@@ -376,9 +376,9 @@ The control is self-contained: it never takes a slot in the control position, so
 
 {{< carousel label="Autoplay carousel" autoplay=true pause=true interval=4000 indicatorStyle="counter" >}}
 
-{{< slide image="IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
+{{< slide image="/img/IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
 
-{{< slide image="IMG_3710.webp" alt="The Bund in Shanghai" >}}
+{{< slide image="/img/IMG_3710.webp" alt="The Bund in Shanghai" >}}
 
 {{< /carousel >}}
 
@@ -388,11 +388,11 @@ The control is self-contained: it never takes a slot in the control position, so
 
 {{< carousel label="Non-looping carousel" loop=false >}}
 
-{{< slide image="IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
+{{< slide image="/img/IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
 
-{{< slide image="IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
+{{< slide image="/img/IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
 
-{{< slide image="IMG_3710.webp" alt="The Bund in Shanghai" >}}
+{{< slide image="/img/IMG_3710.webp" alt="The Bund in Shanghai" >}}
 
 {{< /carousel >}}
 
@@ -402,11 +402,11 @@ With `keyboard=true` (the default), Left/Right, Home, and End navigate while the
 
 {{< carousel label="Starts on the second slide" start=1 >}}
 
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
-{{< slide image="IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
+{{< slide image="/img/IMG_0896.webp" alt="Canton Tower in Guangzhou" >}}
 
-{{< slide image="IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
+{{< slide image="/img/IMG_2173.webp" alt="Kyoto City KYOCERA Museum of Art" >}}
 
 {{< /carousel >}}
 
