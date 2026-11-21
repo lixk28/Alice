@@ -2,9 +2,10 @@
  * Carousel shortcode — {{< carousel >}} + {{< slide >}}.
  *
  * The frame keeps the theme's thin border, background, and rounded corners,
- * but has no drop shadow. A thin hairline separates the image from the control
- * bar. Typography keeps the theme's Navy headings and short 150–200ms
- * transitions. Each slide is one image.
+ * but has no drop shadow. The below-image control bar shares the carousel
+ * background; prev/next and the indicator sit on light panels. Typography
+ * keeps the theme's Navy headings and short 150–200ms transitions. Each slide
+ * is one image.
  */
 
 :root {
@@ -380,9 +381,7 @@
     align-items: center;
     gap: .5em;
     padding: .45em .6em;
-    border-top: .1em solid Gainsboro;
-    background-color: GhostWhite;
-    border-radius: 0 0 .3em .3em;
+    background-color: var(--bgcolor);
 }
 
 .carousel-controls.is-overlay {
@@ -446,6 +445,7 @@
     display: none;
 }
 
+/* The indicator always sits on its own panel; overlay mode frosts it below. */
 .carousel-indicator-wrap {
     display: flex;
     flex-wrap: wrap;
@@ -453,6 +453,9 @@
     justify-content: center;
     gap: .35em .7em;
     min-width: 0;
+    padding: .3em .6em;
+    border-radius: .35em;
+    background-color: White;
 }
 
 /* Segmented indicator: short inactive segments, a wider active segment. */
@@ -538,6 +541,15 @@
 .carousel-autoplay:hover {
     color: var(--carousel-control-hover-color);
     background-color: White;
+}
+
+/* Below mode: individual light chips on the carousel background. */
+.carousel-controls:not(.is-overlay) .carousel-control {
+    background-color: White;
+}
+
+.carousel-controls:not(.is-overlay) .carousel-control:hover {
+    background-color: GhostWhite;
 }
 
 .carousel-control:focus-visible,
