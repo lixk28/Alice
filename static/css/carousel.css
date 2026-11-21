@@ -545,6 +545,15 @@
         box-shadow var(--transition-duration-fast) ease;
 }
 
+/* The below indicator needs no panel: it sits directly in the navigator bar. */
+.carousel-navigator .carousel-indicator-wrap {
+    border: 0;
+    background-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
 /* Dots and segments put the panel padding into the buttons themselves. */
 .carousel-indicator-wrap[data-style="dots"],
 .carousel-indicator-wrap[data-style="segments"],
