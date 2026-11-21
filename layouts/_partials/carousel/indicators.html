@@ -14,10 +14,10 @@
 {{- $style := .style -}}
 <div class="carousel-indicator-wrap" data-style="{{ $style }}">
 	{{- if eq $style "dots" }}
-	<ol class="carousel-indicators">
+	<ol class="carousel-indicator-list carousel-indicators">
 		{{- range $i, $_ := .slides }}
 		<li{{ if gt $i $.maxIndex }} hidden{{ end }}>
-			<button type="button" class="carousel-indicator"
+			<button type="button" class="carousel-indicator carousel-indicator-control"
 				data-carousel-goto="{{ $i }}"
 				aria-label="Go to slide {{ add $i 1 }} of {{ $.total }}"
 				data-tooltip="Go to slide {{ add $i 1 }} of {{ $.total }}"
@@ -27,10 +27,10 @@
 		{{- end }}
 	</ol>
 	{{- else if eq $style "segments" }}
-	<ol class="carousel-segments">
+	<ol class="carousel-indicator-list carousel-segments">
 		{{- range $i, $_ := .slides }}
 		<li{{ if gt $i $.maxIndex }} hidden{{ end }}>
-			<button type="button" class="carousel-segment"
+			<button type="button" class="carousel-segment carousel-indicator-control"
 				data-carousel-goto="{{ $i }}"
 				aria-label="Go to slide {{ add $i 1 }} of {{ $.total }}"
 				data-tooltip="Go to slide {{ add $i 1 }} of {{ $.total }}"

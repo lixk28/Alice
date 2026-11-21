@@ -466,8 +466,8 @@
     padding: 0;
 }
 
-/* Segmented indicator: short inactive segments; the active one is scaled 2× wide and 1.5× thick. */
-.carousel-segments {
+/* Dots and segments share one flex row; spacing lives in the button padding. */
+.carousel-indicator-list {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -477,41 +477,59 @@
     list-style: none;
 }
 
-.carousel-segments > li {
+.carousel-indicator-list > li {
     display: flex;
     margin: 0;
     padding: 0;
 }
 
-.carousel-segments > li[hidden] {
+.carousel-indicator-list > li[hidden] {
     display: none;
 }
 
-.carousel-segment {
+/* Shared button base for dots and segments. */
+.carousel-indicator-control {
     position: relative;
     box-sizing: content-box;
-    width: 1.2em;
-    height: 1em;
-    padding: .3em .2em;
+    padding: .3em .225em;
     appearance: none;
     border: 0;
     background-color: transparent;
     cursor: pointer;
+}
+
+.carousel-indicator-control::before {
+    content: "";
+    position: absolute;
+    background-color: LightGray;
+    transition: background-color var(--transition-duration-fast) ease,
+        transform var(--transition-duration-normal) ease,
+        height var(--transition-duration-normal) ease;
+}
+
+.carousel-indicator-control[aria-current="true"]::before {
+    background-color: var(--carousel-indicator-active-color);
+}
+
+.carousel-indicator-control:hover::before {
+    background-color: var(--carousel-indicator-hover-color);
+}
+
+/* Segment modifier: short inactive bars, active one 2× wide and 1.5× thick. */
+.carousel-segment {
+    width: 1.2em;
+    height: 1em;
+    padding: .3em .2em;
     transition: width var(--transition-duration-normal) ease;
 }
 
 .carousel-segment::before {
-    content: "";
-    position: absolute;
     top: 50%;
     right: .2em;
     left: .2em;
     height: .4em;
     transform: translateY(-50%);
     border-radius: .2em;
-    background-color: LightGray;
-    transition: background-color var(--transition-duration-fast) ease,
-        height var(--transition-duration-normal) ease;
 }
 
 .carousel-segment[aria-current="true"] {
@@ -520,36 +538,25 @@
 
 .carousel-segment[aria-current="true"]::before {
     height: .6em;
-    background-color: var(--carousel-indicator-active-color);
-}
-
-.carousel-segment:hover::before {
-    background-color: var(--carousel-indicator-hover-color);
 }
 
 /* The panel has no padding: the first/last buttons add the outer .6em, and
  * every button's padding is the click target without changing the visuals. */
-.carousel-indicators > li:first-child .carousel-indicator,
-.carousel-segments > li:first-child .carousel-segment {
+.carousel-indicator-list > li:first-child .carousel-indicator-control {
     padding-left: .6em;
 }
 
-.carousel-indicators > li:first-child .carousel-indicator::before,
-.carousel-segments > li:first-child .carousel-segment::before {
+.carousel-indicator-list > li:first-child .carousel-indicator-control::before {
     left: .6em;
 }
 
-.carousel-indicators > li:last-child .carousel-indicator,
-.carousel-segments > li:last-child .carousel-segment,
-.carousel-indicators > li:not(:has(~ li:not([hidden]))) .carousel-indicator,
-.carousel-segments > li:not(:has(~ li:not([hidden]))) .carousel-segment {
+.carousel-indicator-list > li:last-child .carousel-indicator-control,
+.carousel-indicator-list > li:not(:has(~ li:not([hidden]))) .carousel-indicator-control {
     padding-right: .6em;
 }
 
-.carousel-indicators > li:last-child .carousel-indicator::before,
-.carousel-segments > li:last-child .carousel-segment::before,
-.carousel-indicators > li:not(:has(~ li:not([hidden]))) .carousel-indicator::before,
-.carousel-segments > li:not(:has(~ li:not([hidden]))) .carousel-segment::before {
+.carousel-indicator-list > li:last-child .carousel-indicator-control::before,
+.carousel-indicator-list > li:not(:has(~ li:not([hidden]))) .carousel-indicator-control::before {
     right: .6em;
 }
 
@@ -591,8 +598,7 @@
 
 .carousel-control:focus-visible,
 .carousel-autoplay:focus-visible,
-.carousel-indicator:focus-visible,
-.carousel-segment:focus-visible {
+.carousel-indicator-control:focus-visible {
     outline: .15em solid var(--link-active-color);
     outline-offset: .1em;
 }
@@ -720,59 +726,21 @@
     display: inline-flex;
 }
 
-
-.carousel-indicators {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.carousel-indicators > li {
-    display: flex;
-    margin: 0;
-    padding: 0;
-}
-
-.carousel-indicators > li[hidden] {
-    display: none;
-}
-
+/* Dot modifier: the active dot grows with a short transition. */
 .carousel-indicator {
-    position: relative;
-    box-sizing: content-box;
     width: .7em;
     height: .7em;
-    padding: .3em .225em;
-    appearance: none;
-    border: 0;
     font-size: var(--font-size-normal);
-    background-color: transparent;
-    cursor: pointer;
 }
 
-/* The active dot grows with a short transition; the button keeps its hit area. */
 .carousel-indicator::before {
-    content: "";
-    position: absolute;
     inset: .3em .225em;
     border-radius: 50%;
-    background-color: LightGray;
     transform: scale(1);
-    transition: background-color var(--transition-duration-fast) ease,
-        transform var(--transition-duration-normal) ease;
 }
 
 .carousel-indicator[aria-current="true"]::before {
-    background-color: var(--carousel-indicator-active-color);
     transform: scale(1.25);
-}
-
-.carousel-indicator:hover::before {
-    background-color: var(--carousel-indicator-hover-color);
 }
 
 .carousel-indicator:focus-visible {
@@ -786,8 +754,7 @@
 
 /* Hover/focus tooltips for controls and indicators. */
 .carousel-control[data-tooltip]::after,
-.carousel-indicator[data-tooltip]::after,
-.carousel-segment[data-tooltip]::after {
+.carousel-indicator-control[data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
     bottom: calc(100% + .45em);
@@ -821,9 +788,9 @@
 }
 
 .carousel-control[data-tooltip]:hover::after,
-.carousel-indicator[data-tooltip]:hover::after,
+.carousel-indicator-control[data-tooltip]:hover::after,
 .carousel-control[data-tooltip]:focus-visible::after,
-.carousel-indicator[data-tooltip]:focus-visible::after {
+.carousel-indicator-control[data-tooltip]:focus-visible::after {
     opacity: 1;
     visibility: visible;
     transition: opacity var(--transition-duration-fast) ease;
@@ -927,9 +894,8 @@
 @media (prefers-reduced-motion: reduce) {
     .carousel.is-ready .carousel-viewport,
     .carousel-track,
-    .carousel-segment,
-    .carousel-segment::before,
-    .carousel-indicator::before,
+    .carousel-indicator-control,
+    .carousel-indicator-control::before,
     .carousel-edge-btn,
     .carousel-thumbnail,
     .carousel[data-effect="fade"] .carousel-item {
