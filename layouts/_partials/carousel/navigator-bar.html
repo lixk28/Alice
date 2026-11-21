@@ -1,10 +1,10 @@
 {{- /*
-  Below-image control bar.
+  Below-image navigator bar.
 
   Context:
-    showControls      — render prev/next
+    showNavigator      — render prev/next
     showIndicator     — render the indicator
-    controlsPosition  — left|center|right|left-right
+    navigatorPosition  — left|center|right|left-right
     indicatorPosition — left|center|right
     prevHTML          — normal previous button
     nextHTML          — normal next button
@@ -14,12 +14,12 @@
 {{- $center := "" -}}
 {{- $right := "" -}}
 {{- $group := "" -}}
-{{- if .showControls -}}
-	{{- $group = printf `<div class="carousel-controls-group">%s%s</div>` .prevHTML .nextHTML -}}
+{{- if .showNavigator -}}
+	{{- $group = printf `<div class="carousel-navigator-group">%s%s</div>` .prevHTML .nextHTML -}}
 {{- end -}}
 
-{{- if eq .controlsPosition "left-right" -}}
-	{{- if .showControls -}}
+{{- if eq .navigatorPosition "left-right" -}}
+	{{- if .showNavigator -}}
 		{{- $left = .prevHTML -}}
 		{{- $right = .nextHTML -}}
 	{{- end -}}
@@ -33,14 +33,14 @@
 		{{- end -}}
 	{{- end -}}
 {{- else -}}
-	{{- $merged := and .showControls .showIndicator (eq .controlsPosition .indicatorPosition) -}}
+	{{- $merged := and .showNavigator .showIndicator (eq .navigatorPosition .indicatorPosition) -}}
 	{{- if $merged -}}
-		{{- $group = printf `<div class="carousel-controls-group">%s%s%s</div>` .prevHTML .indicatorHTML .nextHTML -}}
+		{{- $group = printf `<div class="carousel-navigator-group">%s%s%s</div>` .prevHTML .indicatorHTML .nextHTML -}}
 	{{- end -}}
 	{{- $block := $group -}}
 	{{- if and (not $merged) .showIndicator -}}
-		{{- $indicatorBlock := printf `<div class="carousel-controls-group carousel-controls-group-indicator">%s</div>` .indicatorHTML -}}
-		{{- if eq .controlsPosition .indicatorPosition -}}
+		{{- $indicatorBlock := printf `<div class="carousel-navigator-group carousel-navigator-group-indicator">%s</div>` .indicatorHTML -}}
+		{{- if eq .navigatorPosition .indicatorPosition -}}
 			{{- $block = printf "%s%s" $block $indicatorBlock -}}
 		{{- else -}}
 			{{- if eq .indicatorPosition "left" -}}{{- $left = $indicatorBlock -}}{{- end -}}
@@ -48,12 +48,12 @@
 			{{- if eq .indicatorPosition "right" -}}{{- $right = $indicatorBlock -}}{{- end -}}
 		{{- end -}}
 	{{- end -}}
-	{{- if eq .controlsPosition "left" -}}{{- $left = printf "%s%s" $block $left -}}{{- end -}}
-	{{- if eq .controlsPosition "center" -}}{{- $center = printf "%s%s" $block $center -}}{{- end -}}
-	{{- if eq .controlsPosition "right" -}}{{- $right = printf "%s%s" $right $block -}}{{- end -}}
+	{{- if eq .navigatorPosition "left" -}}{{- $left = printf "%s%s" $block $left -}}{{- end -}}
+	{{- if eq .navigatorPosition "center" -}}{{- $center = printf "%s%s" $block $center -}}{{- end -}}
+	{{- if eq .navigatorPosition "right" -}}{{- $right = printf "%s%s" $right $block -}}{{- end -}}
 {{- end -}}
 
-<div class="carousel-controls" data-position="below">
+<div class="carousel-navigator" data-position="below">
 	<div class="carousel-zone carousel-zone-left">{{ $left | safeHTML }}</div>
 	<div class="carousel-zone carousel-zone-center">{{ $center | safeHTML }}</div>
 	<div class="carousel-zone carousel-zone-right">{{ $right | safeHTML }}</div>

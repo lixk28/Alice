@@ -91,7 +91,7 @@ Keep the shortcode block-level: do not put it inside a Markdown list item or par
 {{</* /carousel */>}}
 ```
 
-A minimal carousel with the default controls and dots:
+A minimal carousel with the default navigator and dots:
 
 {{< carousel label="Carousel shortcode demo" >}}
 
@@ -152,7 +152,7 @@ These are the options used most often; the full list is in [Carousel parameters]
 | `link` | slide | Wrap the image in a link; overrides the lightbox. |
 | `lightbox` | slide | Open the image in the page lightbox; on by default when the page enables one. |
 | `label` | carousel | Accessible name for the region; default `Carousel`. |
-| `controls` | carousel | Show previous/next buttons; default `true`. |
+| `navigator` | carousel | Show previous/next buttons; default `true`. |
 | `indicatorStyle` | carousel | `dots` (default), `segments`, `counter`, or `thumbnails`. |
 | `perView` | carousel | Images visible at once; default `1`. |
 
@@ -198,11 +198,11 @@ This example shows two images at a time with a counter:
 
 {{< /carousel >}}
 
-### Controls
+### Navigator
 
 #### Previous/next and indicators
 
-`controls` shows or hides the previous/next buttons; the indicator is independent. `indicatorStyle` chooses what appears in the control area:
+`navigator` shows or hides the previous/next buttons; the indicator is independent. `indicatorStyle` chooses what appears in the navigator area:
 
 | Style | Description |
 | --- | --- |
@@ -213,7 +213,7 @@ This example shows two images at a time with a counter:
 
 Only one indicator is shown, and an interactive carousel always has one. This example hides previous/next and leaves the counter:
 
-{{< carousel label="No arrows, counter indicator" controls=false indicatorStyle="counter" >}}
+{{< carousel label="No arrows, counter indicator" navigator=false indicatorStyle="counter" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -255,37 +255,25 @@ Thumbnails work with `perView`, `loop`, and `fade`. With `perView`, every slide 
 
 #### Positions
 
-`overlay` controls whether the controls float over the image. It defaults to `false`, so they sit in a bar below the image; set `overlay=true` to float them over it.
+`navigatorOverlay` and `indicatorOverlay` are independent. Prev/next float over the image by default (`navigatorOverlay=true`), while the indicator sits in the below-image bar by default (`indicatorOverlay=false`).
 
-The old `controlsPlacement`, `prevAlign`, `indicatorAlign`, `nextAlign`, and `captionAlign` arguments are replaced by `overlay`, `controlsPosition`, `indicatorPosition`, and `captionPosition`.
+The old `controlsPlacement`, `prevAlign`, `indicatorAlign`, `nextAlign`, and `captionAlign` arguments are replaced by `navigator`, `navigatorOverlay`, `indicatorOverlay`, `navigatorPosition`, `indicatorPosition`, and `captionPosition`.
 
-`controlsPosition` places previous/next:
+`navigatorPosition` places previous/next:
 
-- Below the image: `left`, `center`, `right`, or `left-right` (default).
-- Over the image: `bottom-left`, `bottom-center`, `bottom-right`, `top-left`, `top-center`, `top-right`, or `left-right` (default).
+- With `navigatorOverlay=true`: `bottom-left`, `bottom-center`, `bottom-right`, `top-left`, `top-center`, `top-right`, or `left-right` (default).
+- With `navigatorOverlay=false`: `left`, `center`, `right`, or `left-right` (default).
 
 `left-right` separates prev and next into the left/right edge strips. Any other value groups prev and next together at that position.
 
 `indicatorPosition` places the indicator:
 
-- Below the image: `left`, `center` (default), or `right`.
-- Over the image: `bottom-left`, `bottom-center` (default), `bottom-right`, `top-left`, `top-center`, or `top-right`.
+- With `indicatorOverlay=true`: `bottom-left`, `bottom-center` (default), `bottom-right`, `top-left`, `top-center`, or `top-right`.
+- With `indicatorOverlay=false`: `left`, `center` (default), or `right`.
 
-When `controlsPosition` and `indicatorPosition` are the same, they merge into one group in the order prev → indicator → next. This example merges all three at the bottom center:
+When both are overlaid and `navigatorPosition` equals `indicatorPosition`, they merge into one group in the order prev → indicator → next. This example merges all three at the bottom center:
 
-{{< carousel label="Merged bottom-center overlay" overlay=true controlsPosition="bc" indicatorPosition="bc" >}}
-
-{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
-
-{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
-
-{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
-
-{{< /carousel >}}
-
-Positions can be written in full or abbreviated. `l`/`r` = left/right, `c`/`m` = center, `b`/`t` = bottom/top; so `bc` = `bottom-center`, `tr` = `top-right`, and `lr` = `left-right`. This example puts the controls top-left and the indicator bottom-right:
-
-{{< carousel label="Split overlay positions" overlay=true controlsPosition="tl" indicatorPosition="br" >}}
+{{< carousel label="Merged bottom-center overlay" navigatorOverlay=true indicatorOverlay=true navigatorPosition="bc" indicatorPosition="bc" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -295,9 +283,21 @@ Positions can be written in full or abbreviated. `l`/`r` = left/right, `c`/`m` =
 
 {{< /carousel >}}
 
-With `overlay=false` the same positions use the below-image bar. Here prev/next are grouped in the center and the indicator sits on the right:
+Positions can be written in full or abbreviated. `l`/`r` = left/right, `c`/`m` = center, `b`/`t` = bottom/top; so `bc` = `bottom-center`, `tr` = `top-right`, and `lr` = `left-right`. This example puts the navigator top-left and the indicator bottom-right:
 
-{{< carousel label="Below bar with split positions" overlay=false controlsPosition="center" indicatorPosition="right" >}}
+{{< carousel label="Split overlay positions" navigatorOverlay=true indicatorOverlay=true navigatorPosition="tl" indicatorPosition="br" >}}
+
+{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+
+{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+
+{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+
+{{< /carousel >}}
+
+With both overlays off, the same positions use the below-image bar. Here prev/next are grouped on the right and the indicator sits on the left:
+
+{{< carousel label="Below bar with split positions" navigatorOverlay=false indicatorOverlay=false navigatorPosition="right" indicatorPosition="left" >}}
 
 {{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
 
@@ -307,11 +307,11 @@ With `overlay=false` the same positions use the below-image bar. Here prev/next 
 
 {{< /carousel >}}
 
-Caption panels are independent of the controls. If a caption and an overlay group share the same position, the caption is shifted inward so it does not cover the group; the controls stay at the chosen edge. The autoplay corner button also moves to a free corner when a control group or caption occupies its default corner. If a control group sits along the top edge, set `progressPosition="bottom"` so the autoplay progress bar stays clear of it.
+Caption panels are independent of the navigator. If a caption and an overlay group share the same position, the caption is shifted inward so it does not cover the group; the navigator stays at the chosen edge. The autoplay corner button also moves to a free corner when a navigator group or caption occupies its default corner. If a navigator group sits along the top edge, set `progressPosition="bottom"` so the autoplay progress bar stays clear of it.
 
 **Overlay with autoplay**
 
-{{< carousel label="Overlay controls with autoplay" overlay=true autoplay=true pause=true controlsPosition="left-right" indicatorPosition="bc" >}}
+{{< carousel label="Overlay navigator with autoplay" navigatorOverlay=true indicatorOverlay=true autoplay=true pause=true navigatorPosition="left-right" indicatorPosition="bc" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -323,7 +323,7 @@ Caption panels are independent of the controls. If a caption and an overlay grou
 
 `indicatorStyle="thumbnails"` also works over the image: the preview strip sits on its frosted indicator panel, scrolls sideways when it overflows, and keeps the current preview in view. Because the strip is taller and wider than dots, it covers more of the image; use `indicatorPosition` or a caption position that leaves room.
 
-{{< carousel label="Overlay controls with thumbnails" overlay=true indicatorStyle="thumbnails" indicatorPosition="bc" >}}
+{{< carousel label="Overlay navigator with thumbnails" navigatorOverlay=true indicatorOverlay=true indicatorStyle="thumbnails" indicatorPosition="bc" >}}
 
 {{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -419,15 +419,16 @@ All carousel and slide arguments are optional. `params.carousel` supplies site-w
 | --- | --- |
 | `captionPosition` | Caption panel position: `bottom-left`, `bottom-center` (default), `bottom-right`, `top-left`, `top-center`, or `top-right`. A slide can override it. |
 
-**Controls**
+**Navigator**
 
 | Name | Description |
 | --- | --- |
-| `controls` | Show previous/next buttons; default `true`. |
-| `overlay` | Float the controls over the image; default `false`. Set `true` for overlay groups. |
-| `controlsPosition` | Prev/next placement. Below: `left`, `center`, `right`, `left-right` (default). Overlay: `bottom-left`, `bottom-center`, `bottom-right`, `top-left`, `top-center`, `top-right`, `left-right` (default). |
+| `navigator` | Show previous/next buttons; default `true`. |
+| `navigatorOverlay` | Float prev/next over the image; default `true`. Set `false` for the below bar. |
+| `navigatorPosition` | Prev/next placement. Overlay: `bottom-left`, `bottom-center`, `bottom-right`, `top-left`, `top-center`, `top-right`, `left-right` (default). Below: `left`, `center`, `right`, `left-right` (default). |
 | `indicatorStyle` | Indicator style: `dots` (default), `segments`, `counter`, or `thumbnails`. An interactive carousel always shows one. |
-| `indicatorPosition` | Indicator placement. Below: `left`, `center` (default), `right`. Overlay: `bottom-left`, `bottom-center` (default), `bottom-right`, `top-left`, `top-center`, `top-right`. |
+| `indicatorOverlay` | Float the indicator over the image; default `false`. Set `true` for an overlay group. |
+| `indicatorPosition` | Indicator placement. Overlay: `bottom-left`, `bottom-center` (default), `bottom-right`, `top-left`, `top-center`, `top-right`. Below: `left`, `center` (default), `right`. |
 
 **Autoplay**
 
@@ -467,27 +468,34 @@ Carousel ids are generated from the shortcode's ordinal on the page and are not 
 
 ### Site-wide defaults
 
-Set defaults under `params.carousel` in the site configuration. Any shortcode argument overrides them. The `icons` table maps each control to an icon path under `static/`, resolved by `svg-icon.html`.
+Set defaults under `params.carousel` in the site configuration. Autoplay, navigator, and indicator settings are grouped under their own tables; shortcode arguments stay flat (`autoplay`, `navigatorOverlay`, `indicatorStyle`, etc.). Any shortcode argument overrides them. The `icons` table maps each control to an icon path under `static/`, resolved by `svg-icon.html`.
 
 ```toml
 [params.carousel]
-    autoplay = false
-    interval = 5000
-    progressStyle = "both"
-    progressPosition = "top"
-    controls = true
-    overlay = false
-    controlsPosition = "left-right"
-    indicatorStyle = "dots"
-    indicatorPosition = "center"
     perView = 1
     loop = true
     keyboard = true
-    pause = false
     effect = "slide"
     contentMode = "scaleToFill"
     captionPosition = "bottom-center"
     label = "Carousel"
+
+    [params.carousel.autoplay]
+        enabled = false
+        interval = 5000
+        progressStyle = "both"
+        progressPosition = "top"
+        pause = false
+
+    [params.carousel.navigator]
+        enabled = true
+        overlay = true
+        position = "left-right"
+
+    [params.carousel.indicator]
+        style = "dots"
+        overlay = false
+        position = "center"
 
     [params.carousel.icons]
         prev = "svg/ui-oval/chevron-left.svg"

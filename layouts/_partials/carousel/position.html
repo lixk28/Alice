@@ -3,8 +3,8 @@
 
   Context:
     value   — full or abbreviated position
-    kind    — indicator|controls|caption
-    overlay — whether controls float over the image
+    kind    — indicator|navigator|caption
+    overlay — whether navigator buttons float over the image
 
   Returns a canonical value, or an empty string when invalid.
 */ -}}
@@ -32,7 +32,7 @@
 
 {{- $result := "" -}}
 
-{{- if and (eq $kind "controls") (in (slice "left-right" "l-r" "lr" "leftright") $raw) -}}
+{{- if and (eq $kind "navigator") (in (slice "left-right" "l-r" "lr" "leftright") $raw) -}}
 	{{- $result = "left-right" -}}
 {{- else -}}
 	{{- $parts := split $raw "-" -}}
@@ -75,7 +75,7 @@
 	{{- else -}}
 		{{- $valid = in $singles $result -}}
 	{{- end -}}
-{{- else if eq $kind "controls" -}}
+{{- else if eq $kind "navigator" -}}
 	{{- if $overlay -}}
 		{{- $valid = or (in $corners $result) (eq $result "left-right") -}}
 	{{- else -}}

@@ -248,7 +248,7 @@
 }
 
 /* Full-height edge arrows sit on the left/right; keep side captions clear. */
-.carousel.has-edge-controls
+.carousel.has-edge-navigator
     .carousel-slide-overlay[data-caption-position$="left"] {
     left: calc(3.5em + var(--carousel-caption-inset));
     max-width: calc(
@@ -257,7 +257,7 @@
     );
 }
 
-.carousel.has-edge-controls
+.carousel.has-edge-navigator
     .carousel-slide-overlay[data-caption-position$="right"] {
     right: calc(3.5em + var(--carousel-caption-inset));
     max-width: calc(
@@ -266,7 +266,7 @@
     );
 }
 
-.carousel.has-edge-controls
+.carousel.has-edge-navigator
     .carousel-slide-overlay[data-caption-position$="center"] {
     max-width: calc(
         100% - 7em - var(--carousel-caption-inset) -
@@ -276,22 +276,22 @@
 
 /* Edge arrows also claim the left/right corners; shift overlay groups and
  * the autoplay button inside them. */
-.carousel.has-edge-controls
+.carousel.has-edge-navigator
     .carousel-overlay-group[data-position$="left"] {
     left: calc(3.5em + var(--carousel-autoplay-inset));
 }
 
-.carousel.has-edge-controls
+.carousel.has-edge-navigator
     .carousel-overlay-group[data-position$="right"] {
     right: calc(3.5em + var(--carousel-autoplay-inset));
 }
 
-.carousel.has-edge-controls
+.carousel.has-edge-navigator
     .carousel-autoplay[data-position$="left"] {
     left: calc(3.5em + var(--carousel-autoplay-inset));
 }
 
-.carousel.has-edge-controls
+.carousel.has-edge-navigator
     .carousel-autoplay[data-position$="right"] {
     right: calc(3.5em + var(--carousel-autoplay-inset));
 }
@@ -405,7 +405,7 @@
 
 /* --------------------------------------------------------------- controls */
 
-.carousel-controls {
+.carousel-navigator {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
@@ -459,7 +459,7 @@
 }
 
 /* Overlay controls stand on frosted chips, matching the edge strips. */
-.carousel.is-overlay .carousel-overlay-group .carousel-control {
+.carousel-overlay-group .carousel-control {
     border: .08em solid var(--carousel-control-glass-border);
     background-color: var(--carousel-control-glass-bg);
     box-shadow: none;
@@ -467,8 +467,8 @@
     -webkit-backdrop-filter: blur(6px);
 }
 
-.carousel.is-overlay .carousel-overlay-group .carousel-control:hover,
-.carousel.is-overlay .carousel-overlay-group .carousel-control:focus-visible {
+.carousel-overlay-group .carousel-control:hover,
+.carousel-overlay-group .carousel-control:focus-visible {
     border-color: SlateGray;
     background-color: var(--carousel-control-glass-hover-bg);
     box-shadow: var(--carousel-control-glass-shadow);
@@ -476,7 +476,7 @@
 
 /* The floating indicator sits on a frosted panel so it stays legible over
  * arbitrary photos. */
-.carousel.is-overlay .carousel-indicator-wrap {
+.carousel-overlay-group .carousel-indicator-wrap {
     padding: .3em .6em;
     border-color: var(--carousel-control-glass-border);
     background-color: var(--carousel-control-glass-bg);
@@ -485,14 +485,14 @@
     -webkit-backdrop-filter: blur(6px);
 }
 
-.carousel.is-overlay .carousel-indicator-wrap:hover,
-.carousel.is-overlay .carousel-indicator-wrap:focus-within {
+.carousel-overlay-group .carousel-indicator-wrap:hover,
+.carousel-overlay-group .carousel-indicator-wrap:focus-within {
     border-color: SlateGray;
     background-color: var(--carousel-control-glass-hover-bg);
     box-shadow: var(--carousel-control-glass-shadow);
 }
 
-.carousel-controls-group {
+.carousel-navigator-group {
     display: flex;
     align-items: center;
     gap: .35em;
@@ -519,7 +519,7 @@
 }
 
 /* Until the script has measured the first slide, the controls cannot work. */
-.carousel:not(.is-ready) .carousel-controls,
+.carousel:not(.is-ready) .carousel-navigator,
 .carousel:not(.is-ready) .carousel-overlay-group,
 .carousel:not(.is-ready) .carousel-edge,
 .carousel:not(.is-ready) .carousel-autoplay,
@@ -548,8 +548,8 @@
 /* Dots and segments put the panel padding into the buttons themselves. */
 .carousel-indicator-wrap[data-style="dots"],
 .carousel-indicator-wrap[data-style="segments"],
-.carousel.is-overlay .carousel-indicator-wrap[data-style="dots"],
-.carousel.is-overlay .carousel-indicator-wrap[data-style="segments"] {
+.carousel-overlay-group .carousel-indicator-wrap[data-style="dots"],
+.carousel-overlay-group .carousel-indicator-wrap[data-style="segments"] {
     padding: 0;
 }
 
@@ -677,7 +677,7 @@
 }
 
 /* Below mode: individual light chips on the carousel background. */
-.carousel-controls:not(.is-overlay) .carousel-control {
+.carousel-navigator:not(.is-overlay) .carousel-control {
     border: .08em solid var(--carousel-control-border);
     background-color: var(--carousel-control-bg);
     box-shadow: var(--carousel-control-shadow);
@@ -686,7 +686,7 @@
         box-shadow var(--transition-duration-fast) ease;
 }
 
-.carousel-controls:not(.is-overlay) .carousel-control:hover {
+.carousel-navigator:not(.is-overlay) .carousel-control:hover {
     border-color: SlateGray;
     background-color: GhostWhite;
 }
@@ -1009,7 +1009,7 @@
         --carousel-autoplay-inset: .6em;
     }
 
-    .carousel-controls {
+    .carousel-navigator {
         grid-template-columns: 1fr;
         padding: .35em .4em;
     }
@@ -1033,7 +1033,7 @@
 }
 
 @media print {
-    .carousel-controls,
+    .carousel-navigator,
     .carousel-overlay-group,
     .carousel-edge,
     .carousel-autoplay,

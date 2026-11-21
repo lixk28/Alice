@@ -916,7 +916,7 @@
             if (
                 event.target instanceof Element &&
                 event.target.closest(
-                    ".carousel-controls, .carousel-overlay-group, .carousel-autoplay"
+                    ".carousel-navigator, .carousel-overlay-group, .carousel-autoplay"
                 )
             ) {
                 return;
@@ -963,7 +963,7 @@
             if (
                 event.target instanceof Element &&
                 event.target.closest(
-                    ".carousel-controls, .carousel-overlay-group, .carousel-edge, .carousel-autoplay"
+                    ".carousel-navigator, .carousel-overlay-group, .carousel-edge, .carousel-autoplay"
                 )
             ) {
                 return;

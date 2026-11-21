@@ -34,29 +34,6 @@ themesDir = "../.."
     # Carousel shortcode defaults ({{< carousel >}} + {{< slide >}}).
     # Every key is a fallback; a shortcode argument still wins.
     [params.carousel]
-        # Enable autoplay. A ring button at the top-right shows progress and toggles it.
-        autoplay = false
-        # Autoplay delay in milliseconds (used when autoplay is true).
-        interval = 5000
-        # Autoplay progress: "both" (bar + ring), "bar", "ring", or "none".
-        progressStyle = "both"
-        # Position of the progress bar when it is shown: top or bottom.
-        progressPosition = "top"
-        # Show previous/next buttons.
-        controls = true
-        # Float the controls over the image. When false they sit below it.
-        overlay = false
-        # Prev/next placement. Below: left, center, right, or left-right.
-        # Overlay: bottom-left, bottom-center, bottom-right, top-left,
-        # top-center, top-right, or left-right.
-        controlsPosition = "left-right"
-        # Indicator: dots, segments, counter, or thumbnails.
-        # "thumbnails" uses preview images in the control position.
-        indicatorStyle = "dots"
-        # Indicator placement. Below: left, center, right.
-        # Overlay: bottom-left, bottom-center, bottom-right, top-left,
-        # top-center, or top-right.
-        indicatorPosition = "center"
         # Number of slides visible at once (effect = "slide" only).
         # Screens up to 40em always show one slide.
         perView = 1
@@ -64,8 +41,6 @@ themesDir = "../.."
         loop = true
         # Arrow keys move between slides while the carousel is focused.
         keyboard = true
-        # Pause autoplay while the pointer or keyboard focus is inside.
-        pause = false
         # Transition: "slide" or "fade".
         effect = "slide"
         # Image content mode: "scaleToFill" (default), "aspectFit", or "aspectFill".
@@ -75,6 +50,39 @@ themesDir = "../.."
         captionPosition = "bottom-center"
         # Accessible name for the carousel region.
         label = "Carousel"
+
+        [params.carousel.autoplay]
+            # Enable autoplay. A ring button shows progress and toggles it.
+            enabled = false
+            # Autoplay delay in milliseconds (used when enabled is true).
+            interval = 5000
+            # Progress: "both" (bar + ring), "bar", "ring", or "none".
+            progressStyle = "both"
+            # Position of the progress bar when it is shown: top or bottom.
+            progressPosition = "top"
+            # Pause autoplay while the pointer or keyboard focus is inside.
+            pause = false
+
+        [params.carousel.navigator]
+            # Show previous/next buttons.
+            enabled = true
+            # Float prev/next over the image. When false they sit below it.
+            overlay = true
+            # Placement. Overlaid: bottom-left, bottom-center, bottom-right,
+            # top-left, top-center, top-right, or left-right.
+            # Below: left, center, right, or left-right.
+            position = "left-right"
+
+        [params.carousel.indicator]
+            # Style: dots, segments, counter, or thumbnails.
+            # "thumbnails" uses preview images in the control position.
+            style = "dots"
+            # Float the indicator over the image. When false it sits below it.
+            overlay = false
+            # Placement. Overlay: bottom-left, bottom-center, bottom-right,
+            # top-left, top-center, or top-right.
+            # Below: left, center, right.
+            position = "center"
 
         [params.carousel.icons]
             prev = "svg/ui-oval/chevron-left.svg"
