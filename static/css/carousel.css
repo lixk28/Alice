@@ -121,6 +121,7 @@
 /* ---------------------------------------------------------------- slide */
 
 .carousel-slide {
+    position: relative;
     margin: 0;
 }
 
@@ -136,6 +137,90 @@
 
 .carousel-slide > a {
     display: block;
+}
+
+/* ---------------------------------------------------------------- caption */
+
+/* Caption and description sit on a frosted panel over the image. The panel is
+ * always visible (so it also works without hover), and its links stay
+ * clickable while the rest lets pointer gestures reach the image. */
+.carousel {
+    --carousel-caption-inset: .8em;
+}
+
+.carousel-slide-overlay {
+    position: absolute;
+    z-index: 2;
+    max-width: calc(
+        100% - var(--carousel-caption-inset) - var(--carousel-caption-inset)
+    );
+    padding: .55em .75em;
+    border-radius: .3em;
+    background-color: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: var(--font-color);
+    line-height: 1.45;
+    text-align: left;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+}
+
+.carousel-slide-overlay[data-caption-position="bottom"] {
+    bottom: var(--carousel-caption-inset);
+}
+
+.carousel-slide-overlay[data-caption-position="top"] {
+    top: var(--carousel-caption-inset);
+}
+
+.carousel-slide-overlay[data-caption-align="left"] {
+    right: auto;
+    left: var(--carousel-caption-inset);
+}
+
+.carousel-slide-overlay[data-caption-align="center"] {
+    right: auto;
+    left: 50%;
+    width: max-content;
+    max-width: calc(
+        100% - var(--carousel-caption-inset) - var(--carousel-caption-inset)
+    );
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.carousel-slide-overlay[data-caption-align="right"] {
+    right: var(--carousel-caption-inset);
+    left: auto;
+    text-align: right;
+}
+
+.carousel-caption {
+    font-weight: 600;
+    font-size: var(--font-size-normal);
+}
+
+.carousel-caption p,
+.carousel-description p {
+    margin: 0;
+}
+
+.carousel-description {
+    color: var(--figure-caption-color);
+    font-size: var(--font-size-tiny);
+}
+
+.carousel-caption + .carousel-description {
+    margin-top: .2em;
+}
+
+.carousel-description p + p {
+    margin-top: .35em;
+}
+
+.carousel-slide-overlay a {
+    pointer-events: auto;
 }
 
 /* ------------------------------------------------------------ thumbnails */
@@ -698,9 +783,17 @@
 }
 
 @media screen and (max-width: 480px) {
+    .carousel {
+        --carousel-caption-inset: .6em;
+    }
+
     .carousel-controls {
         grid-template-columns: 1fr;
         padding: .35em .4em;
+    }
+
+    .carousel-slide-overlay {
+        padding: .45em .6em;
     }
 }
 

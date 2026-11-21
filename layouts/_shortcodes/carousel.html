@@ -30,6 +30,8 @@
     pause      — pause autoplay on hover/focus: true|false (default: false)
     effect     — "slide" or "fade"
     contentMode — "scaleToFill" (default), "aspectFit", or "aspectFill"
+    captionPosition — caption overlay position: top|bottom (default: bottom; slide can override)
+    captionAlign — caption overlay alignment: left|center|right (default: left; slide can override)
     vAlign     — vertical place of the overlay prev/next icon: top|center|bottom (default: center)
     start      — zero-based index of the initially active slide
 */ -}}
@@ -67,6 +69,8 @@
 	"effect" "slide"
 	"contentMode" "scaleToFill"
 	"vAlign" "center"
+	"captionPosition" "bottom"
+	"captionAlign" "left"
 	"start" 0
 -}}
 {{- $opts := merge $defaults (site.Params.carousel | default dict) -}}
@@ -151,6 +155,15 @@
 
 {{- $vAlign := lower (printf "%v" $opts.vAlign) -}}
 {{- if not (in (slice "top" "center" "bottom") $vAlign) -}}{{- $vAlign = "center" -}}{{- end -}}
+
+{{- $captionPosition := "bottom" -}}
+{{- with site.Params.carousel.captionPosition -}}{{- $captionPosition = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "captionPosition" -}}{{- $captionPosition = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "top" "bottom") $captionPosition) -}}{{- $captionPosition = "bottom" -}}{{- end -}}
+{{- $captionAlign := "left" -}}
+{{- with site.Params.carousel.captionAlign -}}{{- $captionAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "captionAlign" -}}{{- $captionAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "left" "center" "right") $captionAlign) -}}{{- $captionAlign = "left" -}}{{- end -}}
 
 {{- $perView := 1 -}}
 {{- with site.Params.carousel.perView -}}{{- $perView = int . -}}{{- end -}}
@@ -333,6 +346,24 @@
 						{{- with $s.Width }} width="{{ . }}"{{ end }}
 						{{- with $s.Height }} height="{{ . }}"{{ end }}>
 					{{- with $linkHref }}</a>{{ end }}
+					{{- end }}
+					{{- if or $s.Caption $s.Description }}
+					{{- $slideCaptionPosition := $captionPosition -}}
+					{{- with $s.CaptionPosition -}}
+						{{- $value := lower (printf "%v" .) -}}
+						{{- if in (slice "top" "bottom") $value -}}{{- $slideCaptionPosition = $value -}}{{- end -}}
+					{{- end -}}
+					{{- $slideCaptionAlign := $captionAlign -}}
+					{{- with $s.CaptionAlign -}}
+						{{- $value := lower (printf "%v" .) -}}
+						{{- if in (slice "left" "center" "right") $value -}}{{- $slideCaptionAlign = $value -}}{{- end -}}
+					{{- end -}}
+					<div class="carousel-slide-overlay"
+						data-caption-position="{{ $slideCaptionPosition }}"
+						data-caption-align="{{ $slideCaptionAlign }}">
+						{{- with $s.Caption }}<div class="carousel-caption">{{ . | markdownify }}</div>{{ end }}
+						{{- with $s.Description }}<div class="carousel-description">{{ . | markdownify }}</div>{{ end }}
+					</div>
 					{{- end }}
 				</div>
 			</div>

@@ -3,7 +3,11 @@
 
   Args (all optional):
     image   — page resource, global resource, or URL
-    alt     — image alt text
+    alt     — image alt text (falls back to the caption when omitted)
+    caption — overlay title for the slide (inline Markdown)
+    description — overlay description under the caption (inline Markdown)
+    captionPosition — per-slide caption position: top|bottom (default: carousel value)
+    captionAlign — per-slide caption alignment: left|center|right (default: carousel value)
     link    — make the image a link (overrides the page lightbox)
     target  — link target
     rel     — link rel (defaults to "noopener noreferrer" for _blank)
@@ -18,6 +22,10 @@
 */ -}}
 
 {{- $image := .Get "image" -}}
+{{- $caption := .Get "caption" -}}
+{{- $description := .Get "description" -}}
+{{- $captionPosition := .Get "captionPosition" -}}
+{{- $captionAlign := .Get "captionAlign" -}}
 {{- $src := "" -}}
 {{- with $image -}}
 	{{- $u := urls.Parse . -}}
@@ -32,6 +40,8 @@
 {{- $alt := "" -}}
 {{- if and (reflect.IsMap .Params) (isset .Params "alt") -}}
 	{{- $alt = .Get "alt" -}}
+{{- else -}}
+	{{- with $caption -}}{{- $alt = . | markdownify | plainify -}}{{- end -}}
 {{- end -}}
 
 {{- $target := .Get "target" -}}
@@ -46,6 +56,10 @@
 {{- $data := dict
 	"Src" $src
 	"Alt" $alt
+	"Caption" $caption
+	"Description" $description
+	"CaptionPosition" $captionPosition
+	"CaptionAlign" $captionAlign
 	"Link" (.Get "link")
 	"Target" $target
 	"Rel" $rel
