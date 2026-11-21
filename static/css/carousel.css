@@ -91,6 +91,7 @@
     overflow: hidden;
     border-radius: .3em .3em 0 0;
     background-color: var(--bgcolor);
+    cursor: grab;
     touch-action: pan-y pinch-zoom;
 }
 

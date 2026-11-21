@@ -74,6 +74,9 @@
             this.ignoreDrag = false;
             this.pointerId = null;
             this.suppressClickUntil = 0;
+            this.wheelDelta = 0;
+            this.wheelLockedUntil = 0;
+            this.wheelResetTimer = null;
             this.userPaused = false;
             this.prefersReducedMotion = window.matchMedia(
                 "(prefers-reduced-motion: reduce)"
@@ -213,6 +216,19 @@
             this.viewport.addEventListener("pointercancel", () =>
                 this.onPointerCancel()
             );
+            this.viewport.addEventListener(
+                "wheel",
+                (event) => this.onWheel(event),
+                { passive: false }
+            );
+            this.viewport.addEventListener("dragstart", (event) => {
+                if (
+                    event.target instanceof Element &&
+                    event.target.closest("img, a")
+                ) {
+                    event.preventDefault();
+                }
+            });
             this.viewport.addEventListener(
                 "click",
                 (event) => {
@@ -595,11 +611,56 @@
             return this.goTo(this.index - 1);
         }
 
-        onPointerDown(event) {
-            if (event.pointerType === "mouse" || event.button !== 0) return;
+        onWheel(event) {
+            if (event.ctrlKey || this.dragging) return;
             if (
                 event.target instanceof Element &&
-                event.target.closest(".carousel-controls")
+                event.target.closest(".carousel-controls, .carousel-autoplay")
+            ) {
+                return;
+            }
+
+            let dx = event.deltaX;
+            if (event.shiftKey && dx === 0) {
+                dx = event.deltaY;
+            } else if (Math.abs(dx) <= Math.abs(event.deltaY)) {
+                return;
+            }
+            if (!dx) return;
+
+            if (event.cancelable) event.preventDefault();
+
+            let unit = 1;
+            if (event.deltaMode === 1) unit = 16;
+            else if (event.deltaMode === 2) unit = this.viewport.clientWidth;
+            dx *= unit;
+
+            const now = Date.now();
+            if (now < this.wheelLockedUntil) return;
+
+            if (this.wheelDelta && Math.sign(dx) !== Math.sign(this.wheelDelta)) {
+                this.wheelDelta = 0;
+            }
+            this.wheelDelta += dx;
+
+            window.clearTimeout(this.wheelResetTimer);
+            this.wheelResetTimer = window.setTimeout(() => {
+                this.wheelDelta = 0;
+            }, 250);
+
+            if (Math.abs(this.wheelDelta) < 40) return;
+
+            const forward = this.wheelDelta > 0;
+            this.wheelDelta = 0;
+            this.wheelLockedUntil = now + 400;
+            this.userNavigate(() => (forward ? this.next() : this.prev()));
+        }
+
+        onPointerDown(event) {
+            if (event.button !== 0) return;
+            if (
+                event.target instanceof Element &&
+                event.target.closest(".carousel-controls, .carousel-edge, .carousel-autoplay")
             ) {
                 return;
             }

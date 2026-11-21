@@ -341,8 +341,8 @@
 				aria-label="{{ add $i 1 }} of {{ $n }}">
 				<div class="carousel-slide{{ with $s.Class }} {{ . }}{{ end }}">
 					{{- with $s.Src }}
-					{{- with $linkHref }}<a href="{{ . | safeURL }}"{{ if eq $lightbox "fancybox" }} data-fancybox="gallery"{{ else if eq $lightbox "glightbox" }} class="glightbox" data-gallery="gallery"{{ end }}{{ with $s.Target }} target="{{ . }}"{{ end }}{{ with $s.Rel }} rel="{{ . }}"{{ end }}>{{ end }}
-					<img src="{{ $s.Src | safeURL }}" alt="{{ $s.Alt }}" loading="{{ $loading }}" decoding="async"{{ if ne $slideFit "fill" }} style="object-fit: {{ $slideFit }}"{{ end }}
+					{{- with $linkHref }}<a href="{{ . | safeURL }}" draggable="false"{{ if eq $lightbox "fancybox" }} data-fancybox="gallery"{{ else if eq $lightbox "glightbox" }} class="glightbox" data-gallery="gallery"{{ end }}{{ with $s.Target }} target="{{ . }}"{{ end }}{{ with $s.Rel }} rel="{{ . }}"{{ end }}>{{ end }}
+					<img src="{{ $s.Src | safeURL }}" alt="{{ $s.Alt }}" draggable="false" loading="{{ $loading }}" decoding="async"{{ if ne $slideFit "fill" }} style="object-fit: {{ $slideFit }}"{{ end }}
 						{{- with $s.Width }} width="{{ . }}"{{ end }}
 						{{- with $s.Height }} height="{{ . }}"{{ end }}>
 					{{- with $linkHref }}</a>{{ end }}
