@@ -14,6 +14,13 @@
     --carousel-indicator-hover-color: var(--link-active-color);
     --carousel-control-icon-size: 1.8em;
     --carousel-counter-color: DimGray;
+    --carousel-control-bg: White;
+    --carousel-control-border: Silver;
+    --carousel-control-shadow: 0 .1em .25em rgba(112, 128, 144, 0.35);
+    --carousel-control-glass-bg: rgba(255, 255, 255, 0.45);
+    --carousel-control-glass-border: rgba(112, 128, 144, 0.38);
+    --carousel-control-glass-hover-bg: rgba(255, 255, 255, 0.95);
+    --carousel-control-glass-shadow: 0 .1em .25em rgba(112, 128, 144, 0.35);
 }
 
 .carousel {
@@ -453,23 +460,36 @@
 
 /* Overlay controls stand on frosted chips, matching the edge strips. */
 .carousel.is-overlay .carousel-overlay-group .carousel-control {
-    background-color: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    border: .08em solid var(--carousel-control-glass-border);
+    background-color: var(--carousel-control-glass-bg);
+    box-shadow: none;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
-.carousel.is-overlay .carousel-overlay-group .carousel-control:hover {
-    background-color: rgba(255, 255, 255, 0.85);
+.carousel.is-overlay .carousel-overlay-group .carousel-control:hover,
+.carousel.is-overlay .carousel-overlay-group .carousel-control:focus-visible {
+    border-color: SlateGray;
+    background-color: var(--carousel-control-glass-hover-bg);
+    box-shadow: var(--carousel-control-glass-shadow);
 }
 
 /* The floating indicator sits on a frosted panel so it stays legible over
  * arbitrary photos. */
 .carousel.is-overlay .carousel-indicator-wrap {
     padding: .3em .6em;
-    border-radius: .35em;
-    background-color: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    border-color: var(--carousel-control-glass-border);
+    background-color: var(--carousel-control-glass-bg);
+    box-shadow: none;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.carousel.is-overlay .carousel-indicator-wrap:hover,
+.carousel.is-overlay .carousel-indicator-wrap:focus-within {
+    border-color: SlateGray;
+    background-color: var(--carousel-control-glass-hover-bg);
+    box-shadow: var(--carousel-control-glass-shadow);
 }
 
 .carousel-controls-group {
@@ -516,8 +536,13 @@
     gap: .35em .7em;
     min-width: 0;
     padding: .3em .6em;
-    border-radius: .35em;
-    background-color: White;
+    border: .08em solid var(--carousel-control-border);
+    border-radius: .3em;
+    background-color: var(--carousel-control-bg);
+    box-shadow: var(--carousel-control-shadow);
+    transition: background-color var(--transition-duration-fast) ease,
+        border-color var(--transition-duration-fast) ease,
+        box-shadow var(--transition-duration-fast) ease;
 }
 
 /* Dots and segments put the panel padding into the buttons themselves. */
@@ -640,6 +665,8 @@
     line-height: 1;
     cursor: pointer;
     transition: background-color var(--transition-duration-fast) ease,
+        border-color var(--transition-duration-fast) ease,
+        box-shadow var(--transition-duration-fast) ease,
         color var(--transition-duration-fast) ease;
 }
 
@@ -651,10 +678,16 @@
 
 /* Below mode: individual light chips on the carousel background. */
 .carousel-controls:not(.is-overlay) .carousel-control {
-    background-color: White;
+    border: .08em solid var(--carousel-control-border);
+    background-color: var(--carousel-control-bg);
+    box-shadow: var(--carousel-control-shadow);
+    transition: background-color var(--transition-duration-fast) ease,
+        border-color var(--transition-duration-fast) ease,
+        box-shadow var(--transition-duration-fast) ease;
 }
 
 .carousel-controls:not(.is-overlay) .carousel-control:hover {
+    border-color: SlateGray;
     background-color: GhostWhite;
 }
 
@@ -671,10 +704,12 @@
     z-index: 8;
     width: 2.4em;
     height: 2.4em;
+    border: .08em solid var(--carousel-control-glass-border);
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background-color: var(--carousel-control-glass-bg);
+    box-shadow: none;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
 .carousel-autoplay[data-position^="top"] {
@@ -693,8 +728,11 @@
     right: var(--carousel-autoplay-inset);
 }
 
-.carousel-autoplay:hover {
-    background-color: rgba(255, 255, 255, 0.85);
+.carousel-autoplay:hover,
+.carousel-autoplay:focus-visible {
+    border-color: SlateGray;
+    background-color: var(--carousel-control-glass-hover-bg);
+    box-shadow: var(--carousel-control-glass-shadow);
 }
 
 .carousel-autoplay:hover .carousel-autoplay-ring circle {
@@ -747,11 +785,15 @@
     height: 2.6em;
     padding: .4em;
     box-sizing: border-box;
-    border-radius: .35em;
-    background-color: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: background-color var(--transition-duration-fast) ease;
+    border: .08em solid var(--carousel-control-glass-border);
+    border-radius: .3em;
+    background-color: var(--carousel-control-glass-bg);
+    box-shadow: none;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: background-color var(--transition-duration-fast) ease,
+        border-color var(--transition-duration-fast) ease,
+        box-shadow var(--transition-duration-fast) ease;
 }
 
 .carousel-control.carousel-edge:hover {
@@ -759,10 +801,13 @@
     background-color: rgba(255, 255, 255, 0.45);
 }
 
-.carousel-control.carousel-edge:hover .carousel-edge-btn {
-    background-color: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+.carousel-control.carousel-edge:hover .carousel-edge-btn,
+.carousel-control.carousel-edge:focus-visible .carousel-edge-btn {
+    border-color: SlateGray;
+    background-color: var(--carousel-control-glass-hover-bg);
+    box-shadow: var(--carousel-control-glass-shadow);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
 .carousel-control.carousel-edge:focus-visible {
