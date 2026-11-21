@@ -207,8 +207,8 @@ This example shows two images at a time with a counter:
 
 | Style | Description |
 | --- | --- |
-| `dots` | Small dots, with the active dot highlighted. Default. |
-| `segments` | Segmented bar: short inactive segments, with the active one widened. |
+| `dots` | Small dots; the active dot is larger and highlighted. Default. |
+| `segments` | Segmented bar; active bar 2× wide, 1.5× thick. |
 | `counter` | Text such as `1 / 4`; `counterSeparator` changes the middle text. |
 | `thumbnails` | Preview images in the same row as previous/next. |
 

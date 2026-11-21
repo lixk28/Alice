@@ -458,7 +458,7 @@
     background-color: White;
 }
 
-/* Segmented indicator: short inactive segments, a wider active segment. */
+/* Segmented indicator: short inactive segments; the active one is scaled 2× wide and 1.5× thick. */
 .carousel-segments {
     display: flex;
     align-items: center;
@@ -481,14 +481,14 @@
 
 .carousel-segment {
     position: relative;
-    width: 1.15em;
+    width: 1.2em;
     height: 1em;
     padding: 0;
     appearance: none;
     border: 0;
     background-color: transparent;
     cursor: pointer;
-    transition: width var(--transition-duration-fast) ease;
+    transition: width var(--transition-duration-normal) ease;
 }
 
 .carousel-segment::before {
@@ -497,18 +497,20 @@
     top: 50%;
     right: 0;
     left: 0;
-    height: .35em;
+    height: .4em;
     transform: translateY(-50%);
     border-radius: .2em;
     background-color: LightGray;
-    transition: background-color var(--transition-duration-fast) ease;
+    transition: background-color var(--transition-duration-fast) ease,
+        height var(--transition-duration-normal) ease;
 }
 
 .carousel-segment[aria-current="true"] {
-    width: 2.3em;
+    width: 2.4em;
 }
 
 .carousel-segment[aria-current="true"]::before {
+    height: .6em;
     background-color: var(--carousel-indicator-active-color);
 }
 
@@ -712,17 +714,38 @@
     border: 0;
     font-size: var(--font-size-normal);
     border-radius: 50%;
-    background-color: LightGray;
+    background-color: transparent;
     cursor: pointer;
-    transition: background-color var(--transition-duration-fast) ease;
 }
 
-.carousel-indicator[aria-current="true"] {
+/* The active dot grows with a short transition; the button keeps its hit area. */
+.carousel-indicator::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: LightGray;
+    transform: scale(1);
+    transition: background-color var(--transition-duration-fast) ease,
+        transform var(--transition-duration-normal) ease;
+}
+
+.carousel-indicator[aria-current="true"]::before {
     background-color: var(--carousel-indicator-active-color);
+    transform: scale(1.25);
 }
 
-.carousel-indicator:hover {
+.carousel-indicator:hover::before {
     background-color: var(--carousel-indicator-hover-color);
+}
+
+.carousel-indicator:focus-visible {
+    outline: none;
+}
+
+.carousel-indicator:focus-visible::before {
+    outline: .15em solid var(--link-active-color);
+    outline-offset: .1em;
 }
 
 /* Hover/focus tooltips for controls and indicators. */
@@ -870,6 +893,7 @@
     .carousel-track,
     .carousel-segment,
     .carousel-segment::before,
+    .carousel-indicator::before,
     .carousel-edge-btn,
     .carousel-thumbnail,
     .carousel[data-effect="fade"] .carousel-item {
