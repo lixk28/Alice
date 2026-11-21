@@ -55,6 +55,7 @@
             this.keyboard = toBool(root.dataset.keyboard, true);
             this.pauseOnInteraction = toBool(root.dataset.pause, true);
             this.effect = root.dataset.effect === "fade" ? "fade" : "slide";
+            this.scrollHint = root.classList.contains("has-scroll-hint");
             this.perView = this.readPerView();
             this.circular =
                 this.loop &&
@@ -68,7 +69,7 @@
                 ? ((start % this.slides.length) + this.slides.length) %
                   this.slides.length
                 : Math.min(Math.max(start, 0), this.maxIndex());
-            if (this.circular && this.index > 0) {
+            if (this.circular && (this.index > 0 || this.scrollHint)) {
                 this.rotateToIndex(this.index);
             }
 
@@ -125,6 +126,50 @@
             const second = items[1].getBoundingClientRect();
             const step = second.left - first.left;
             return step > 0 ? step : this.viewport.clientWidth;
+        }
+
+        getGap() {
+            const first = this.domItems()[0];
+            if (!first) return 0;
+            return Math.max(
+                0,
+                this.getStep() - first.getBoundingClientRect().width
+            );
+        }
+
+        scrollHintWidth() {
+            const raw = getComputedStyle(this.root)
+                .getPropertyValue("--carousel-scroll-hint")
+                .trim();
+            const value = parseFloat(raw);
+            if (!Number.isFinite(value)) return 0;
+            if (raw.endsWith("em")) {
+                return value * parseFloat(getComputedStyle(this.root).fontSize);
+            }
+            return value;
+        }
+
+        /* Resting track offset, including the scrollHint window. */
+        restTransform() {
+            if (this.effect !== "slide") return 0;
+            const step = this.getStep();
+            if (!this.scrollHint) {
+                return this.circular ? 0 : -this.index * step;
+            }
+            const gap = this.getGap();
+            const hint = this.scrollHintWidth();
+            if (this.circular) return hint - (step - gap);
+
+            const groupWidth = this.perView * step - gap;
+            if (this.index <= 0) return 0;
+            if (this.index >= this.maxIndex()) {
+                return (
+                    this.viewport.clientWidth -
+                    groupWidth -
+                    this.index * step
+                );
+            }
+            return hint + gap - this.index * step;
         }
 
         refreshLayout(immediate = false) {
@@ -421,9 +466,14 @@
         }
 
         rotateToIndex(index) {
+            const count = this.slides.length;
+            const start =
+                this.circular && this.scrollHint
+                    ? (index - 1 + count) % count
+                    : index;
             const ordered = this.slides
-                .slice(index)
-                .concat(this.slides.slice(0, index));
+                .slice(start)
+                .concat(this.slides.slice(0, start));
             ordered.forEach((slide) => this.track.appendChild(slide));
             this.index = index;
             this.track.style.transform = "translate3d(0, 0, 0)";
@@ -432,8 +482,10 @@
         activate(index) {
             if (this.circular) {
                 const items = this.domItems();
+                const offset = this.scrollHint ? 1 : 0;
                 items.forEach((slide, i) => {
-                    const active = i < this.perView;
+                    const active =
+                        i >= offset && i < offset + this.perView;
                     slide.classList.toggle("is-active", active);
                     if (active) {
                         slide.removeAttribute("aria-hidden");
@@ -464,9 +516,7 @@
             if (this.effect !== "slide" || this.looping) return;
             if (immediate) this.track.style.transition = "none";
 
-            this.track.style.transform = this.circular
-                ? "translate3d(0, 0, 0)"
-                : `translate3d(${-this.index * this.getStep()}px, 0, 0)`;
+            this.track.style.transform = `translate3d(${this.restTransform()}px, 0, 0)`;
 
             if (immediate) {
                 void this.track.offsetWidth;
@@ -488,7 +538,9 @@
         }
 
         groupHeight(start) {
-            if (this.circular) return this.circularGroupHeight(0);
+            if (this.circular) {
+                return this.circularGroupHeight(this.scrollHint ? 1 : 0);
+            }
 
             const last = Math.min(
                 start + this.perView,
@@ -820,8 +872,11 @@
 
             const previous = this.index;
             const step = this.getStep();
-            const currentHeight = this.circularGroupHeight(0);
-            const targetStart = direction > 0 ? 1 : count - 1;
+            const base = this.restTransform();
+            const currentStart = this.scrollHint ? 1 : 0;
+            const currentHeight = this.circularGroupHeight(currentStart);
+            const targetStart =
+                (currentStart + direction + count) % count;
             const targetHeight = this.circularGroupHeight(targetStart);
             this.looping = true;
 
@@ -835,14 +890,14 @@
                     items[count - 1],
                     this.track.firstElementChild
                 );
-                this.track.style.transform = `translate3d(${-step}px, 0, 0)`;
+                this.track.style.transform = `translate3d(${base - step}px, 0, 0)`;
                 void this.track.offsetWidth;
                 this.track.style.transition = "";
-                this.track.style.transform = "translate3d(0, 0, 0)";
+                this.track.style.transform = `translate3d(${base}px, 0, 0)`;
             } else {
                 this.track.style.transition = "";
                 void this.track.offsetWidth;
-                this.track.style.transform = `translate3d(${-step}px, 0, 0)`;
+                this.track.style.transform = `translate3d(${base - step}px, 0, 0)`;
             }
 
             let timer = null;
@@ -860,7 +915,7 @@
                 }
                 this.index =
                     (this.index + direction + count) % count;
-                this.track.style.transform = "translate3d(0, 0, 0)";
+                this.track.style.transform = `translate3d(${this.restTransform()}px, 0, 0)`;
                 void this.track.offsetWidth;
                 requestAnimationFrame(() => {
                     this.track.style.transition = "";
@@ -1037,9 +1092,7 @@
 
             const base = this.dragRotated
                 ? this.dragBase
-                : this.circular
-                  ? 0
-                  : -this.index * step;
+                : this.restTransform();
             this.track.style.transform = `translate3d(${
                 base + offset
             }px, 0, 0)`;
@@ -1069,13 +1122,14 @@
         prepareBackwardDrag() {
             if (this.dragRotated) return;
             const step = this.getStep();
+            const base = this.restTransform();
             this.track.style.transition = "none";
             this.track.insertBefore(
                 this.track.lastElementChild,
                 this.track.firstElementChild
             );
-            this.track.style.transform = `translate3d(${-step}px, 0, 0)`;
-            this.dragBase = -step;
+            this.track.style.transform = `translate3d(${base - step}px, 0, 0)`;
+            this.dragBase = base - step;
             this.dragRotated = true;
         }
 
@@ -1117,10 +1171,12 @@
         finishBackwardDrag(commit) {
             const count = this.slides.length;
             const previous = this.index;
+            const currentStart = this.scrollHint ? 2 : 1;
+            const targetStart = this.scrollHint ? 1 : 0;
             const targetHeight = commit
-                ? this.circularGroupHeight(0)
-                : this.circularGroupHeight(1);
-            const currentHeight = this.circularGroupHeight(1);
+                ? this.circularGroupHeight(targetStart)
+                : this.circularGroupHeight(currentStart);
+            const currentHeight = this.circularGroupHeight(currentStart);
             if (targetHeight > currentHeight) {
                 this.viewport.style.height = `${targetHeight}px`;
             }
@@ -1132,7 +1188,7 @@
                 } else {
                     this.track.appendChild(this.track.firstElementChild);
                 }
-                this.track.style.transform = "translate3d(0, 0, 0)";
+                this.track.style.transform = `translate3d(${this.restTransform()}px, 0, 0)`;
                 void this.track.offsetWidth;
                 requestAnimationFrame(() => {
                     this.track.style.transition = "";
@@ -1159,7 +1215,10 @@
                 }
             };
 
-            this.animateDragTo(commit ? 0 : this.dragBase, done);
+            this.animateDragTo(
+                commit ? this.restTransform() : this.dragBase,
+                done
+            );
         }
 
         onPointerUp(event) {
@@ -1231,7 +1290,7 @@
                 if (this.dragRotated) {
                     this.track.style.transition = "none";
                     this.track.appendChild(this.track.firstElementChild);
-                    this.track.style.transform = "translate3d(0, 0, 0)";
+                    this.track.style.transform = `translate3d(${this.restTransform()}px, 0, 0)`;
                     void this.track.offsetWidth;
                     requestAnimationFrame(() => {
                         this.track.style.transition = "";

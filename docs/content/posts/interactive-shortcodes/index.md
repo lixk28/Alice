@@ -186,6 +186,20 @@ This example shows two images at a time with a counter:
 
 {{< /carousel >}}
 
+#### Scroll hint
+
+`scrollHint=true` narrows each slide slightly so the adjacent slides peek in at both edges. With `loop`, every position has a peek on both sides; with `loop=false`, the first slide has no left peek and the last has no right peek. It is ignored with `effect="fade"` and when `perView` already covers every slide.
+
+{{< carousel label="Scroll hint" scrollHint=true navigatorOverlay=false >}}
+
+{{< slide image="carousel-example.webp" alt="Kada coast in Wakayama" >}}
+
+{{< slide image="IMG_5999.webp" alt="Lake Biwa" >}}
+
+{{< slide image="IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+
+{{< /carousel >}}
+
 #### Transition
 
 `effect` picks how slides change: `slide` (default) moves the track horizontally, while `fade` cross-fades in place. Fade ignores `perView`.
@@ -409,6 +423,7 @@ All carousel and slide arguments are optional. `params.carousel` supplies site-w
 | `class` | Extra classes on the carousel root. |
 | `label` | Accessible name for the carousel region; default `Carousel`. |
 | `perView` | Number of images visible at once; default `1`. Ignored with `effect="fade"`; screens up to `40em` show one. |
+| `scrollHint` | Leave slivers of the adjacent slides visible; default `false`. Ignored with `effect="fade"` or when `perView` covers every slide. |
 | `effect` | `slide` (default) or `fade`. |
 | `contentMode` | Default image fit: `scaleToFill` (default), `aspectFit`, or `aspectFill`. A slide can override it. |
 | `start` | Zero-based index of the initially active slide; default `0`. Out-of-range values are clamped. |
@@ -473,6 +488,7 @@ Set defaults under `params.carousel` in the site configuration. Autoplay, naviga
 ```toml
 [params.carousel]
     perView = 1
+    scrollHint = false
     loop = true
     keyboard = true
     effect = "slide"

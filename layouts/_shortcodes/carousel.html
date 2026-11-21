@@ -29,6 +29,7 @@
                         overlay: bottom-left|bottom-center|bottom-right|
                                  top-left|top-center|top-right (default: bottom-center)
     perView    — number of slides visible at once (default: 1)
+    scrollHint — leave slivers of the adjacent slides visible: true|false (default: false)
     loop       — circular navigation (last → first): true|false (default: true)
     keyboard   — arrow-key navigation: true|false
     pause      — pause autoplay on hover/focus: true|false (default: false)
@@ -70,6 +71,7 @@
 	"indicatorStyle" "dots"
 	"indicatorPosition" ""
 	"perView" 1
+	"scrollHint" false
 	"loop" true
 	"keyboard" true
 	"pause" false
@@ -208,10 +210,19 @@
 {{- $maxStart := sub $n $perView -}}
 {{- if ge $start $maxStart -}}{{- $start = $maxStart -}}{{- end -}}
 
+{{- $scrollHint := false -}}
+{{- if in $boolTrue (lower (printf "%v" $opts.scrollHint)) -}}{{- $scrollHint = true -}}{{- end -}}
+{{- if or (eq $effect "fade") (ge $perView $n) -}}{{- $scrollHint = false -}}{{- end -}}
+
 {{- /* A fixed AliceBlue gutter separates slides; Hugo sums it for perView. */ -}}
 {{- $slideGap := "0.8em" -}}
 {{- $slideBasis := "100%" -}}
-{{- if gt $perView 1 -}}
+{{- if $scrollHint -}}
+	{{- /* Leave room for two gutters and a sliver on each side. */ -}}
+	{{- $hintWidth := "4.8em" -}}
+	{{- $hintGap := printf "%.2fem" (mul (float (add $perView 1)) 0.8) -}}
+	{{- $slideBasis = printf "calc((100%% - %s - %s) / %d)" $hintWidth $hintGap $perView -}}
+{{- else if gt $perView 1 -}}
 	{{- $totalGap := printf "%.2fem" (mul (float (sub $perView 1)) 0.8) -}}
 	{{- $slideBasis = printf "calc((100%% - %s) / %d)" $totalGap $perView -}}
 {{- end -}}
@@ -356,12 +367,12 @@
 	{{- end -}}
 {{- end -}}
 
-<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if or $navigatorOverlay $indicatorOverlay }} is-overlay{{ end }}{{ if $hasEdgeNavigator }} has-edge-navigator{{ end }}{{ if $hasBelowStrip }} has-bottom{{ end }}{{ if not $hasContent }} no-navigator{{ end }}"
+<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $scrollHint }} has-scroll-hint{{ end }}{{ if or $navigatorOverlay $indicatorOverlay }} is-overlay{{ end }}{{ if $hasEdgeNavigator }} has-edge-navigator{{ end }}{{ if $hasBelowStrip }} has-bottom{{ end }}{{ if not $hasContent }} no-navigator{{ end }}"
 	id="{{ $id }}"
 	data-navigator-position="{{ $navigatorPosition }}"
 	data-indicator-position="{{ $indicatorPosition }}"
 	data-caption-position="{{ $captionPosition }}"
-	{{ printf `style="--carousel-per-view: %d; --carousel-gap: %s; --carousel-slide-basis: %s"` $perView $slideGap $slideBasis | safeHTMLAttr }}
+	{{ printf `style="--carousel-per-view: %d; --carousel-gap: %s; --carousel-slide-basis: %s; --carousel-scroll-hint: %s"` $perView $slideGap $slideBasis (cond $scrollHint "2.4em" "0px") | safeHTMLAttr }}
 	{{- if $interactive }} data-carousel
 	data-interval="{{ $effectiveInterval }}"
 	data-loop="{{ $loop }}"

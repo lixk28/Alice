@@ -992,6 +992,14 @@
         --carousel-slide-basis: 100% !important;
     }
 
+    .carousel[data-carousel].has-scroll-hint {
+        --carousel-slide-basis: calc(
+            100% - var(--carousel-scroll-hint) -
+                var(--carousel-scroll-hint) - var(--carousel-gap) -
+                var(--carousel-gap)
+        ) !important;
+    }
+
     /* A static grid (perView = slide count) stacks into one column. */
     .carousel.is-static .carousel-track {
         flex-wrap: wrap;
