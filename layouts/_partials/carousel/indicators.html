@@ -1,0 +1,45 @@
+{{- /*
+  One indicator group for the carousel control bar. Styles are mutually
+  exclusive: dots, a progress bar, or a counter. `none` renders nothing.
+
+  Context:
+    style       — dots|bar|counter
+    id          — carousel id
+    slides      — slide list (for dots)
+    total       — slide count
+    start       — initial position
+    maxIndex    — last valid position
+    counterHTML — rendered counter partial (counter style)
+*/ -}}
+{{- $style := .style -}}
+<div class="carousel-indicator-wrap" data-style="{{ $style }}">
+	{{- if eq $style "dots" }}
+	<ol class="carousel-indicators">
+		{{- range $i, $_ := .slides }}
+		<li{{ if gt $i $.maxIndex }} hidden{{ end }}>
+			<button type="button" class="carousel-indicator"
+				data-carousel-goto="{{ $i }}"
+				aria-label="Go to slide {{ add $i 1 }} of {{ $.total }}"
+				data-tooltip="Go to slide {{ add $i 1 }} of {{ $.total }}"
+				aria-controls="{{ $.id }}"
+				{{- if eq $i $.start }} aria-current="true"{{ end }}></button>
+		</li>
+		{{- end }}
+	</ol>
+	{{- else if eq $style "bar" }}
+	<ol class="carousel-bars">
+		{{- range $i, $_ := .slides }}
+		<li{{ if gt $i $.maxIndex }} hidden{{ end }}>
+			<button type="button" class="carousel-bar"
+				data-carousel-goto="{{ $i }}"
+				aria-label="Go to slide {{ add $i 1 }} of {{ $.total }}"
+				data-tooltip="Go to slide {{ add $i 1 }} of {{ $.total }}"
+				aria-controls="{{ $.id }}"
+				{{- if eq $i $.start }} aria-current="true"{{ end }}></button>
+		</li>
+		{{- end }}
+	</ol>
+	{{- else if eq $style "counter" }}
+	{{- .counterHTML | safeHTML -}}
+	{{- end }}
+</div>

@@ -1,0 +1,653 @@
+/*
+ * Carousel shortcode — {{< carousel >}} + {{< slide >}}.
+ *
+ * The frame keeps the theme's thin border, background, and rounded corners,
+ * but has no drop shadow. A thin hairline separates the image from the control
+ * bar. Typography keeps the theme's Navy headings and short 150–200ms
+ * transitions. Each slide is one image.
+ */
+
+:root {
+    --carousel-border-color: LightSlateGray;
+    --carousel-control-color: var(--link-color);
+    --carousel-control-hover-color: var(--link-active-color);
+    --carousel-indicator-active-color: var(--link-color);
+    --carousel-indicator-hover-color: var(--link-active-color);
+    --carousel-control-icon-size: 1.8em;
+    --carousel-counter-color: DimGray;
+}
+
+.carousel {
+    --carousel-per-view: 1;
+    --carousel-gap: 0;
+    --carousel-slide-basis: 100%;
+    position: relative;
+    margin: 1.5em 0;
+    border: .1em solid var(--carousel-border-color);
+    border-radius: .3em;
+    background-color: var(--bgcolor);
+}
+
+.carousel:focus-visible {
+    outline: .15em solid var(--link-active-color);
+    outline-offset: .15em;
+}
+
+/* Autoplay timer: a very thin line across the top of the frame. */
+.carousel-autoplay-progress {
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 7;
+    height: .18em;
+    overflow: hidden;
+    background-color: Gainsboro;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-duration-fast) ease;
+}
+
+.carousel-autoplay-progress[data-position="top"] {
+    top: 0;
+    border-radius: .3em .3em 0 0;
+}
+
+.carousel-autoplay-progress[data-position="bottom"] {
+    bottom: 0;
+}
+
+.carousel-autoplay-progress.is-running {
+    opacity: 1;
+}
+
+.carousel-autoplay-progress-fill {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: left center;
+    background-color: var(--link-color);
+}
+
+.carousel-autoplay-progress.is-running .carousel-autoplay-progress-fill {
+    animation: carousel-autoplay-progress
+        var(--carousel-autoplay-interval, 5000ms) linear forwards;
+}
+
+@keyframes carousel-autoplay-progress {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
+    }
+}
+
+/* The viewport clips the horizontal track. JS sets its height to the active
+ * slide; without JS the track's tallest slide sets the height. */
+.carousel-viewport {
+    position: relative;
+    overflow: hidden;
+    border-radius: .3em .3em 0 0;
+    background-color: var(--bgcolor);
+    touch-action: pan-y pinch-zoom;
+}
+
+.carousel.is-static .carousel-viewport,
+.carousel.no-controls .carousel-viewport,
+.carousel.is-overlay .carousel-viewport,
+.carousel:not(.is-ready) .carousel-viewport {
+    border-radius: .3em;
+}
+
+.carousel.is-ready .carousel-viewport {
+    transition: height var(--transition-duration-normal) ease;
+}
+
+.carousel-track {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--carousel-gap);
+    transition: transform var(--transition-duration-normal) ease;
+    will-change: transform;
+}
+
+.carousel-item {
+    flex: 0 0 var(--carousel-slide-basis);
+    min-width: 0;
+}
+
+/* ---------------------------------------------------------------- slide */
+
+.carousel-slide {
+    margin: 0;
+}
+
+.carousel-slide > img,
+.carousel-slide > a > img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 70vh;
+    object-fit: fill;
+    background-color: var(--bgcolor);
+}
+
+.carousel-slide > a {
+    display: block;
+}
+
+/* --------------------------------------------------------------- controls */
+
+.carousel-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: .5em;
+    padding: .45em .6em;
+    border-top: .1em solid Gainsboro;
+    background-color: GhostWhite;
+    border-radius: 0 0 .3em .3em;
+}
+
+.carousel-controls.is-overlay {
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 6;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    pointer-events: none;
+}
+
+.carousel-controls.is-overlay .carousel-control,
+.carousel-controls.is-overlay .carousel-autoplay,
+.carousel-controls.is-overlay .carousel-indicator-wrap {
+    pointer-events: auto;
+}
+
+.carousel-controls.is-overlay[data-position="bottom"] {
+    bottom: 0;
+}
+
+.carousel-controls.is-overlay[data-position="top"] {
+    top: 0;
+}
+
+/* The floating indicator and play/pause sit on a frosted panel so they stay
+ * legible over arbitrary photos. */
+.carousel-controls.is-overlay .carousel-indicator-wrap {
+    padding: .3em .6em;
+    border-radius: .35em;
+    background-color: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.carousel-controls.is-overlay .carousel-autoplay {
+    background-color: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.carousel-controls.is-overlay .carousel-autoplay:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+.carousel-zone {
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    min-width: 0;
+}
+
+.carousel-zone-left {
+    justify-content: flex-start;
+}
+
+.carousel-zone-center {
+    justify-content: center;
+}
+
+.carousel-zone-right {
+    justify-content: flex-end;
+}
+
+/* Until the script has measured the first slide, the controls cannot work. */
+.carousel:not(.is-ready) .carousel-controls,
+.carousel:not(.is-ready) .carousel-edge {
+    display: none;
+}
+
+.carousel-indicator-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: .35em .7em;
+    min-width: 0;
+}
+
+/* Segmented bar indicator: short inactive bars, a wider active bar. */
+.carousel-bars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.carousel-bars > li {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.carousel-bars > li[hidden] {
+    display: none;
+}
+
+.carousel-bar {
+    position: relative;
+    width: 1.15em;
+    height: 1em;
+    padding: 0;
+    appearance: none;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
+    transition: width var(--transition-duration-fast) ease;
+}
+
+.carousel-bar::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    height: .35em;
+    transform: translateY(-50%);
+    border-radius: .2em;
+    background-color: LightGray;
+    transition: background-color var(--transition-duration-fast) ease;
+}
+
+.carousel-bar[aria-current="true"] {
+    width: 2.3em;
+}
+
+.carousel-bar[aria-current="true"]::before {
+    background-color: var(--carousel-indicator-active-color);
+}
+
+.carousel-bar:hover::before {
+    background-color: var(--carousel-indicator-hover-color);
+}
+
+.carousel-control,
+.carousel-autoplay {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25em;
+    height: 2.25em;
+    padding: 0;
+    appearance: none;
+    border: 0;
+    font-size: var(--font-size-normal);
+    border-radius: .2em;
+    background-color: transparent;
+    color: var(--carousel-control-color);
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color var(--transition-duration-fast) ease,
+        color var(--transition-duration-fast) ease;
+}
+
+.carousel-control:hover,
+.carousel-autoplay:hover {
+    color: var(--carousel-control-hover-color);
+    background-color: White;
+}
+
+.carousel-control:focus-visible,
+.carousel-autoplay:focus-visible,
+.carousel-indicator:focus-visible,
+.carousel-bar:focus-visible {
+    outline: .15em solid var(--link-active-color);
+    outline-offset: .1em;
+}
+
+.carousel-control[disabled] {
+    color: Silver;
+    cursor: default;
+    background-color: transparent;
+}
+
+/* Overlay prev/next: the whole full-height side strip is the button. The icon
+ * sits on a small frosted chip that grows to fill the strip on hover. */
+.carousel-control.carousel-edge {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 5;
+    width: 3.5em;
+    height: auto;
+    padding: 0;
+    border-radius: 0;
+    justify-content: center;
+}
+
+.carousel-control.carousel-edge.carousel-control-prev {
+    left: 0;
+}
+
+.carousel-control.carousel-edge.carousel-control-next {
+    right: 0;
+}
+
+.carousel-control.carousel-edge.is-v-top {
+    align-items: flex-start;
+}
+
+.carousel-control.carousel-edge.is-v-center {
+    align-items: center;
+}
+
+.carousel-control.carousel-edge.is-v-bottom {
+    align-items: flex-end;
+}
+
+.carousel-edge-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.6em;
+    height: 2.6em;
+    padding: .4em;
+    box-sizing: border-box;
+    border-radius: .35em;
+    background-color: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background-color var(--transition-duration-fast) ease;
+}
+
+.carousel-control.carousel-edge.is-v-top .carousel-edge-btn {
+    align-items: flex-start;
+}
+
+.carousel-control.carousel-edge.is-v-center .carousel-edge-btn {
+    align-items: center;
+}
+
+.carousel-control.carousel-edge.is-v-bottom .carousel-edge-btn {
+    align-items: flex-end;
+}
+
+.carousel-control.carousel-edge:hover {
+    color: var(--carousel-control-hover-color);
+    background-color: rgba(255, 255, 255, 0.45);
+}
+
+.carousel-control.carousel-edge:hover .carousel-edge-btn {
+    background-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.carousel-control.carousel-edge:focus-visible {
+    outline-offset: -.15em;
+}
+
+.carousel-control-icon {
+    display: block;
+    width: var(--carousel-control-icon-size);
+    height: var(--carousel-control-icon-size);
+    color: inherit;
+}
+
+.carousel-autoplay-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-autoplay .carousel-autoplay-play {
+    display: none;
+}
+
+.carousel-autoplay[data-playing="false"] .carousel-autoplay-pause {
+    display: none;
+}
+
+.carousel-autoplay[data-playing="false"] .carousel-autoplay-play {
+    display: inline-flex;
+}
+
+.carousel-indicators {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.carousel-indicators > li {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.carousel-indicators > li[hidden] {
+    display: none;
+}
+
+.carousel-indicator {
+    position: relative;
+    width: .7em;
+    height: .7em;
+    padding: 0;
+    appearance: none;
+    border: 0;
+    font-size: var(--font-size-normal);
+    border-radius: 50%;
+    background-color: LightGray;
+    cursor: pointer;
+    transition: background-color var(--transition-duration-fast) ease;
+}
+
+.carousel-indicator[aria-current="true"] {
+    background-color: var(--carousel-indicator-active-color);
+}
+
+.carousel-indicator:hover {
+    background-color: var(--carousel-indicator-hover-color);
+}
+
+/* Hover/focus tooltips for controls and indicators. */
+.carousel-control[data-tooltip]::after,
+.carousel-autoplay[data-tooltip]::after,
+.carousel-indicator[data-tooltip]::after,
+.carousel-bar[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + .45em);
+    left: 50%;
+    z-index: 10;
+    transform: translateX(-50%);
+    padding: .25em .5em;
+    border-radius: .2em;
+    background-color: DimGray;
+    color: White;
+    font-family: var(--sans-font);
+    font-size: var(--font-size-tiny);
+    line-height: 1.4;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-duration-fast) ease,
+        visibility 0s linear var(--transition-duration-fast);
+}
+
+.carousel-control-prev[data-tooltip]::after {
+    left: 0;
+    transform: none;
+}
+
+.carousel-control-next[data-tooltip]::after {
+    right: 0;
+    left: auto;
+    transform: none;
+}
+
+.carousel-control[data-tooltip]:hover::after,
+.carousel-autoplay[data-tooltip]:hover::after,
+.carousel-indicator[data-tooltip]:hover::after,
+.carousel-control[data-tooltip]:focus-visible::after,
+.carousel-autoplay[data-tooltip]:focus-visible::after,
+.carousel-indicator[data-tooltip]:focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--transition-duration-fast) ease;
+}
+
+.carousel-counter {
+    color: var(--carousel-counter-color);
+    font-size: var(--font-size-tiny);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* Announced to screen readers, not painted. */
+.carousel-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- fade */
+
+.carousel[data-effect="fade"] .carousel-track {
+    display: block;
+    position: relative;
+    transition: none;
+}
+
+.carousel[data-effect="fade"] .carousel-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-duration-normal) ease,
+        visibility 0s linear var(--transition-duration-normal);
+}
+
+.carousel[data-effect="fade"] .carousel-item.is-active {
+    position: relative;
+    z-index: 1;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--transition-duration-normal) ease;
+}
+
+/* --------------------------------------------------------------- states */
+
+.carousel.is-dragging .carousel-track {
+    transition: none;
+}
+
+.carousel.is-dragging .carousel-viewport {
+    cursor: grabbing;
+}
+
+.carousel.is-dragging .carousel-slide {
+    user-select: none;
+}
+
+/* A narrow viewport shows one slide, even when perView asks for more. */
+@media screen and (max-width: 40em) {
+    .carousel[data-carousel] {
+        --carousel-per-view: 1 !important;
+        --carousel-gap: 0 !important;
+        --carousel-slide-basis: 100% !important;
+    }
+
+    /* A static grid (perView = slide count) stacks into one column. */
+    .carousel.is-static .carousel-track {
+        flex-wrap: wrap;
+        gap: 1em;
+    }
+
+    .carousel.is-static .carousel-item {
+        flex-basis: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .carousel-controls {
+        grid-template-columns: 1fr;
+        padding: .35em .4em;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .carousel.is-ready .carousel-viewport,
+    .carousel-track,
+    .carousel-bar,
+    .carousel-bar::before,
+    .carousel-edge-btn,
+    .carousel[data-effect="fade"] .carousel-item {
+        transition-duration: 0s !important;
+    }
+}
+
+@media print {
+    .carousel-controls,
+    .carousel-edge,
+    .carousel-live,
+    .carousel-autoplay-progress {
+        display: none !important;
+    }
+
+    .carousel-viewport {
+        height: auto !important;
+        overflow: visible;
+    }
+
+    .carousel-track,
+    .carousel[data-effect="fade"] .carousel-track {
+        display: block;
+        transform: none !important;
+    }
+
+    .carousel-item,
+    .carousel[data-effect="fade"] .carousel-item {
+        position: static !important;
+        display: block;
+        opacity: 1 !important;
+        visibility: visible !important;
+        margin-bottom: 1em;
+    }
+
+    .carousel-slide > img,
+    .carousel-slide > a > img {
+        max-height: none;
+    }
+}

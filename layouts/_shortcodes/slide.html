@@ -1,0 +1,68 @@
+{{- /*
+  One image slide inside a {{< carousel >}}.
+
+  Args (all optional):
+    image   — page resource, global resource, or URL
+    alt     — image alt text
+    link    — make the image a link (overrides the page lightbox)
+    target  — link target
+    rel     — link rel (defaults to "noopener noreferrer" for _blank)
+    width   — image width attribute
+    height  — image height attribute
+    loading — image loading: lazy|eager (first slide defaults to eager)
+    contentMode — "scaleToFill" (default), "aspectFit", or "aspectFill"
+    lightbox — open the image in the page lightbox: true|false
+    class   — extra classes on the slide
+
+  A slide must live inside a {{< carousel >}}; it only contributes its image.
+*/ -}}
+
+{{- $image := .Get "image" -}}
+{{- $src := "" -}}
+{{- with $image -}}
+	{{- $u := urls.Parse . -}}
+	{{- $src = $u.String -}}
+	{{- if not $u.IsAbs -}}
+		{{- with or ($.Page.Resources.Get $u.Path) (resources.Get $u.Path) -}}
+			{{- $src = .RelPermalink -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $alt := "" -}}
+{{- if and (reflect.IsMap .Params) (isset .Params "alt") -}}
+	{{- $alt = .Get "alt" -}}
+{{- end -}}
+
+{{- $target := .Get "target" -}}
+{{- $rel := .Get "rel" -}}
+{{- if and (eq $target "_blank") (not $rel) -}}{{- $rel = "noopener noreferrer" -}}{{- end -}}
+
+{{- $lightbox := true -}}
+{{- with .Get "lightbox" -}}
+	{{- if in (slice "false" "no" "0" "off") (lower (printf "%v" .)) -}}{{- $lightbox = false -}}{{- end -}}
+{{- end -}}
+
+{{- $data := dict
+	"Src" $src
+	"Alt" $alt
+	"Link" (.Get "link")
+	"Target" $target
+	"Rel" $rel
+	"Width" (.Get "width")
+	"Height" (.Get "height")
+	"Loading" (.Get "loading")
+	"ContentMode" (.Get "contentMode")
+	"Lightbox" $lightbox
+	"Class" (.Get "class")
+-}}
+
+{{- $parent := .Parent -}}
+{{- if and $parent (eq $parent.Name "carousel") -}}
+	{{- if not ($parent.Scratch.Get "carouselSlides") -}}
+		{{- $parent.Scratch.Set "carouselSlides" slice -}}
+	{{- end -}}
+	{{- $parent.Scratch.Add "carouselSlides" $data -}}
+{{- else -}}
+	{{- warnf "slide shortcode: must be used inside a carousel" -}}
+{{- end -}}

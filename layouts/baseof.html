@@ -46,6 +46,9 @@
 	{{- if $loadDropdownJS -}}
 		<script src="{{ "js/dropdown.js" | relURL }}" defer></script>
 	{{- end -}}
+	{{- if .HasShortcode "carousel" -}}
+		<script src="{{ "js/carousel.js" | relURL }}" defer></script>
+	{{- end -}}
 	{{- if .HasShortcode "prism" -}}
 		<link rel="stylesheet" href="{{ "css/prism.css" | relURL }}">
 		<script defer

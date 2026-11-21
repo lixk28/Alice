@@ -82,6 +82,15 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
   - Styles: `static/css/dropdown.css`. Script: `static/js/dropdown.js` (linked in `baseof` `<head>` when the page has the shortcode or the header menu has children).
   - Left side optional `title` (markdownified); right side inline caret (solid triangle). Header menu entries still pass left-side HTML into the partial.
   - Mode `hover` (default) or `click` via shortcode arg, `params.dropdown.mode`, or `params.header.dropdown.mode` for the header. Hamburger menus always use `click`.
+- `carousel` and `slide`:
+  - Image-only carousel; `carousel` wraps one or more `slide` children, and each `slide` is one image.
+  - Shared partials: `layouts/_partials/carousel/controls-bar.html`, `layouts/_partials/carousel/indicators.html`, and `layouts/_partials/carousel/counter.html`.
+  - Styles: `static/css/carousel.css`. Script: `static/js/carousel.js` (linked in `baseof` `<head>` when the page has the shortcode). The carousel frame keeps the theme border, background, and radius but has no drop shadow; a thin hairline separates the image and the control bar.
+  - Defaults: `params.carousel` (`autoplay`, `interval`, `progressPosition`, `controls`, `controlsPosition`, `prevAlign`, `indicatorStyle`, `indicatorAlign`, `nextAlign`, `autoplayAlign`, `vAlign`, `perView`, `counterSeparator`, `loop`, `keyboard`, `pause`, `effect`, `contentMode`, `label`, and `icons`). Per-slide arguments: `image`, `alt`, `link`, `target`, `rel`, `width`, `height`, `loading`, `contentMode`, `lightbox`, `class`.
+  - `perView` shows several images at once (slide effect only; ignored with `effect="fade"`): navigation moves one slide at a time, the counter (when selected) shows the visible range, the bar's active segment marks the current position, and screens up to `40em` fall back to one image per view.
+  - `controlsPosition` places the control bar below the image (`below`, default) or overlays the controls on the image at the `top` or `bottom`. In overlay mode prev/next become full-height clickable strips on the left and right edges: the icon sits on a small frosted chip, horizontally centered and placed vertically by `vAlign` (`top`, `center` default, or `bottom`), and hovering highlights the whole strip; the indicator and play/pause float at the top/bottom on a matching frosted panel. In `below` mode each control and the indicator choose a horizontal zone independently: `prevAlign` (default `left`), `indicatorAlign` (default `center`), `nextAlign` (default `right`), and `autoplayAlign` (default `right`). Within a zone the order is prev → indicator → next → play/pause. `indicatorStyle` is `dots` (default), `bar`, `counter`, or `none`; only one indicator is shown. `counterSeparator` applies to the counter style.
+  - `autoplay` is a boolean switch (default `false`); `interval` is the delay in milliseconds (default `5000`). The pause button only appears when autoplay is on; a thin progress bar fills per interval and hides while autoplay is paused; `progressPosition` places it at the top (default) or bottom of the image. `pause` defaults to `false`; set `pause=true` to pause autoplay on hover/focus. The carousel ids are generated from `.Ordinal` and are not configurable. `loop` defaults to `true`; with `loop=false`, prev/next are disabled at the first/last position.
+  - Images use the page lightbox vendor when the page enables one; a slide `link` overrides it. `contentMode` picks the image `object-fit`: `scaleToFill` (default, `fill`), `aspectFit` (`contain`), or `aspectFill` (`cover`); set it on the carousel for a shared default or on a slide to override. `effect="fade"` cross-fades instead of sliding, and the viewport height follows the visible images.
 - `tab` and `tabpanel`: `static/css/tabs.css`.
 - `shell`, `cmd`, and `cmdout`: `static/css/shell.css`.
 - `secret`: `static/css/secret.css`.
@@ -121,6 +130,9 @@ Scripts in `static/js/` are served as-is and linked with `relURL`. A template lo
 - `static/js/copyCodeBlock.js`
   - Loaded by `baseof.html` when the page sets `codeblock.cursed`.
   - Copies a Chroma code block. The copy button is styled in `static/css/code.css`.
+- `static/js/carousel.js`
+  - Loaded by `baseof.html` when the page uses the `carousel` shortcode.
+  - Drives `carousel`/`slide` slides, per-view layout, height, autoplay, indicators, and touch swipes. Styles: `static/css/carousel.css`.
 - `static/js/snakeTOC2.js`
   - Loaded by `baseof.html` when the page sets `toc.snake`.
   - Draws the table-of-contents progress path. Styles: `static/css/toc.css`.

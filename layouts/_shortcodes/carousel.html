@@ -1,0 +1,361 @@
+{{- /*
+  Carousel shortcode — an image-only, dependency-free slideshow.
+
+  Usage:
+    {{< carousel label="Photo tour" >}}
+      {{< slide image="photo-1.jpg" alt="..." >}}
+      {{< slide image="photo-2.jpg" alt="..." >}}
+    {{< /carousel >}}
+
+  Each {{< slide >}} contributes one image. Slides are collected from the
+  children, then rendered here.
+
+  Args (all optional; params.carousel provides the site defaults):
+    class      — extra classes on the root
+    label      — accessible name of the region
+    autoplay   — enable autoplay: true|false (default: false)
+    interval   — autoplay delay in ms (default: 5000)
+    progressPosition — autoplay progress bar: top|bottom (default: top)
+    controls   — previous/next buttons: true|false
+    controlsPosition — control bar placement: below|top|bottom (default: below)
+    prevAlign  — previous button alignment: left|center|right (default: left)
+    indicatorStyle — indicator style: dots|bar|counter|none (default: dots)
+    indicatorAlign — indicator alignment: left|center|right (default: center)
+    nextAlign  — next button alignment: left|center|right (default: right)
+    autoplayAlign — play/pause button alignment: left|center|right (default: right)
+    perView    — number of slides visible at once (default: 1)
+    counterSeparator — text between current and total (default: "/")
+    loop       — circular navigation (last → first): true|false (default: true)
+    keyboard   — arrow-key navigation: true|false
+    pause      — pause autoplay on hover/focus: true|false (default: false)
+    effect     — "slide" or "fade"
+    contentMode — "scaleToFill" (default), "aspectFit", or "aspectFill"
+    vAlign     — vertical place of the overlay prev/next icon: top|center|bottom (default: center)
+    start      — zero-based index of the initially active slide
+*/ -}}
+
+{{- /* Shortcodes only run their children when .Inner is evaluated. */ -}}
+{{- if .Inner -}}{{- end -}}
+
+{{- $slides := .Scratch.Get "carouselSlides" | default slice -}}
+{{- .Scratch.Delete "carouselSlides" -}}
+
+{{- if eq (len $slides) 0 -}}
+	{{- warnf "carousel shortcode: no slides found (add a slide child)" -}}
+{{- end -}}
+
+{{- $n := len $slides -}}
+{{- if gt $n 0 -}}
+
+{{- $defaults := dict
+	"class" ""
+	"label" "Carousel"
+	"autoplay" false
+	"interval" 5000
+	"progressPosition" "top"
+	"controls" true
+	"controlsPosition" "below"
+	"prevAlign" "left"
+	"indicatorStyle" "dots"
+	"indicatorAlign" "center"
+	"nextAlign" "right"
+	"autoplayAlign" "right"
+	"counterSeparator" "/"
+	"loop" true
+	"keyboard" true
+	"pause" false
+	"effect" "slide"
+	"contentMode" "scaleToFill"
+	"vAlign" "center"
+	"start" 0
+-}}
+{{- $opts := merge $defaults (site.Params.carousel | default dict) -}}
+{{- /* Shortcodes without named args expose .Params as []string. */ -}}
+{{- if reflect.IsMap .Params -}}
+	{{- $opts = merge $opts .Params -}}
+{{- end -}}
+
+{{- $id := printf "carousel-%d" .Ordinal -}}
+{{- $class := printf "%v" $opts.class -}}
+{{- $label := printf "%v" $opts.label | default "Carousel" -}}
+
+{{- $interval := 5000 -}}
+{{- with $opts.interval -}}{{- $interval = int . -}}{{- end -}}
+{{- if lt $interval 0 -}}{{- $interval = 0 -}}{{- end -}}
+
+{{- $start := 0 -}}
+{{- with $opts.start -}}{{- $start = int . -}}{{- end -}}
+{{- if lt $start 0 -}}{{- $start = 0 -}}{{- end -}}
+
+{{- $boolTrue := slice "true" "yes" "1" "on" -}}
+{{- $boolFalse := slice "false" "no" "0" "off" -}}
+
+{{- $controls := true -}}
+{{- if in $boolFalse (lower (printf "%v" $opts.controls)) -}}{{- $controls = false -}}{{- end -}}
+{{- $controlsPosition := "below" -}}
+{{- with site.Params.carousel.controlsPosition -}}{{- $controlsPosition = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "controlsPosition" -}}{{- $controlsPosition = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "below" "top" "bottom") $controlsPosition) -}}{{- $controlsPosition = "below" -}}{{- end -}}
+{{- $prevAlign := "left" -}}
+{{- with site.Params.carousel.prevAlign -}}{{- $prevAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "prevAlign" -}}{{- $prevAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "left" "center" "right") $prevAlign) -}}{{- $prevAlign = "left" -}}{{- end -}}
+{{- $indicatorStyle := "dots" -}}
+{{- with site.Params.carousel.indicatorStyle -}}{{- $indicatorStyle = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "indicatorStyle" -}}{{- $indicatorStyle = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "dots" "bar" "counter" "none") $indicatorStyle) -}}{{- $indicatorStyle = "dots" -}}{{- end -}}
+{{- $indicatorAlign := "center" -}}
+{{- with site.Params.carousel.indicatorAlign -}}{{- $indicatorAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "indicatorAlign" -}}{{- $indicatorAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "left" "center" "right") $indicatorAlign) -}}{{- $indicatorAlign = "center" -}}{{- end -}}
+{{- $nextAlign := "right" -}}
+{{- with site.Params.carousel.nextAlign -}}{{- $nextAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "nextAlign" -}}{{- $nextAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "left" "center" "right") $nextAlign) -}}{{- $nextAlign = "right" -}}{{- end -}}
+{{- $autoplayAlign := "right" -}}
+{{- with site.Params.carousel.autoplayAlign -}}{{- $autoplayAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "autoplayAlign" -}}{{- $autoplayAlign = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "left" "center" "right") $autoplayAlign) -}}{{- $autoplayAlign = "right" -}}{{- end -}}
+{{- $counterSeparator := "/" -}}
+{{- with site.Params.carousel.counterSeparator -}}{{- $counterSeparator = printf "%v" . -}}{{- end -}}
+{{- with .Get "counterSeparator" -}}{{- $counterSeparator = printf "%v" . -}}{{- end -}}
+{{- $counterSeparator = strings.TrimSpace $counterSeparator -}}
+{{- if not $counterSeparator -}}{{- $counterSeparator = "/" -}}{{- end -}}
+
+{{- $loop := true -}}
+{{- if in $boolFalse (lower (printf "%v" $opts.loop)) -}}{{- $loop = false -}}{{- end -}}
+{{- $keyboard := true -}}
+{{- if in $boolFalse (lower (printf "%v" $opts.keyboard)) -}}{{- $keyboard = false -}}{{- end -}}
+{{- $pause := false -}}
+{{- if in $boolTrue (lower (printf "%v" $opts.pause)) -}}{{- $pause = true -}}{{- end -}}
+
+{{- $autoplay := false -}}
+{{- if in $boolTrue (lower (printf "%v" $opts.autoplay)) -}}{{- $autoplay = true -}}{{- end -}}
+{{- $progressPosition := "top" -}}
+{{- with site.Params.carousel.progressPosition -}}{{- $progressPosition = lower (printf "%v" .) -}}{{- end -}}
+{{- with .Get "progressPosition" -}}{{- $progressPosition = lower (printf "%v" .) -}}{{- end -}}
+{{- if not (in (slice "top" "bottom") $progressPosition) -}}{{- $progressPosition = "top" -}}{{- end -}}
+{{- $effectiveInterval := 0 -}}
+{{- if $autoplay -}}
+	{{- if lt $interval 1 -}}{{- $interval = 5000 -}}{{- end -}}
+	{{- $effectiveInterval = $interval -}}
+{{- end -}}
+
+{{- $effect := lower (printf "%v" $opts.effect) -}}
+{{- if ne $effect "fade" -}}{{- $effect = "slide" -}}{{- end -}}
+
+{{- $contentMode := lower (printf "%v" $opts.contentMode) -}}
+{{- $fit := "fill" -}}
+{{- if eq $contentMode "aspectfit" -}}{{- $fit = "contain" -}}{{- else if eq $contentMode "aspectfill" -}}{{- $fit = "cover" -}}{{- end -}}
+
+{{- $vAlign := lower (printf "%v" $opts.vAlign) -}}
+{{- if not (in (slice "top" "center" "bottom") $vAlign) -}}{{- $vAlign = "center" -}}{{- end -}}
+
+{{- $perView := 1 -}}
+{{- with site.Params.carousel.perView -}}{{- $perView = int . -}}{{- end -}}
+{{- with .Get "perView" -}}{{- $perView = int . -}}{{- end -}}
+{{- if lt $perView 1 -}}{{- $perView = 1 -}}{{- end -}}
+{{- if gt $perView $n -}}{{- $perView = $n -}}{{- end -}}
+{{- if and (eq $effect "fade") (gt $perView 1) -}}
+	{{- warnf "carousel shortcode %q: perView is ignored with effect=\"fade\"" $id -}}
+	{{- $perView = 1 -}}
+{{- end -}}
+
+{{- $maxStart := sub $n $perView -}}
+{{- if ge $start $maxStart -}}{{- $start = $maxStart -}}{{- end -}}
+
+{{- /* The gap is fixed in em; Hugo sums it so CSS needs no multiplication. */ -}}
+{{- $slideGap := "0" -}}
+{{- $slideBasis := "100%" -}}
+{{- if gt $perView 1 -}}
+	{{- $slideGap = "0.8em" -}}
+	{{- $totalGap := printf "%.2fem" (mul (float (sub $perView 1)) 0.8) -}}
+	{{- $slideBasis = printf "calc((100%% - %s) / %d)" $totalGap $perView -}}
+{{- end -}}
+
+{{- $maxIndex := sub $n $perView -}}
+{{- $interactive := gt $maxIndex 0 -}}
+{{- $showControls := and $interactive $controls -}}
+{{- $showIndicator := and $interactive (ne $indicatorStyle "none") -}}
+{{- $showAutoplay := and $interactive (gt $effectiveInterval 0) -}}
+{{- $hasControlBar := or $showControls $showAutoplay $showIndicator -}}
+{{- $overlay := and $interactive (ne $controlsPosition "below") -}}
+{{- /* Overlay prev/next are full-height edge strips outside the bar. */ -}}
+{{- $barShowControls := and $showControls (not $overlay) -}}
+{{- $barHasContent := or $barShowControls $showAutoplay $showIndicator -}}
+
+{{- $counterHTML := "" -}}
+{{- if and $showIndicator (eq $indicatorStyle "counter") -}}
+	{{- $counterCurrent := add $start 1 -}}
+	{{- if gt $perView 1 -}}
+		{{- $counterCurrent = printf "%d–%d" (add $start 1) (add $start $perView) -}}
+	{{- end -}}
+	{{- $counterHTML = partial "carousel/counter.html" (dict "current" $counterCurrent "total" $n "separator" $counterSeparator) -}}
+{{- end -}}
+
+{{- $iconDefaults := dict
+	"prev" "svg/ui-oval/chevron-left.svg"
+	"next" "svg/ui-oval/chevron-right.svg"
+	"play" "svg/ui-oval/play.svg"
+	"pause" "svg/ui-oval/stop.svg"
+-}}
+{{- $icons := merge $iconDefaults (site.Params.carousel.icons | default dict) -}}
+{{- $prevIcon := partial "svg-icon.html" (dict "path" ($icons.prev | default "svg/ui-oval/chevron-left.svg") "class" "carousel-control-icon") -}}
+{{- $nextIcon := partial "svg-icon.html" (dict "path" ($icons.next | default "svg/ui-oval/chevron-right.svg") "class" "carousel-control-icon") -}}
+{{- $playIcon := partial "svg-icon.html" (dict "path" ($icons.play | default "svg/ui-oval/play.svg") "class" "carousel-control-icon") -}}
+{{- $pauseIcon := "" -}}
+{{- with $icons.pause -}}
+	{{- $pauseIcon = partial "svg-icon.html" (dict "path" . "class" "carousel-control-icon") -}}
+{{- else -}}
+	{{- $pauseIcon = `<svg class="carousel-control-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5v14M15 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>` -}}
+{{- end -}}
+
+{{- $prevHTML := "" -}}
+{{- if $showControls -}}
+	{{- if $overlay -}}
+		{{- $prevHTML = printf `<button type="button" class="carousel-control carousel-control-prev carousel-edge is-v-%s" aria-label="Previous slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $vAlign $id $prevIcon -}}
+	{{- else -}}
+		{{- $prevHTML = printf `<button type="button" class="carousel-control carousel-control-prev" aria-label="Previous slide" aria-controls="%s" data-tooltip="Previous slide">%s</button>` $id $prevIcon -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $nextHTML := "" -}}
+{{- if $showControls -}}
+	{{- if $overlay -}}
+		{{- $nextHTML = printf `<button type="button" class="carousel-control carousel-control-next carousel-edge is-v-%s" aria-label="Next slide" aria-controls="%s"><span class="carousel-edge-btn">%s</span></button>` $vAlign $id $nextIcon -}}
+	{{- else -}}
+		{{- $nextHTML = printf `<button type="button" class="carousel-control carousel-control-next" aria-label="Next slide" aria-controls="%s" data-tooltip="Next slide">%s</button>` $id $nextIcon -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $autoplayHTML := "" -}}
+{{- if $showAutoplay -}}
+	{{- $autoplayHTML = printf `<button type="button" class="carousel-autoplay" data-playing="true" aria-label="Pause autoplay" data-tooltip="Pause autoplay" aria-controls="%s"><span class="carousel-autoplay-icon carousel-autoplay-pause">%s</span><span class="carousel-autoplay-icon carousel-autoplay-play">%s</span></button>` $id $pauseIcon $playIcon -}}
+{{- end -}}
+
+{{- $indicatorHTML := "" -}}
+{{- if $showIndicator -}}
+	{{- $indicatorHTML = partial "carousel/indicators.html" (dict
+		"style" $indicatorStyle
+		"id" $id
+		"slides" $slides
+		"total" $n
+		"start" $start
+		"maxIndex" $maxIndex
+		"counterHTML" $counterHTML
+	) -}}
+{{- end -}}
+
+{{- $controlsBarHTML := "" -}}
+{{- if $barHasContent -}}
+	{{- $controlsBarHTML = partial "carousel/controls-bar.html" (dict
+		"position" $controlsPosition
+		"showControls" $barShowControls
+		"showIndicator" $showIndicator
+		"showAutoplay" $showAutoplay
+		"prevAlign" $prevAlign
+		"indicatorAlign" $indicatorAlign
+		"nextAlign" $nextAlign
+		"autoplayAlign" $autoplayAlign
+		"prevHTML" $prevHTML
+		"indicatorHTML" $indicatorHTML
+		"nextHTML" $nextHTML
+		"autoplayHTML" $autoplayHTML
+	) -}}
+{{- end -}}
+
+{{- $lightboxVendor := "none" -}}
+{{- with .Page.Params.lightbox -}}
+	{{- if reflect.IsMap . -}}
+		{{- $lightboxVendor = lower (.vendor | default "none") -}}
+	{{- end -}}
+{{- end -}}
+
+<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $overlay }} is-overlay{{ end }}{{ if not $hasControlBar }} no-controls{{ end }}"
+	id="{{ $id }}"
+	{{ printf `style="--carousel-per-view: %d; --carousel-gap: %s; --carousel-slide-basis: %s"` $perView $slideGap $slideBasis | safeHTMLAttr }}
+	{{- if $interactive }} data-carousel
+	data-interval="{{ $effectiveInterval }}"
+	data-loop="{{ $loop }}"
+	data-keyboard="{{ $keyboard }}"
+	data-pause="{{ $pause }}"
+	data-effect="{{ $effect }}"
+	data-start="{{ $start }}"{{ end }}
+	role="region"
+	aria-roledescription="carousel"
+	aria-label="{{ $label }}"
+	{{- if and $interactive $keyboard }} tabindex="0"{{ end }}>
+
+	<div class="carousel-viewport" id="{{ $id }}-viewport">
+		{{- if $showAutoplay }}
+		<div class="carousel-autoplay-progress" data-position="{{ $progressPosition }}" aria-hidden="true"
+			style="{{ printf `--carousel-autoplay-interval: %dms` $effectiveInterval | safeCSS }}">
+			<span class="carousel-autoplay-progress-fill"></span>
+		</div>
+		{{- end }}
+		<div class="carousel-track">
+			{{- range $i, $s := $slides -}}
+			{{- $isVisible := and (ge $i $start) (lt $i (add $start $perView)) -}}
+			{{- $loading := $s.Loading | default (cond $isVisible "eager" "lazy") -}}
+			{{- $slideFit := $fit -}}
+			{{- with $s.ContentMode -}}
+				{{- $cm := lower (printf "%v" .) -}}
+				{{- $slideFit = "fill" -}}
+				{{- if eq $cm "aspectfit" -}}{{- $slideFit = "contain" -}}
+				{{- else if eq $cm "aspectfill" -}}{{- $slideFit = "cover" -}}
+				{{- end -}}
+			{{- end -}}
+			{{- $useLightbox := $s.Lightbox | default true -}}
+			{{- $linkHref := $s.Link -}}
+			{{- $lightbox := "" -}}
+			{{- if and (not $linkHref) $useLightbox $s.Src -}}
+				{{- if eq $lightboxVendor "fancybox" -}}
+					{{- $linkHref = $s.Src -}}
+					{{- $lightbox = "fancybox" -}}
+				{{- else if eq $lightboxVendor "glightbox" -}}
+					{{- $linkHref = $s.Src -}}
+					{{- $lightbox = "glightbox" -}}
+				{{- end -}}
+			{{- end -}}
+			<div class="carousel-item{{ if $isVisible }} is-active{{ end }}"
+				id="{{ $id }}-slide-{{ add $i 1 }}"
+				role="group"
+				aria-roledescription="slide"
+				aria-label="{{ add $i 1 }} of {{ $n }}">
+				<div class="carousel-slide{{ with $s.Class }} {{ . }}{{ end }}">
+					{{- with $s.Src }}
+					{{- with $linkHref }}<a href="{{ . | safeURL }}"{{ if eq $lightbox "fancybox" }} data-fancybox="gallery"{{ else if eq $lightbox "glightbox" }} class="glightbox" data-gallery="gallery"{{ end }}{{ with $s.Target }} target="{{ . }}"{{ end }}{{ with $s.Rel }} rel="{{ . }}"{{ end }}>{{ end }}
+					<img src="{{ $s.Src | safeURL }}" alt="{{ $s.Alt }}" loading="{{ $loading }}" decoding="async"{{ if ne $slideFit "fill" }} style="object-fit: {{ $slideFit }}"{{ end }}
+						{{- with $s.Width }} width="{{ . }}"{{ end }}
+						{{- with $s.Height }} height="{{ . }}"{{ end }}>
+					{{- with $linkHref }}</a>{{ end }}
+					{{- end }}
+				</div>
+			</div>
+			{{- end -}}
+		</div>
+		{{- if $overlay }}
+		{{- with $prevHTML }}{{ . | safeHTML }}{{ end }}
+		{{- with $nextHTML }}{{ . | safeHTML }}{{ end }}
+		{{- if $barHasContent }}{{ $controlsBarHTML | safeHTML }}{{ end }}
+		{{- end }}
+	</div>
+
+	{{- if and $barHasContent (not $overlay) }}
+	{{ $controlsBarHTML | safeHTML }}
+	{{- end }}
+	{{- if $interactive }}
+	<p class="carousel-live" role="status" aria-live="polite" aria-atomic="true"></p>
+	<noscript>
+		<style>
+			#{{ $id }} .carousel-viewport { height: auto !important; overflow: visible; }
+			#{{ $id }} .carousel-track { display: block; transform: none !important; }
+			#{{ $id }} .carousel-item { display: block; position: static !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1em; }
+			#{{ $id }} .carousel-item:last-child { margin-bottom: 0; }
+			#{{ $id }} .carousel-controls, #{{ $id }} .carousel-edge { display: none !important; }
+		</style>
+	</noscript>
+	{{- end }}
+</div>
+
+{{- end -}}

@@ -45,6 +45,10 @@
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_chevron-left"
     },
+    "svg/ui-oval/chevron-right.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_chevron-right"
+    },
     "svg/ui-oval/chevron-up.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_chevron-up"
@@ -132,6 +136,10 @@
     "svg/ui-oval/rss-01.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",
       "id": "ui-oval_rss-01"
+    },
+    "svg/ui-oval/stop.svg": {
+      "sprite": "svg/sprite/svg-icon-sprite.svg",
+      "id": "ui-oval_stop"
     },
     "svg/ui-oval/tag-01.svg": {
       "sprite": "svg/sprite/svg-icon-sprite.svg",

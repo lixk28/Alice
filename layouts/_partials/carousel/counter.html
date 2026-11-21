@@ -1,0 +1,12 @@
+{{- /*
+  Counter shared by the carousel control bar.
+
+  Context:
+    current   — current position or visible range, e.g. 1 or "1–2"
+    total     — total slide count
+    separator — text between the two values, e.g. "/" or "of"
+*/ -}}
+{{- $separator := .separator | default "/" -}}
+<span class="carousel-counter" aria-hidden="true">
+	<span class="carousel-counter-current">{{ .current }}</span> {{ $separator }} <span class="carousel-counter-total">{{ .total }}</span>
+</span>

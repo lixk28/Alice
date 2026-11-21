@@ -31,6 +31,51 @@ themesDir = "../.."
     [params.dropdown]
         mode = "hover"
 
+    # Carousel shortcode defaults ({{< carousel >}} + {{< slide >}}).
+    # Every key is a fallback; a shortcode argument still wins.
+    [params.carousel]
+        # Enable autoplay. The pause button appears when this is true.
+        autoplay = false
+        # Autoplay delay in milliseconds (used when autoplay is true).
+        interval = 5000
+        # Autoplay progress bar position: top or bottom.
+        progressPosition = "top"
+        # Show previous/next buttons.
+        controls = true
+        # Control bar placement: below, top, or bottom (top/bottom overlay the content).
+        controlsPosition = "below"
+        # Place each control and the indicator: left, center, right.
+        prevAlign = "left"
+        indicatorStyle = "dots"
+        indicatorAlign = "center"
+        nextAlign = "right"
+        autoplayAlign = "right"
+        # Number of slides visible at once (effect = "slide" only).
+        # Screens up to 40em always show one slide.
+        perView = 1
+        # Text between the current and total values when indicatorStyle = "counter".
+        counterSeparator = "/"
+        # Circular navigation: last -> first, and first -> last.
+        loop = true
+        # Arrow keys move between slides while the carousel is focused.
+        keyboard = true
+        # Pause autoplay while the pointer or keyboard focus is inside.
+        pause = false
+        # Transition: "slide" or "fade".
+        effect = "slide"
+        # Image content mode: "scaleToFill" (default), "aspectFit", or "aspectFill".
+        contentMode = "scaleToFill"
+        # Vertical place of the overlay prev/next icon: top, center, or bottom.
+        vAlign = "center"
+        # Accessible name for the carousel region.
+        label = "Carousel"
+
+        [params.carousel.icons]
+            prev = "svg/ui-oval/chevron-left.svg"
+            next = "svg/ui-oval/chevron-right.svg"
+            play = "svg/ui-oval/play.svg"
+            pause = "svg/ui-oval/stop.svg"
+
     # Link render hook
     [params.link.icons]
         external = "svg/ui-oval/link-external-02.svg"
