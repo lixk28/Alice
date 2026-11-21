@@ -174,11 +174,10 @@
 {{- $maxStart := sub $n $perView -}}
 {{- if ge $start $maxStart -}}{{- $start = $maxStart -}}{{- end -}}
 
-{{- /* The gap is fixed in em; Hugo sums it so CSS needs no multiplication. */ -}}
-{{- $slideGap := "0" -}}
+{{- /* A fixed AliceBlue gutter separates slides; Hugo sums it for perView. */ -}}
+{{- $slideGap := "0.8em" -}}
 {{- $slideBasis := "100%" -}}
 {{- if gt $perView 1 -}}
-	{{- $slideGap = "0.8em" -}}
 	{{- $totalGap := printf "%.2fem" (mul (float (sub $perView 1)) 0.8) -}}
 	{{- $slideBasis = printf "calc((100%% - %s) / %d)" $totalGap $perView -}}
 {{- end -}}

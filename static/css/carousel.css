@@ -859,7 +859,6 @@
 @media screen and (max-width: 40em) {
     .carousel[data-carousel] {
         --carousel-per-view: 1 !important;
-        --carousel-gap: 0 !important;
         --carousel-slide-basis: 100% !important;
     }
 
