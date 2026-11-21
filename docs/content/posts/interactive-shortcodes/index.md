@@ -228,7 +228,7 @@ Only one indicator is shown, and an interactive carousel always has one. This ex
 
 `indicatorStyle="thumbnails"` replaces the indicator with a row of preview images in the control bar, in the same row as previous/next. Clicking a preview jumps to that slide and the active preview is outlined. If the previews overflow, their slot scrolls sideways and keeps the active one in view. `indicatorAlign` decides whether the slot sits on the left, in the center, or on the right; the slot also gets extra width so a few previews stay visible.
 
-Thumbnails work with `perView`, `loop`, and `fade`, and they join the overlay bar when `controlsPlacement` is `overlay-top` or `overlay-bottom`. With `perView`, previews past the last starting position are hidden.
+Thumbnails work with `perView`, `loop`, and `fade`, and they join the overlay bar when `controlsPlacement` is `overlay-top` or `overlay-bottom`. With `perView`, every slide can be a starting position when `loop` is on; with `loop=false`, previews past the last starting position are hidden.
 
 {{< carousel label="Thumbnail indicator" indicatorStyle="thumbnails" >}}
 
@@ -347,7 +347,7 @@ The control is self-contained: it never takes a slot in the control bar, so prev
 
 #### Looping
 
-`loop` controls the ends. The default, `true`, wraps: Next on the last slide goes to the first, and Prev on the first goes to the last. With `false`, Prev is disabled on the first slide and Next on the last.
+`loop` controls the ends. The default, `true`, wraps one slide at a time: Next on the last slide continues forward into the first, and Prev on the first goes to the last. With `perView`, the window can wrap too, for example `3–4 → 4–1 → 1–2`. With `false`, Prev is disabled on the first slide and Next on the last.
 
 {{< carousel label="Non-looping carousel" loop=false >}}
 
@@ -423,7 +423,7 @@ All carousel and slide arguments are optional. `params.carousel` supplies site-w
 
 | Name | Description |
 | --- | --- |
-| `loop` | Wrap from the last slide to the first and from the first to the last; default `true`. With `false`, prev/next stop at the ends. |
+| `loop` | Wrap one slide at a time, including across `perView` windows (for example `3–4 → 4–1`); default `true`. With `false`, prev/next stop at the ends. |
 | `keyboard` | Left/Right, Home, and End navigate while the carousel is focused; default `true`. |
 
 Carousel ids are generated from the shortcode's ordinal on the page and are not configurable.

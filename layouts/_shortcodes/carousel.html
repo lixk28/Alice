@@ -184,6 +184,9 @@
 {{- end -}}
 
 {{- $maxIndex := sub $n $perView -}}
+{{- /* Sliding loop turns every slide into a valid start position. */ -}}
+{{- $indicatorMax := $maxIndex -}}
+{{- if and $loop (eq $effect "slide") -}}{{- $indicatorMax = sub $n 1 -}}{{- end -}}
 {{- $interactive := gt $maxIndex 0 -}}
 {{- $showControls := and $interactive $controls -}}
 {{- /* Every interactive carousel shows one of the indicator styles. */ -}}
@@ -263,7 +266,7 @@
 		"slides" $slides
 		"total" $n
 		"start" $start
-		"maxIndex" $maxIndex
+		"maxIndex" $indicatorMax
 		"counterHTML" $counterHTML
 	) -}}
 {{- end -}}

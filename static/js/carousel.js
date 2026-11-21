@@ -56,9 +56,20 @@
             this.pauseOnInteraction = toBool(root.dataset.pause, true);
             this.effect = root.dataset.effect === "fade" ? "fade" : "slide";
             this.perView = this.readPerView();
+            this.circular =
+                this.loop &&
+                this.effect === "slide" &&
+                this.perView < this.slides.length;
+            this.looping = false;
 
             const start = parseInt(root.dataset.start || "0", 10) || 0;
-            this.index = Math.min(Math.max(start, 0), this.maxIndex());
+            this.index = this.circular
+                ? ((start % this.slides.length) + this.slides.length) %
+                  this.slides.length
+                : Math.min(Math.max(start, 0), this.maxIndex());
+            if (this.circular && this.index > 0) {
+                this.rotateToIndex(this.index);
+            }
 
             this.timer = null;
             this.hovering = false;
@@ -67,6 +78,8 @@
             this.ignoreFocus = false;
             this.visible = !("IntersectionObserver" in window);
             this.dragging = false;
+            this.dragRotated = false;
+            this.dragBase = 0;
             this.pointerDown = false;
             this.ignoreDrag = false;
             this.pointerId = null;
@@ -94,21 +107,34 @@
         }
 
         maxIndex() {
+            if (this.circular) return Math.max(0, this.slides.length - 1);
             return Math.max(0, this.slides.length - this.perView);
         }
 
+        domItems() {
+            return Array.from(this.track.children).filter((element) =>
+                element.classList.contains("carousel-item")
+            );
+        }
+
         getStep() {
-            if (this.slides.length < 2) return this.viewport.clientWidth;
-            const first = this.slides[0].getBoundingClientRect();
-            const second = this.slides[1].getBoundingClientRect();
+            const items = this.domItems();
+            if (items.length < 2) return this.viewport.clientWidth;
+            const first = items[0].getBoundingClientRect();
+            const second = items[1].getBoundingClientRect();
             const step = second.left - first.left;
             return step > 0 ? step : this.viewport.clientWidth;
         }
 
         refreshLayout(immediate = false) {
+            if (this.looping) return;
             const perView = this.readPerView();
             const changed = perView !== this.perView;
             this.perView = perView;
+            this.circular =
+                this.loop &&
+                this.effect === "slide" &&
+                this.perView < this.slides.length;
 
             if (this.index > this.maxIndex()) this.index = this.maxIndex();
 
@@ -320,6 +346,37 @@
         }
 
         goTo(index, options = {}) {
+            if (this.looping) return false;
+
+            if (this.circular) {
+                const count = this.slides.length;
+                const next = ((index % count) + count) % count;
+                if (next === this.index) {
+                    this.updateTransform();
+                    return false;
+                }
+
+                const previous = this.index;
+                this.rotateToIndex(next);
+                this.activate(next);
+                this.updateTransform();
+                this.updateHeight();
+                this.updateControls();
+                this.updateStatus();
+
+                this.root.dispatchEvent(
+                    new CustomEvent("carousel:change", {
+                        bubbles: true,
+                        detail: {
+                            index: next,
+                            previous,
+                            slide: this.slides[next],
+                        },
+                    })
+                );
+                return true;
+            }
+
             const { animate = true } = options;
             const maxIndex = this.maxIndex();
             const positions = maxIndex + 1;
@@ -360,7 +417,32 @@
             return true;
         }
 
+        rotateToIndex(index) {
+            const ordered = this.slides
+                .slice(index)
+                .concat(this.slides.slice(0, index));
+            ordered.forEach((slide) => this.track.appendChild(slide));
+            this.index = index;
+            this.track.style.transform = "translate3d(0, 0, 0)";
+        }
+
         activate(index) {
+            if (this.circular) {
+                const items = this.domItems();
+                items.forEach((slide, i) => {
+                    const active = i < this.perView;
+                    slide.classList.toggle("is-active", active);
+                    if (active) {
+                        slide.removeAttribute("aria-hidden");
+                        slide.removeAttribute("inert");
+                    } else {
+                        slide.setAttribute("aria-hidden", "true");
+                        slide.setAttribute("inert", "");
+                    }
+                });
+                return;
+            }
+
             const last = Math.min(index + this.perView, this.slides.length);
             this.slides.forEach((slide, i) => {
                 const active = i >= index && i < last;
@@ -376,11 +458,13 @@
         }
 
         updateTransform(immediate = false) {
-            if (this.effect !== "slide") return;
+            if (this.effect !== "slide" || this.looping) return;
             if (immediate) this.track.style.transition = "none";
-            this.track.style.transform = `translate3d(${
-                -this.index * this.getStep()
-            }px, 0, 0)`;
+
+            this.track.style.transform = this.circular
+                ? "translate3d(0, 0, 0)"
+                : `translate3d(${-this.index * this.getStep()}px, 0, 0)`;
+
             if (immediate) {
                 void this.track.offsetWidth;
                 requestAnimationFrame(() => {
@@ -389,15 +473,33 @@
             }
         }
 
-        updateHeight() {
+        circularGroupHeight(start) {
+            const items = this.domItems();
+            const count = items.length;
+            let height = 0;
+            for (let i = 0; i < this.perView; i += 1) {
+                const item = items[(start + i) % count];
+                if (item) height = Math.max(height, item.offsetHeight);
+            }
+            return height;
+        }
+
+        groupHeight(start) {
+            if (this.circular) return this.circularGroupHeight(0);
+
             const last = Math.min(
-                this.index + this.perView,
+                start + this.perView,
                 this.slides.length
             );
             let height = 0;
-            for (let i = this.index; i < last; i += 1) {
+            for (let i = start; i < last; i += 1) {
                 height = Math.max(height, this.slides[i].offsetHeight);
             }
+            return height;
+        }
+
+        updateHeight() {
+            const height = this.groupHeight(this.index);
             if (height > 0) {
                 const next = `${height}px`;
                 if (this.viewport.style.height !== next) {
@@ -433,10 +535,14 @@
 
             if (this.counter) {
                 if (this.perView > 1) {
-                    const last = Math.min(
-                        this.index + this.perView,
-                        this.slides.length
-                    );
+                    const last = this.circular
+                        ? ((this.index + this.perView - 1) %
+                              this.slides.length) +
+                          1
+                        : Math.min(
+                              this.index + this.perView,
+                              this.slides.length
+                          );
                     this.counter.textContent = `${
                         this.index + 1
                     }\u2013${last}`;
@@ -470,10 +576,11 @@
         updateStatus() {
             if (!this.status) return;
             const first = this.index + 1;
-            const last = Math.min(
-                this.index + this.perView,
-                this.slides.length
-            );
+            const last = this.circular
+                ? ((this.index + this.perView - 1) %
+                      this.slides.length) +
+                  1
+                : Math.min(this.index + this.perView, this.slides.length);
             const range =
                 this.perView > 1
                     ? `Slides ${first} to ${last}`
@@ -595,6 +702,8 @@
         }
 
         next() {
+            if (this.looping) return false;
+            if (this.circular) return this.advance(1);
             if (!this.loop && this.index >= this.maxIndex()) {
                 return false;
             }
@@ -602,12 +711,106 @@
         }
 
         prev() {
+            if (this.looping) return false;
+            if (this.circular) return this.advance(-1);
             if (!this.loop && this.index <= 0) return false;
             return this.goTo(this.index - 1);
         }
 
+        /* Circular queue: the current group always sits at the front of the
+         * track. Next/Prev animate one step, then rotate the first/last node
+         * and snap the physical offset back to zero. */
+        advance(direction) {
+            if (this.looping) return false;
+            const items = this.domItems();
+            const count = items.length;
+            if (count < 2 || this.perView >= count) return false;
+
+            const previous = this.index;
+            const step = this.getStep();
+            const currentHeight = this.circularGroupHeight(0);
+            const targetStart = direction > 0 ? 1 : count - 1;
+            const targetHeight = this.circularGroupHeight(targetStart);
+            this.looping = true;
+
+            if (targetHeight > currentHeight) {
+                this.viewport.style.height = `${targetHeight}px`;
+            }
+
+            if (direction < 0) {
+                this.track.style.transition = "none";
+                this.track.insertBefore(
+                    items[count - 1],
+                    this.track.firstElementChild
+                );
+                this.track.style.transform = `translate3d(${-step}px, 0, 0)`;
+                void this.track.offsetWidth;
+                this.track.style.transition = "";
+                this.track.style.transform = "translate3d(0, 0, 0)";
+            } else {
+                this.track.style.transition = "";
+                void this.track.offsetWidth;
+                this.track.style.transform = `translate3d(${-step}px, 0, 0)`;
+            }
+
+            let timer = null;
+            const finish = () => {
+                if (!this.looping) return;
+                this.looping = false;
+                this.track.removeEventListener("transitionend", onEnd);
+                window.clearTimeout(timer);
+
+                this.track.style.transition = "none";
+                if (direction > 0) {
+                    this.track.appendChild(this.track.firstElementChild);
+                }
+                this.index =
+                    (this.index + direction + count) % count;
+                this.track.style.transform = "translate3d(0, 0, 0)";
+                void this.track.offsetWidth;
+                requestAnimationFrame(() => {
+                    this.track.style.transition = "";
+                });
+
+                this.activate(this.index);
+                this.updateHeight();
+                this.updateControls();
+                this.updateStatus();
+                this.root.dispatchEvent(
+                    new CustomEvent("carousel:change", {
+                        bubbles: true,
+                        detail: {
+                            index: this.index,
+                            previous,
+                            slide: this.slides[this.index],
+                        },
+                    })
+                );
+            };
+            const onEnd = (event) => {
+                if (
+                    event.target === this.track &&
+                    event.propertyName === "transform"
+                ) {
+                    finish();
+                }
+            };
+
+            this.track.addEventListener("transitionend", onEnd);
+            const duration =
+                parseFloat(
+                    getComputedStyle(this.track).transitionDuration
+                ) * 1000 || 0;
+            timer = window.setTimeout(finish, duration + 120);
+            if (this.prefersReducedMotion || !duration) {
+                requestAnimationFrame(finish);
+            }
+
+            return true;
+        }
+
         onWheel(event) {
-            if (event.ctrlKey || this.dragging) return;
+            if (event.ctrlKey || this.dragging || this.looping) return;
             if (
                 event.target instanceof Element &&
                 event.target.closest(".carousel-controls, .carousel-autoplay")
@@ -652,7 +855,7 @@
         }
 
         onPointerDown(event) {
-            if (event.button !== 0) return;
+            if (event.button !== 0 || this.looping) return;
             if (
                 event.target instanceof Element &&
                 event.target.closest(".carousel-controls, .carousel-edge, .carousel-autoplay")
@@ -667,6 +870,8 @@
             this.startTime = Date.now();
             this.deltaX = 0;
             this.dragging = false;
+            this.dragRotated = false;
+            this.dragBase = 0;
             this.ignoreDrag =
                 event.target instanceof Element &&
                 Boolean(
@@ -701,6 +906,9 @@
                     /* Synthetic pointers have no capture target. */
                 }
                 this.track.style.transition = "none";
+                if (this.circular && dx > 0) {
+                    this.prepareBackwardDrag();
+                }
             }
 
             if (event.cancelable) event.preventDefault();
@@ -722,9 +930,110 @@
                 }
             }
 
+            const base = this.dragRotated
+                ? this.dragBase
+                : this.circular
+                  ? 0
+                  : -this.index * step;
             this.track.style.transform = `translate3d(${
-                -this.index * step + offset
+                base + offset
             }px, 0, 0)`;
+        }
+
+        prepareBackwardDrag() {
+            if (this.dragRotated) return;
+            const step = this.getStep();
+            this.track.style.transition = "none";
+            this.track.insertBefore(
+                this.track.lastElementChild,
+                this.track.firstElementChild
+            );
+            this.track.style.transform = `translate3d(${-step}px, 0, 0)`;
+            this.dragBase = -step;
+            this.dragRotated = true;
+        }
+
+        /* Animate the current drag position to a target, then run done(). */
+        animateDragTo(target, done) {
+            this.looping = true;
+            this.track.style.transition = "";
+            void this.track.offsetWidth;
+            this.track.style.transform = `translate3d(${target}px, 0, 0)`;
+
+            let timer = null;
+            const finish = () => {
+                if (!this.looping) return;
+                this.looping = false;
+                this.track.removeEventListener("transitionend", onEnd);
+                window.clearTimeout(timer);
+                done();
+            };
+            const onEnd = (event) => {
+                if (
+                    event.target === this.track &&
+                    event.propertyName === "transform"
+                ) {
+                    finish();
+                }
+            };
+
+            this.track.addEventListener("transitionend", onEnd);
+            const duration =
+                parseFloat(
+                    getComputedStyle(this.track).transitionDuration
+                ) * 1000 || 0;
+            timer = window.setTimeout(finish, duration + 120);
+            if (this.prefersReducedMotion || !duration) {
+                requestAnimationFrame(finish);
+            }
+        }
+
+        finishBackwardDrag(commit) {
+            const count = this.slides.length;
+            const previous = this.index;
+            const targetHeight = commit
+                ? this.circularGroupHeight(0)
+                : this.circularGroupHeight(1);
+            const currentHeight = this.circularGroupHeight(1);
+            if (targetHeight > currentHeight) {
+                this.viewport.style.height = `${targetHeight}px`;
+            }
+
+            const done = () => {
+                this.track.style.transition = "none";
+                if (commit) {
+                    this.index = (this.index - 1 + count) % count;
+                } else {
+                    this.track.appendChild(this.track.firstElementChild);
+                }
+                this.track.style.transform = "translate3d(0, 0, 0)";
+                void this.track.offsetWidth;
+                requestAnimationFrame(() => {
+                    this.track.style.transition = "";
+                });
+
+                this.dragRotated = false;
+                this.dragBase = 0;
+                this.activate(this.index);
+                this.updateHeight();
+                this.updateControls();
+                this.updateStatus();
+
+                if (commit) {
+                    this.root.dispatchEvent(
+                        new CustomEvent("carousel:change", {
+                            bubbles: true,
+                            detail: {
+                                index: this.index,
+                                previous,
+                                slide: this.slides[this.index],
+                            },
+                        })
+                    );
+                }
+            };
+
+            this.animateDragTo(commit ? 0 : this.dragBase, done);
         }
 
         onPointerUp(event) {
@@ -760,6 +1069,17 @@
             const forward = this.deltaX < -threshold || velocity < -0.45;
             const backward = this.deltaX > threshold || velocity > 0.45;
 
+            if (this.dragRotated) {
+                this.finishBackwardDrag(backward);
+                if (Math.abs(this.deltaX) > 8) {
+                    this.suppressClickUntil = Date.now() + 350;
+                }
+                this.deltaX = 0;
+                this.pointerId = null;
+                this.schedule();
+                return;
+            }
+
             let moved = false;
             if (forward) moved = this.next();
             else if (backward) moved = this.prev();
@@ -783,7 +1103,21 @@
                 this.dragging = false;
                 this.root.classList.remove("is-dragging");
                 this.track.style.transition = "";
-                this.updateTransform();
+                if (this.dragRotated) {
+                    this.track.style.transition = "none";
+                    this.track.appendChild(this.track.firstElementChild);
+                    this.track.style.transform = "translate3d(0, 0, 0)";
+                    void this.track.offsetWidth;
+                    requestAnimationFrame(() => {
+                        this.track.style.transition = "";
+                    });
+                    this.dragRotated = false;
+                    this.dragBase = 0;
+                    this.activate(this.index);
+                    this.updateHeight();
+                } else {
+                    this.updateTransform();
+                }
             }
 
             this.deltaX = 0;
