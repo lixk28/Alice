@@ -1028,6 +1028,10 @@
             this.pointerId = event.pointerId;
             this.startX = event.clientX;
             this.startY = event.clientY;
+            this.startTime = Date.now();
+            this.lastMoveTime = 0;
+            this.lastMoveX = 0;
+            this.dragVelocity = 0;
             this.deltaX = 0;
             this.dragging = false;
             this.dragRotated = false;
@@ -1070,6 +1074,18 @@
                     this.prepareBackwardDrag();
                 }
             }
+
+            const now = Date.now();
+            if (this.lastMoveTime) {
+                const elapsed = now - this.lastMoveTime;
+                if (elapsed > 0 && elapsed < 120) {
+                    this.dragVelocity = (dx - this.lastMoveX) / elapsed;
+                }
+            } else {
+                this.dragVelocity = dx / Math.max(1, now - this.startTime);
+            }
+            this.lastMoveTime = now;
+            this.lastMoveX = dx;
 
             if (event.cancelable) event.preventDefault();
             this.deltaX = dx;
@@ -1246,9 +1262,16 @@
 
             const step = this.getStep();
             const halfway = step * 0.5;
+            const recent = this.lastMoveTime && Date.now() - this.lastMoveTime < 120;
+            const velocity = recent ? this.dragVelocity : 0;
+            const flick =
+                Math.abs(this.deltaX) >= 28 && Math.abs(velocity) >= 0.55;
 
             if (this.dragRotated) {
-                this.finishBackwardDrag(this.deltaX > halfway);
+                const commit =
+                    this.deltaX > halfway ||
+                    (flick && this.deltaX > 0);
+                this.finishBackwardDrag(commit);
                 if (Math.abs(this.deltaX) > 8) {
                     this.suppressClickUntil = Date.now() + 350;
                 }
@@ -1258,8 +1281,12 @@
                 return;
             }
 
-            const forward = this.deltaX < -halfway;
-            const backward = this.deltaX > halfway;
+            const forward =
+                this.deltaX < -halfway ||
+                (flick && this.deltaX < 0);
+            const backward =
+                this.deltaX > halfway ||
+                (flick && this.deltaX > 0);
 
             let moved = false;
             if (forward) moved = this.next();
