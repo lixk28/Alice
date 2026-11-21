@@ -659,7 +659,7 @@
     appearance: none;
     border: 0;
     font-size: var(--font-size-normal);
-    border-radius: .2em;
+    border-radius: 50%;
     background-color: transparent;
     color: var(--carousel-control-color);
     line-height: 1;
@@ -786,7 +786,7 @@
     padding: .4em;
     box-sizing: border-box;
     border: .08em solid var(--carousel-control-glass-border);
-    border-radius: .3em;
+    border-radius: 50%;
     background-color: var(--carousel-control-glass-bg);
     box-shadow: none;
     backdrop-filter: blur(6px);
