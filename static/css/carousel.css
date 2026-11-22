@@ -798,12 +798,6 @@
     z-index: 1;
 }
 
-.carousel-control[disabled] {
-    color: Silver;
-    cursor: default;
-    background-color: transparent;
-}
-
 /* Overlay prev/next: the whole full-height side strip is the button. The icon
  * sits on a small frosted chip that grows to fill the strip on hover. */
 .carousel-control.carousel-edge {
@@ -861,6 +855,35 @@
 
 .carousel-control.carousel-edge:focus-visible {
     outline-offset: -.15em;
+}
+
+/* A disabled prev/next must not keep any hover/focus chrome. The :not()
+ * below-mode hover selector is more specific than a bare [disabled], so
+ * repeat the disabled selectors here with the same specificity. */
+.carousel-control[disabled],
+.carousel-control[disabled]:hover,
+.carousel-navigator:not(.is-overlay) .carousel-control[disabled],
+.carousel-navigator:not(.is-overlay) .carousel-control[disabled]:hover,
+.carousel-control.carousel-edge[disabled],
+.carousel-control.carousel-edge[disabled]:hover {
+    color: Silver;
+    cursor: default;
+    background-color: transparent;
+    border-color: Silver;
+    box-shadow: none;
+    pointer-events: none;
+}
+
+.carousel-control[disabled] .carousel-edge-btn,
+.carousel-control[disabled]:hover .carousel-edge-btn,
+.carousel-control.carousel-edge[disabled] .carousel-edge-btn,
+.carousel-control.carousel-edge[disabled]:hover .carousel-edge-btn {
+    border-color: Silver;
+    background-color: transparent;
+    box-shadow: none;
+    opacity: .55;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 .carousel-control-icon {

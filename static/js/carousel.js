@@ -35,8 +35,12 @@
             );
             if (this.slides.length < 2) return;
 
-            this.prevButton = root.querySelector(".carousel-control-prev");
-            this.nextButton = root.querySelector(".carousel-control-next");
+            this.prevButtons = Array.from(
+                root.querySelectorAll(".carousel-control-prev")
+            );
+            this.nextButtons = Array.from(
+                root.querySelectorAll(".carousel-control-next")
+            );
             this.indicators = Array.from(
                 root.querySelectorAll("[data-carousel-goto]")
             );
@@ -298,11 +302,15 @@
         }
 
         bind() {
-            this.prevButton?.addEventListener("click", () =>
-                this.userNavigate(() => this.prev())
+            this.prevButtons.forEach((button) =>
+                button.addEventListener("click", () =>
+                    this.userNavigate(() => this.prev())
+                )
             );
-            this.nextButton?.addEventListener("click", () =>
-                this.userNavigate(() => this.next())
+            this.nextButtons.forEach((button) =>
+                button.addEventListener("click", () =>
+                    this.userNavigate(() => this.next())
+                )
             );
 
             this.indicators.forEach((button) => {
@@ -930,14 +938,25 @@
 
             this.previewIndex = null;
 
-            if (this.prevButton) {
-                this.prevButton.disabled =
-                    maxIndex === 0 || (!this.loop && atStart);
-            }
-            if (this.nextButton) {
-                this.nextButton.disabled =
-                    maxIndex === 0 || (!this.loop && atEnd);
-            }
+            const prevDisabled =
+                maxIndex === 0 || (!this.loop && atStart);
+            const nextDisabled =
+                maxIndex === 0 || (!this.loop && atEnd);
+
+            this.prevButtons.forEach((button) => {
+                button.disabled = prevDisabled;
+                button.setAttribute(
+                    "aria-disabled",
+                    String(prevDisabled)
+                );
+            });
+            this.nextButtons.forEach((button) => {
+                button.disabled = nextDisabled;
+                button.setAttribute(
+                    "aria-disabled",
+                    String(nextDisabled)
+                );
+            });
 
             this.updateIndicators(this.index);
         }
