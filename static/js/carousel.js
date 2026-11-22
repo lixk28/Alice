@@ -71,9 +71,6 @@
                 ? ((start % this.slides.length) + this.slides.length) %
                   this.slides.length
                 : Math.min(Math.max(start, 0), this.maxIndex());
-            if (this.circular && (this.index > 0 || this.scrollHint)) {
-                this.rotateToIndex(this.index);
-            }
             /* The frame follows the image shown first, so a carousel that
              * starts on a later slide does not wait for a lazy off-screen one. */
             this.frameItem = this.slides[this.index] || this.slides[0] || null;
@@ -88,8 +85,23 @@
             this.ignoreFocus = false;
             this.visible = !("IntersectionObserver" in window);
             this.dragging = false;
-            this.dragRotated = false;
-            this.dragBase = 0;
+            this.dragStep = 0;
+            this.dragRest = 0;
+            this.moveHistory = [];
+            this.slideShifts = [];
+            this.slideOffsets = [];
+            this.slideWidths = [];
+            this.viewWidth = 0;
+            this.step = 0;
+            this.contentSize = 0;
+            this.scrollPosition = 0;
+            this.scrollTarget = 0;
+            this.scrollVelocity = 0;
+            this.scrollDuration = 25;
+            this.scrollFriction = 0.68;
+            this.scrollFrame = null;
+            this.scrollSettled = null;
+            this.scrolling = false;
             this.pointerDown = false;
             this.ignoreDrag = false;
             this.pointerId = null;
@@ -130,19 +142,14 @@
         getStep() {
             const items = this.domItems();
             if (items.length < 2) return this.viewport.clientWidth;
-            const first = items[0].getBoundingClientRect();
-            const second = items[1].getBoundingClientRect();
-            const step = second.left - first.left;
+            const step = items[1].offsetLeft - items[0].offsetLeft;
             return step > 0 ? step : this.viewport.clientWidth;
         }
 
         getGap() {
             const first = this.domItems()[0];
             if (!first) return 0;
-            return Math.max(
-                0,
-                this.getStep() - first.getBoundingClientRect().width
-            );
+            return Math.max(0, this.getStep() - first.offsetWidth);
         }
 
         scrollHintWidth() {
@@ -157,17 +164,76 @@
             return value;
         }
 
+        updateLoopMetrics() {
+            this.step = this.getStep();
+            this.viewWidth = this.viewport.clientWidth;
+            const trackLeft = this.track.offsetLeft;
+            this.slideOffsets = this.slides.map((slide) =>
+                slide.offsetParent === this.track
+                    ? slide.offsetLeft
+                    : slide.offsetLeft - trackLeft
+            );
+            this.slideWidths = this.slides.map(
+                (slide) => slide.offsetWidth
+            );
+            this.contentSize = this.circular
+                ? this.slides.length * this.step
+                : 0;
+            if (this.circular) {
+                if (this.slideShifts.length !== this.slides.length) {
+                    this.slideShifts = new Array(this.slides.length).fill(
+                        null
+                    );
+                } else {
+                    this.slideShifts.fill(null);
+                }
+            } else {
+                this.slides.forEach((slide) => {
+                    if (slide.style.transform) slide.style.transform = "";
+                });
+                this.slideShifts = [];
+            }
+        }
+
+        loopBase() {
+            if (!this.scrollHint) return 0;
+            return this.scrollHintWidth() + this.getGap();
+        }
+
+        /* Keep the scroll coordinate in one content cycle. The per-slide
+         * offsets (layoutLoopSlides) make this invisible. */
+        normalizeLoop(position) {
+            const size = this.contentSize;
+            if (!this.circular || !size) return position;
+            let value = position % size;
+            if (value > 0) value -= size;
+            return value;
+        }
+
+        nearestLoop(target, from = this.scrollPosition) {
+            const size = this.contentSize;
+            if (!this.circular || !size) return target;
+            let value = target;
+            while (value - from > size / 2) value -= size;
+            while (from - value > size / 2) value += size;
+            return value;
+        }
+
+        circularRest(index = this.index) {
+            const step = this.step || this.getStep();
+            return this.normalizeLoop(this.loopBase() - index * step);
+        }
+
         /* Resting track offset, including the scrollHint window. */
         restTransform() {
             if (this.effect !== "slide") return 0;
+            if (this.circular) return this.circularRest(this.index);
             const step = this.getStep();
             if (!this.scrollHint) {
-                return this.circular ? 0 : -this.index * step;
+                return -this.index * step;
             }
             const gap = this.getGap();
             const hint = this.scrollHintWidth();
-            if (this.circular) return hint - (step - gap);
-
             const groupWidth = this.perView * step - gap;
             if (this.index <= 0) return 0;
             if (this.index >= this.maxIndex()) {
@@ -190,6 +256,7 @@
                 this.effect === "slide" &&
                 this.perView < this.slides.length;
             this.applyAutoFrame();
+            this.updateLoopMetrics();
 
             if (this.index > this.maxIndex()) this.index = this.maxIndex();
 
@@ -206,6 +273,7 @@
             }
 
             this.bind();
+            this.updateLoopMetrics();
             this.activate(this.index);
             this.updateTransform(true);
             this.updateHeight();
@@ -286,16 +354,37 @@
             this.viewport.addEventListener("pointerdown", (event) =>
                 this.onPointerDown(event)
             );
-            this.viewport.addEventListener(
+            /* Track the pointer on the window: a fast flick can lift outside
+             * the viewport, and the carousel still needs the pointerup. */
+            window.addEventListener(
                 "pointermove",
                 (event) => this.onPointerMove(event),
                 { passive: false }
             );
-            this.viewport.addEventListener("pointerup", (event) =>
+            window.addEventListener("pointerup", (event) =>
                 this.onPointerUp(event)
             );
-            this.viewport.addEventListener("pointercancel", () =>
-                this.onPointerCancel()
+            window.addEventListener("pointercancel", (event) =>
+                this.onPointerCancel(event)
+            );
+            /* Touch gets native touch events (Embla does the same): they are
+             * delivered to the start target even when the finger leaves it,
+             * and touchmove can prevent the browser pan. */
+            this.viewport.addEventListener(
+                "touchstart",
+                (event) => this.onTouchStart(event),
+                { passive: true }
+            );
+            window.addEventListener(
+                "touchmove",
+                (event) => this.onTouchMove(event),
+                { passive: false }
+            );
+            window.addEventListener("touchend", (event) =>
+                this.onTouchEnd(event)
+            );
+            window.addEventListener("touchcancel", () =>
+                this.onTouchCancel()
             );
             this.viewport.addEventListener(
                 "wheel",
@@ -413,14 +502,14 @@
                 const count = this.slides.length;
                 const next = ((index % count) + count) % count;
                 if (next === this.index) {
-                    this.updateTransform();
+                    this.updateTransform(false, options);
                     return false;
                 }
 
                 const previous = this.index;
-                this.rotateToIndex(next);
+                this.index = next;
                 this.activate(next);
-                this.updateTransform();
+                this.updateTransform(options.animate === false, options);
                 this.updateHeight();
                 this.updateControls();
                 this.updateStatus();
@@ -438,7 +527,7 @@
                 return true;
             }
 
-            const { animate = true } = options;
+            const { animate = true, duration, friction } = options;
             const maxIndex = this.maxIndex();
             const positions = maxIndex + 1;
             let next = index;
@@ -451,7 +540,7 @@
 
             if (next === this.index) {
                 if (this.effect === "slide" && animate) {
-                    this.updateTransform();
+                    this.updateTransform(false, { duration, friction });
                 }
                 return false;
             }
@@ -459,7 +548,7 @@
             const previous = this.index;
             this.index = next;
             this.activate(next);
-            this.updateTransform(!animate);
+            this.updateTransform(!animate, { duration, friction });
             this.updateHeight();
             this.updateControls();
             this.updateStatus();
@@ -478,27 +567,12 @@
             return true;
         }
 
-        rotateToIndex(index) {
-            const count = this.slides.length;
-            const start =
-                this.circular && this.scrollHint
-                    ? (index - 1 + count) % count
-                    : index;
-            const ordered = this.slides
-                .slice(start)
-                .concat(this.slides.slice(0, start));
-            ordered.forEach((slide) => this.track.appendChild(slide));
-            this.index = index;
-            this.track.style.transform = "translate3d(0, 0, 0)";
-        }
-
         activate(index) {
             if (this.circular) {
-                const items = this.domItems();
-                const offset = this.scrollHint ? 1 : 0;
-                items.forEach((slide, i) => {
+                const count = this.slides.length;
+                this.slides.forEach((slide, i) => {
                     const active =
-                        i >= offset && i < offset + this.perView;
+                        (i - index + count) % count < this.perView;
                     slide.classList.toggle("is-active", active);
                     if (active) {
                         slide.removeAttribute("aria-hidden");
@@ -525,18 +599,188 @@
             });
         }
 
-        updateTransform(immediate = false) {
-            if (this.effect !== "slide" || this.looping) return;
-            if (immediate) this.track.style.transition = "none";
+        applyScrollPosition() {
+            if (this.effect !== "slide") return;
+            this.track.style.transform = `translate3d(${this.scrollPosition}px, 0, 0)`;
+            if (this.circular) this.layoutLoopSlides();
+        }
 
-            this.track.style.transform = `translate3d(${this.restTransform()}px, 0, 0)`;
+        /* Reposition real slides by ±contentSize when their copy leaves the
+         * viewport. This is the SlideLooper equivalent: no DOM cloning. */
+        layoutLoopSlides() {
+            const size = this.contentSize;
+            if (!size) return;
+            const viewWidth = this.viewWidth;
+            if (!viewWidth) return;
+            const center = viewWidth / 2;
 
-            if (immediate) {
-                void this.track.offsetWidth;
-                requestAnimationFrame(() => {
-                    this.track.style.transition = "";
-                });
+            this.slides.forEach((slide, index) => {
+                const natural = this.slideOffsets[index] || 0;
+                const raw = natural + this.scrollPosition;
+                const width = this.slideWidths[index] || slide.offsetWidth;
+                const anchor = center - width / 2;
+                const startK = Math.round((anchor - raw) / size);
+                let bestK = startK;
+                let bestOverlap = -Infinity;
+                let bestDistance = Infinity;
+
+                for (let k = startK - 2; k <= startK + 2; k += 1) {
+                    const start = raw + k * size;
+                    const end = start + width;
+                    const overlap =
+                        Math.min(viewWidth, end) - Math.max(0, start);
+                    const distance = Math.abs(
+                        start + width / 2 - center
+                    );
+                    if (
+                        overlap > bestOverlap + 0.5 ||
+                        (Math.abs(overlap - bestOverlap) <= 0.5 &&
+                            distance < bestDistance)
+                    ) {
+                        bestOverlap = overlap;
+                        bestDistance = distance;
+                        bestK = k;
+                    }
+                }
+
+                const shift = bestK * size;
+                if (this.slideShifts[index] !== shift) {
+                    this.slideShifts[index] = shift;
+                    slide.style.transform = shift
+                        ? `translate3d(${shift}px, 0, 0)`
+                        : "";
+                }
+            });
+        }
+
+        stopScroll() {
+            if (this.scrollFrame) {
+                cancelAnimationFrame(this.scrollFrame);
+                this.scrollFrame = null;
             }
+            this.scrollSettled = null;
+            this.scrollVelocity = 0;
+            this.scrolling = false;
+            this.looping = false;
+        }
+
+        /* Embla-style scroll body: each frame adds displacement/duration to
+         * the velocity, damps it by friction, and moves the track. No CSS
+         * transition is involved, so a drag can hand over its exact position. */
+        scrollTo(target, options = {}) {
+            if (this.effect !== "slide") return;
+            const {
+                duration = 25,
+                friction = 0.68,
+                onSettled = null,
+            } = options;
+
+            this.scrollTarget = target;
+            this.scrollDuration = duration;
+            this.scrollFriction = friction;
+            this.scrollSettled = onSettled;
+            this.scrolling = true;
+            this.looping = true;
+
+            if (this.scrollFrame) {
+                cancelAnimationFrame(this.scrollFrame);
+                this.scrollFrame = null;
+            }
+            if (this.prefersReducedMotion || !duration) {
+                this.scrollPosition = target;
+                this.applyScrollPosition();
+                this.finishScroll();
+                return;
+            }
+            if (!this.scrollFrame) {
+                this.scrollFrame = requestAnimationFrame(() =>
+                    this.seekScroll()
+                );
+            }
+        }
+
+        /* While the finger is down the scroll body follows the pointer
+         * target with a soft lag instead of pinning the track to it. */
+        dragTo(target) {
+            if (this.effect !== "slide") return;
+            this.scrollTarget = target;
+            this.scrollDuration = 0.75;
+            this.scrollFriction = 0.3;
+            this.scrollSettled = null;
+            this.scrolling = true;
+            if (!this.scrollFrame) {
+                this.scrollFrame = requestAnimationFrame(() =>
+                    this.seekScroll()
+                );
+            }
+        }
+
+        seekScroll() {
+            this.scrollFrame = null;
+            const displacement = this.scrollTarget - this.scrollPosition;
+            this.scrollVelocity += displacement / this.scrollDuration;
+            this.scrollVelocity *= this.scrollFriction;
+            this.scrollPosition += this.scrollVelocity;
+            this.applyScrollPosition();
+
+            const remaining = Math.abs(
+                this.scrollTarget - this.scrollPosition
+            );
+            if (remaining < 0.5 && Math.abs(this.scrollVelocity) < 0.05) {
+                this.finishScroll();
+                return;
+            }
+            this.scrollFrame = requestAnimationFrame(() =>
+                this.seekScroll()
+            );
+        }
+
+        finishScroll() {
+            if (this.circular) {
+                this.scrollPosition = this.normalizeLoop(this.scrollTarget);
+                this.scrollTarget = this.scrollPosition;
+            } else {
+                this.scrollPosition = this.scrollTarget;
+            }
+            this.applyScrollPosition();
+            const callback = this.scrollSettled;
+            this.scrollSettled = null;
+            this.scrollFrame = null;
+            this.scrolling = false;
+            this.looping = false;
+            if (callback) callback();
+        }
+
+        updateTransform(immediate = false, options = {}) {
+            if (this.effect !== "slide") return;
+
+            if (this.circular) {
+                const rest = this.circularRest(this.index);
+                if (immediate) {
+                    this.stopScroll();
+                    this.scrollPosition = rest;
+                    this.scrollTarget = rest;
+                    this.applyScrollPosition();
+                    return;
+                }
+                if (this.looping) return;
+                this.scrollTo(
+                    this.nearestLoop(rest, this.scrollPosition),
+                    options
+                );
+                return;
+            }
+
+            const target = this.restTransform();
+            if (immediate) {
+                this.stopScroll();
+                this.scrollPosition = target;
+                this.scrollTarget = target;
+                this.applyScrollPosition();
+                return;
+            }
+            if (this.looping) return;
+            this.scrollTo(target, options);
         }
 
         circularGroupHeight(start) {
@@ -552,7 +796,7 @@
 
         groupHeight(start) {
             if (this.circular) {
-                return this.circularGroupHeight(this.scrollHint ? 1 : 0);
+                return this.circularGroupHeight(start);
             }
 
             const last = Math.min(
@@ -751,15 +995,38 @@
             );
             if (!active) return;
             const strip = active.closest(".carousel-indicator-wrap");
-            if (!strip || strip.scrollWidth <= strip.clientWidth + 1) return;
+            if (!strip) return;
+
+            /* Measure the buttons, not the strip's scroll width: tooltips are
+             * absolutely positioned and otherwise count as scroll overflow,
+             * which made the strip scroll even when every dot fit. */
+            const list = strip.querySelector(
+                ".carousel-indicator-list, .carousel-thumbnails"
+            );
+            const contentWidth = list
+                ? list.getBoundingClientRect().width
+                : strip.scrollWidth;
+            const behavior = this.prefersReducedMotion ? "auto" : "smooth";
+            if (contentWidth <= strip.clientWidth + 1) {
+                if (strip.scrollLeft !== 0) {
+                    strip.scrollTo({ left: 0, behavior });
+                }
+                return;
+            }
 
             const stripRect = strip.getBoundingClientRect();
             const activeRect = active.getBoundingClientRect();
-            const inset = 8;
+            /* Thumbnails keep a small breathing room; dots/segments align to
+             * the edge so the last one does not shift the whole row. */
+            const inset = strip.dataset.style === "thumbnails" ? 8 : 0;
+            let next = strip.scrollLeft;
             if (activeRect.left < stripRect.left + inset) {
-                strip.scrollLeft -= stripRect.left + inset - activeRect.left;
+                next -= stripRect.left + inset - activeRect.left;
             } else if (activeRect.right > stripRect.right - inset) {
-                strip.scrollLeft += activeRect.right - stripRect.right + inset;
+                next += activeRect.right - stripRect.right + inset;
+            }
+            if (Math.abs(next - strip.scrollLeft) > 1) {
+                strip.scrollTo({ left: next, behavior });
             }
         }
 
@@ -889,125 +1156,18 @@
             this.schedule();
         }
 
-        next() {
+        next(options = {}) {
             if (this.looping) return false;
-            if (this.circular) return this.advance(1);
             if (!this.loop && this.index >= this.maxIndex()) {
                 return false;
             }
-            return this.goTo(this.index + 1);
+            return this.goTo(this.index + 1, options);
         }
 
-        prev() {
+        prev(options = {}) {
             if (this.looping) return false;
-            if (this.circular) return this.advance(-1);
             if (!this.loop && this.index <= 0) return false;
-            return this.goTo(this.index - 1);
-        }
-
-        /* Circular queue: the current group always sits at the front of the
-         * track. Next/Prev animate one step, then rotate the first/last node
-         * and snap the physical offset back to zero. */
-        advance(direction) {
-            if (this.looping) return false;
-            const items = this.domItems();
-            const count = items.length;
-            if (count < 2 || this.perView >= count) return false;
-
-            const previous = this.index;
-            const step = this.getStep();
-            const base = this.restTransform();
-            const currentStart = this.scrollHint ? 1 : 0;
-            const currentHeight = this.circularGroupHeight(currentStart);
-            const targetStart =
-                (currentStart + direction + count) % count;
-            const targetHeight = this.circularGroupHeight(targetStart);
-            this.looping = true;
-
-            if (!this.fixedFrame && targetHeight > currentHeight) {
-                this.viewport.style.height = `${targetHeight}px`;
-            }
-
-            if (direction < 0) {
-                this.track.style.transition = "none";
-                this.track.insertBefore(
-                    items[count - 1],
-                    this.track.firstElementChild
-                );
-                this.track.style.transform = `translate3d(${base - step}px, 0, 0)`;
-                void this.track.offsetWidth;
-                this.track.style.transition = "";
-                this.track.style.transform = `translate3d(${base}px, 0, 0)`;
-            } else {
-                this.track.style.transition = "";
-                void this.track.offsetWidth;
-                this.track.style.transform = `translate3d(${base - step}px, 0, 0)`;
-            }
-
-            let timer = null;
-            let previewTimer = null;
-            const finish = () => {
-                if (!this.looping) return;
-                this.looping = false;
-                this.track.removeEventListener("transitionend", onEnd);
-                window.clearTimeout(timer);
-                window.clearTimeout(previewTimer);
-
-                this.track.style.transition = "none";
-                if (direction > 0) {
-                    this.track.appendChild(this.track.firstElementChild);
-                }
-                this.index =
-                    (this.index + direction + count) % count;
-                this.track.style.transform = `translate3d(${this.restTransform()}px, 0, 0)`;
-                void this.track.offsetWidth;
-                requestAnimationFrame(() => {
-                    this.track.style.transition = "";
-                });
-
-                this.activate(this.index);
-                this.updateHeight();
-                this.updateControls();
-                this.updateStatus();
-                this.root.dispatchEvent(
-                    new CustomEvent("carousel:change", {
-                        bubbles: true,
-                        detail: {
-                            index: this.index,
-                            previous,
-                            slide: this.slides[this.index],
-                        },
-                    })
-                );
-            };
-            const onEnd = (event) => {
-                if (
-                    event.target === this.track &&
-                    event.propertyName === "transform"
-                ) {
-                    finish();
-                }
-            };
-
-            this.track.addEventListener("transitionend", onEnd);
-            const duration =
-                parseFloat(
-                    getComputedStyle(this.track).transitionDuration
-                ) * 1000 || 0;
-            timer = window.setTimeout(finish, duration + 120);
-            if (duration > 0) {
-                previewTimer = window.setTimeout(() => {
-                    if (!this.looping) return;
-                    this.previewIndicator(
-                        (this.index + direction + count) % count
-                    );
-                }, duration * 0.5);
-            }
-            if (this.prefersReducedMotion || !duration) {
-                requestAnimationFrame(finish);
-            }
-
-            return true;
+            return this.goTo(this.index - 1, options);
         }
 
         onWheel(event) {
@@ -1037,7 +1197,19 @@
             dx *= unit;
 
             const now = Date.now();
-            if (now < this.wheelLockedUntil) return;
+            if (now < this.wheelLockedUntil) {
+                /* Keep accumulating while the lock runs so a continuous
+                 * trackpad gesture chains the next slide. */
+                if (this.wheelDelta && Math.sign(dx) !== Math.sign(this.wheelDelta)) {
+                    this.wheelDelta = 0;
+                }
+                this.wheelDelta += dx;
+                window.clearTimeout(this.wheelResetTimer);
+                this.wheelResetTimer = window.setTimeout(() => {
+                    this.wheelDelta = 0;
+                }, 250);
+                return;
+            }
 
             if (this.wheelDelta && Math.sign(dx) !== Math.sign(this.wheelDelta)) {
                 this.wheelDelta = 0;
@@ -1049,16 +1221,25 @@
                 this.wheelDelta = 0;
             }, 250);
 
-            if (Math.abs(this.wheelDelta) < 40) return;
+            if (Math.abs(this.wheelDelta) < 30) return;
 
             const forward = this.wheelDelta > 0;
             this.wheelDelta = 0;
-            this.wheelLockedUntil = now + 400;
+            this.wheelLockedUntil = now + 320;
             this.userNavigate(() => (forward ? this.next() : this.prev()));
         }
 
-        onPointerDown(event) {
-            if (event.button !== 0 || this.looping) return;
+        eventTime(event) {
+            return event.timeStamp && event.timeStamp > 0
+                ? event.timeStamp
+                : Date.now();
+        }
+
+        onPointerDown(event, fromTouch = false) {
+            if (event.pointerType === "touch" && !fromTouch) return;
+            if (event.button !== 0 || this.pointerDown) {
+                return;
+            }
             if (
                 event.target instanceof Element &&
                 event.target.closest(
@@ -1068,18 +1249,17 @@
                 return;
             }
 
+            this.stopScroll();
             this.pointerDown = true;
             this.pointerId = event.pointerId;
             this.startX = event.clientX;
             this.startY = event.clientY;
-            this.startTime = Date.now();
-            this.lastMoveTime = 0;
-            this.lastMoveX = 0;
-            this.dragVelocity = 0;
+            this.startTime = this.eventTime(event);
             this.deltaX = 0;
             this.dragging = false;
-            this.dragRotated = false;
-            this.dragBase = 0;
+            this.dragStep = 0;
+            this.dragRest = 0;
+            this.moveHistory = [{ t: this.startTime, x: 0 }];
             this.ignoreDrag =
                 event.target instanceof Element &&
                 Boolean(
@@ -1101,35 +1281,34 @@
 
             const dx = event.clientX - this.startX;
             const dy = event.clientY - this.startY;
+            const now = this.eventTime(event);
 
             if (!this.dragging) {
-                if (Math.abs(dx) < 8) return;
-                if (Math.abs(dy) > Math.abs(dx)) return;
+                /* A horizontal intention starts the drag; vertical movement
+                 * is left to the browser (touch-action: pan-y). */
+                if (Math.abs(dx) < 10) return;
+                if (Math.abs(dy) > Math.abs(dx) * 0.6) return;
 
                 this.dragging = true;
+                this.dragStep = this.getStep();
+                this.dragRest = this.scrollPosition;
                 this.root.classList.add("is-dragging");
-                try {
-                    this.viewport.setPointerCapture?.(event.pointerId);
-                } catch {
-                    /* Synthetic pointers have no capture target. */
-                }
-                this.track.style.transition = "none";
-                if (this.circular && dx > 0) {
-                    this.prepareBackwardDrag();
+                if (event.pointerType !== "touch") {
+                    try {
+                        this.viewport.setPointerCapture?.(event.pointerId);
+                    } catch {
+                        /* Synthetic pointers have no capture target. */
+                    }
                 }
             }
 
-            const now = Date.now();
-            if (this.lastMoveTime) {
-                const elapsed = now - this.lastMoveTime;
-                if (elapsed > 0 && elapsed < 120) {
-                    this.dragVelocity = (dx - this.lastMoveX) / elapsed;
-                }
-            } else {
-                this.dragVelocity = dx / Math.max(1, now - this.startTime);
+            this.moveHistory.push({ t: now, x: dx });
+            while (
+                this.moveHistory.length > 2 &&
+                now - this.moveHistory[0].t > 140
+            ) {
+                this.moveHistory.shift();
             }
-            this.lastMoveTime = now;
-            this.lastMoveX = dx;
 
             if (event.cancelable) event.preventDefault();
             this.deltaX = dx;
@@ -1141,7 +1320,7 @@
 
             const atStart = this.index === 0;
             const atEnd = this.index >= this.maxIndex();
-            const step = this.getStep();
+            const step = this.dragStep || this.getStep();
             let offset = dx;
 
             if (!this.loop) {
@@ -1150,12 +1329,21 @@
                 }
             }
 
-            const base = this.dragRotated
-                ? this.dragBase
-                : this.restTransform();
-            this.track.style.transform = `translate3d(${
-                base + offset
-            }px, 0, 0)`;
+            /* Rubber-band past one slide so the track resists a long drag,
+             * except in the looping slide effect where slides wrap. */
+            if (
+                !this.circular &&
+                step > 0 &&
+                Math.abs(offset) > step
+            ) {
+                const over = Math.abs(offset) - step;
+                offset = Math.sign(offset) * (step + over * 0.35);
+            }
+
+            const base = this.dragging
+                ? this.dragRest
+                : this.scrollPosition;
+            this.dragTo(base + offset);
 
             let destination = this.index;
             if (this.circular) {
@@ -1179,106 +1367,19 @@
             );
         }
 
-        prepareBackwardDrag() {
-            if (this.dragRotated) return;
-            const step = this.getStep();
-            const base = this.restTransform();
-            this.track.style.transition = "none";
-            this.track.insertBefore(
-                this.track.lastElementChild,
-                this.track.firstElementChild
-            );
-            this.track.style.transform = `translate3d(${base - step}px, 0, 0)`;
-            this.dragBase = base - step;
-            this.dragRotated = true;
-        }
-
-        /* Animate the current drag position to a target, then run done(). */
-        animateDragTo(target, done) {
-            this.looping = true;
-            this.track.style.transition = "";
-            void this.track.offsetWidth;
-            this.track.style.transform = `translate3d(${target}px, 0, 0)`;
-
-            let timer = null;
-            const finish = () => {
-                if (!this.looping) return;
-                this.looping = false;
-                this.track.removeEventListener("transitionend", onEnd);
-                window.clearTimeout(timer);
-                done();
-            };
-            const onEnd = (event) => {
-                if (
-                    event.target === this.track &&
-                    event.propertyName === "transform"
-                ) {
-                    finish();
-                }
-            };
-
-            this.track.addEventListener("transitionend", onEnd);
-            const duration =
-                parseFloat(
-                    getComputedStyle(this.track).transitionDuration
-                ) * 1000 || 0;
-            timer = window.setTimeout(finish, duration + 120);
-            if (this.prefersReducedMotion || !duration) {
-                requestAnimationFrame(finish);
+        /* A short, recent velocity window (px/ms) is more reliable than the
+         * last pointermove pair, which can be a tiny lift sample. */
+        dragSpeed() {
+            const history = this.moveHistory;
+            if (history.length < 2) return 0;
+            const last = history[history.length - 1];
+            let first = history[0];
+            for (let i = history.length - 2; i >= 0; i -= 1) {
+                if (last.t - history[i].t <= 120) first = history[i];
+                else break;
             }
-        }
-
-        finishBackwardDrag(commit) {
-            const count = this.slides.length;
-            const previous = this.index;
-            const currentStart = this.scrollHint ? 2 : 1;
-            const targetStart = this.scrollHint ? 1 : 0;
-            const targetHeight = commit
-                ? this.circularGroupHeight(targetStart)
-                : this.circularGroupHeight(currentStart);
-            const currentHeight = this.circularGroupHeight(currentStart);
-            if (!this.fixedFrame && targetHeight > currentHeight) {
-                this.viewport.style.height = `${targetHeight}px`;
-            }
-
-            const done = () => {
-                this.track.style.transition = "none";
-                if (commit) {
-                    this.index = (this.index - 1 + count) % count;
-                } else {
-                    this.track.appendChild(this.track.firstElementChild);
-                }
-                this.track.style.transform = `translate3d(${this.restTransform()}px, 0, 0)`;
-                void this.track.offsetWidth;
-                requestAnimationFrame(() => {
-                    this.track.style.transition = "";
-                });
-
-                this.dragRotated = false;
-                this.dragBase = 0;
-                this.activate(this.index);
-                this.updateHeight();
-                this.updateControls();
-                this.updateStatus();
-
-                if (commit) {
-                    this.root.dispatchEvent(
-                        new CustomEvent("carousel:change", {
-                            bubbles: true,
-                            detail: {
-                                index: this.index,
-                                previous,
-                                slide: this.slides[this.index],
-                            },
-                        })
-                    );
-                }
-            };
-
-            this.animateDragTo(
-                commit ? this.restTransform() : this.dragBase,
-                done
-            );
+            const elapsed = last.t - first.t;
+            return elapsed > 0 ? (last.x - first.x) / elapsed : 0;
         }
 
         onPointerUp(event) {
@@ -1287,9 +1388,36 @@
             }
 
             this.pointerDown = false;
+            const ignoredTarget = this.ignoreDrag;
             this.ignoreDrag = false;
 
             if (!this.dragging) {
+                /* Swiper-style short swipe: a fast flick may never cross the
+                 * drag threshold before the finger lifts. */
+                const now = this.eventTime(event);
+                const dx = Number.isFinite(event.clientX)
+                    ? event.clientX - this.startX
+                    : 0;
+                const dy = Number.isFinite(event.clientY)
+                    ? event.clientY - this.startY
+                    : 0;
+                const elapsed = now - this.startTime;
+                const horizontal = Math.abs(dx) > Math.abs(dy);
+                if (
+                    !ignoredTarget &&
+                    horizontal &&
+                    Math.abs(dx) >= 10 &&
+                    elapsed <= 300
+                ) {
+                    const settle = {
+                        duration: 18,
+                        friction: 0.68,
+                    };
+                    const moved =
+                        dx < 0 ? this.next(settle) : this.prev(settle);
+                    if (!moved) this.updateTransform(false, settle);
+                    this.suppressClickUntil = Date.now() + 350;
+                }
                 this.pointerId = null;
                 this.deltaX = 0;
                 this.schedule();
@@ -1298,46 +1426,56 @@
 
             this.dragging = false;
             this.root.classList.remove("is-dragging");
-            this.track.style.transition = "";
 
-            if (this.viewport.hasPointerCapture?.(event.pointerId)) {
+            if (
+                event.pointerType !== "touch" &&
+                this.viewport.hasPointerCapture?.(event.pointerId)
+            ) {
                 this.viewport.releasePointerCapture(event.pointerId);
             }
 
-            const step = this.getStep();
-            const halfway = step * 0.5;
-            const recent = this.lastMoveTime && Date.now() - this.lastMoveTime < 120;
-            const velocity = recent ? this.dragVelocity : 0;
-            const flick =
-                Math.abs(this.deltaX) >= 28 && Math.abs(velocity) >= 0.55;
-
-            if (this.dragRotated) {
-                const commit =
-                    this.deltaX > halfway ||
-                    (flick && this.deltaX > 0);
-                this.finishBackwardDrag(commit);
-                if (Math.abs(this.deltaX) > 8) {
-                    this.suppressClickUntil = Date.now() + 350;
-                }
-                this.deltaX = 0;
-                this.pointerId = null;
-                this.schedule();
-                return;
+            const now = this.eventTime(event);
+            const upDx = Number.isFinite(event.clientX)
+                ? event.clientX - this.startX
+                : this.deltaX;
+            if (Math.abs(upDx) > Math.abs(this.deltaX)) {
+                this.deltaX = upDx;
+            }
+            this.moveHistory.push({ t: now, x: this.deltaX });
+            while (
+                this.moveHistory.length > 2 &&
+                now - this.moveHistory[0].t > 140
+            ) {
+                this.moveHistory.shift();
             }
 
-            const forward =
-                this.deltaX < -halfway ||
-                (flick && this.deltaX < 0);
-            const backward =
-                this.deltaX > halfway ||
-                (flick && this.deltaX > 0);
+            const step = this.dragStep || this.getStep();
+            const speed = this.dragSpeed();
+            const threshold = Math.min(225, Math.max(50, step * 0.2));
+            /* Embla's release force: velocity is boosted into a distance,
+             * then compared with the next-slide threshold. */
+            const boost = event.pointerType === "mouse" ? 300 : 400;
+            const projected = this.deltaX + speed * boost;
+            const deliberate = Math.abs(this.deltaX) >= 8;
+
+            const forceFactor = Math.min(
+                1,
+                Math.abs(projected) / Math.max(1, step)
+            );
+            const settle = {
+                duration: 25 - 10 * forceFactor,
+                friction: 0.68 + forceFactor / 50,
+            };
+
+            const forward = deliberate && projected < -threshold;
+            const backward = deliberate && projected > threshold;
 
             let moved = false;
-            if (forward) moved = this.next();
-            else if (backward) moved = this.prev();
+            if (forward) moved = this.next(settle);
+            else if (backward) moved = this.prev(settle);
 
             if (!moved) {
-                this.updateTransform();
+                this.updateTransform(false, settle);
                 this.clearPreview();
             }
             if (Math.abs(this.deltaX) > 8) {
@@ -1346,10 +1484,80 @@
 
             this.deltaX = 0;
             this.pointerId = null;
+            this.dragStep = 0;
+            this.dragRest = 0;
             this.schedule();
         }
 
-        onPointerCancel() {
+        touchEvent(touch, event, type) {
+            return {
+                pointerId: "touch",
+                pointerType: "touch",
+                isPrimary: true,
+                button: type === "pointerdown" ? 0 : -1,
+                buttons: type === "pointerup" ? 0 : 1,
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+                target: event.target,
+                timeStamp: event.timeStamp,
+                cancelable: event.cancelable,
+                preventDefault() {},
+            };
+        }
+
+        onTouchStart(event) {
+            if (this.pointerDown || !event.touches.length) return;
+            const touch = event.touches[0];
+            this.onPointerDown(
+                this.touchEvent(touch, event, "pointerdown"),
+                true
+            );
+        }
+
+        onTouchMove(event) {
+            if (!this.pointerDown || this.pointerId !== "touch") return;
+            if (event.touches.length > 1) {
+                this.onPointerCancel();
+                return;
+            }
+            const touch = event.touches[0];
+            if (!touch) return;
+            this.onPointerMove(
+                this.touchEvent(touch, event, "pointermove")
+            );
+            const dx = touch.clientX - this.startX;
+            const dy = touch.clientY - this.startY;
+            if (
+                this.dragging ||
+                (Math.abs(dx) >= 10 &&
+                    Math.abs(dy) <= Math.abs(dx) * 0.6)
+            ) {
+                if (event.cancelable) event.preventDefault();
+            }
+        }
+
+        onTouchEnd(event) {
+            if (this.pointerId !== "touch" || !event.changedTouches.length) {
+                return;
+            }
+            this.onPointerUp(
+                this.touchEvent(
+                    event.changedTouches[0],
+                    event,
+                    "pointerup"
+                )
+            );
+        }
+
+        onTouchCancel() {
+            if (this.pointerId === "touch") this.onPointerCancel();
+        }
+
+        onPointerCancel(event) {
+            if (event && event.pointerType === "touch") {
+                this.onTouchCancel();
+                return;
+            }
             this.pointerDown = false;
             this.ignoreDrag = false;
             this.pointerId = null;
@@ -1357,22 +1565,7 @@
             if (this.dragging) {
                 this.dragging = false;
                 this.root.classList.remove("is-dragging");
-                this.track.style.transition = "";
-                if (this.dragRotated) {
-                    this.track.style.transition = "none";
-                    this.track.appendChild(this.track.firstElementChild);
-                    this.track.style.transform = `translate3d(${this.restTransform()}px, 0, 0)`;
-                    void this.track.offsetWidth;
-                    requestAnimationFrame(() => {
-                        this.track.style.transition = "";
-                    });
-                    this.dragRotated = false;
-                    this.dragBase = 0;
-                    this.activate(this.index);
-                    this.updateHeight();
-                } else {
-                    this.updateTransform();
-                }
+                this.updateTransform(true);
                 this.clearPreview();
             }
 

@@ -157,7 +157,6 @@
     display: flex;
     align-items: flex-start;
     gap: var(--carousel-gap);
-    transition: transform var(--transition-duration-normal) ease;
     will-change: transform;
 }
 
@@ -374,6 +373,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
     /* Hide the scrollbar so it adds no height to the control bar; prev/next
      * and the automatic scroll keep overflow reachable. */
     -ms-overflow-style: none;
@@ -1022,10 +1022,6 @@
 
 /* --------------------------------------------------------------- states */
 
-.carousel.is-dragging .carousel-track {
-    transition: none;
-}
-
 .carousel.is-dragging .carousel-viewport {
     cursor: grabbing;
 }
@@ -1112,6 +1108,7 @@
         overflow-x: auto;
         overflow-y: hidden;
         overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
@@ -1134,6 +1131,7 @@
         overflow-x: auto;
         overflow-y: hidden;
         overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         -ms-overflow-style: none;
     }
@@ -1144,6 +1142,13 @@
 
     .carousel-overlay-group .carousel-indicator-list {
         flex-wrap: nowrap;
+    }
+
+    /* The scrolling strip clips tooltips; hide them (the buttons keep their
+     * aria-label). They also inflate the strip's scroll width. */
+    .carousel-indicator-wrap
+        .carousel-indicator-control[data-tooltip]::after {
+        display: none;
     }
 }
 
