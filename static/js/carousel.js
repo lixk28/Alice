@@ -109,6 +109,8 @@
             this.pointerDown = false;
             this.ignoreDrag = false;
             this.pointerId = null;
+            this.wasScrolling = false;
+            this.pendingRefresh = false;
             this.suppressClickUntil = 0;
             this.wheelDelta = 0;
             this.wheelLockedUntil = 0;
@@ -162,8 +164,11 @@
                 .trim();
             const value = parseFloat(raw);
             if (!Number.isFinite(value)) return 0;
-            if (raw.endsWith("em")) {
-                return value * parseFloat(getComputedStyle(this.root).fontSize);
+            const fontSize = parseFloat(
+                getComputedStyle(this.root).fontSize
+            );
+            if (raw.endsWith("rem") || raw.endsWith("em")) {
+                return value * fontSize;
             }
             return value;
         }
@@ -255,7 +260,16 @@
         }
 
         refreshLayout(immediate = false) {
-            if (this.looping) return;
+            if (this.dragging) {
+                this.pendingRefresh = true;
+                return;
+            }
+            if (this.looping) {
+                this.pendingRefresh = true;
+                if (!immediate) return;
+                this.stopScroll();
+            }
+            this.pendingRefresh = false;
             const perView = this.readPerView();
             const changed = perView !== this.perView;
             this.perView = perView;
@@ -431,7 +445,6 @@
         observe() {
             if ("ResizeObserver" in window) {
                 this.resizeObserver = new ResizeObserver(() => {
-                    if (this.dragging) return;
                     this.refreshLayout();
                 });
                 this.resizeObserver.observe(this.viewport);
@@ -456,7 +469,6 @@
             });
 
             window.addEventListener("resize", () => {
-                if (this.dragging) return;
                 this.refreshLayout(true);
             });
 
@@ -760,6 +772,9 @@
             this.scrollFrame = null;
             this.scrolling = false;
             this.looping = false;
+            const pendingRefresh = this.pendingRefresh;
+            this.pendingRefresh = false;
+            if (pendingRefresh) this.refreshLayout();
             if (callback) callback();
         }
 
@@ -1278,6 +1293,7 @@
                 return;
             }
 
+            this.wasScrolling = this.scrolling;
             this.stopScroll();
             this.pointerDown = true;
             this.pointerId = event.pointerId;
@@ -1418,7 +1434,9 @@
 
             this.pointerDown = false;
             const ignoredTarget = this.ignoreDrag;
+            const wasScrolling = this.wasScrolling;
             this.ignoreDrag = false;
+            this.wasScrolling = false;
 
             if (!this.dragging) {
                 /* Swiper-style short swipe: a fast flick may never cross the
@@ -1446,6 +1464,12 @@
                         dx < 0 ? this.next(settle) : this.prev(settle);
                     if (!moved) this.updateTransform(false, settle);
                     this.suppressClickUntil = Date.now() + 350;
+                } else if (wasScrolling) {
+                    /* A tap during a scroll stops it on pointerdown. Put the
+                     * track back on its snap point instead of leaving it
+                     * frozen between two slides. */
+                    this.updateTransform(false);
+                    this.clearPreview();
                 }
                 this.pointerId = null;
                 this.deltaX = 0;
@@ -1590,6 +1614,7 @@
             this.pointerDown = false;
             this.ignoreDrag = false;
             this.pointerId = null;
+            this.wasScrolling = false;
 
             if (this.dragging) {
                 this.dragging = false;
@@ -1600,6 +1625,11 @@
 
             this.deltaX = 0;
             this.schedule();
+
+            if (this.pendingRefresh) {
+                this.pendingRefresh = false;
+                this.refreshLayout();
+            }
         }
     }
 
