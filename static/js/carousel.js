@@ -210,12 +210,16 @@
             return value;
         }
 
-        nearestLoop(target, from = this.scrollPosition) {
+        nearestLoop(target, from = this.scrollPosition, direction = 0) {
             const size = this.contentSize;
             if (!this.circular || !size) return target;
-            let value = target;
-            while (value - from > size / 2) value -= size;
-            while (from - value > size / 2) value += size;
+            const cycle = Math.round((from - target) / size);
+            let value = target + cycle * size;
+            /* With two slides every loop step is exactly half a content
+             * size, so the nearest target is a tie. Use the intended
+             * direction to keep Next moving forward and Prev backward. */
+            if (direction < 0 && value > from) value -= size;
+            if (direction > 0 && value < from) value += size;
             return value;
         }
 
@@ -496,7 +500,7 @@
         }
 
         goTo(index, options = {}) {
-            if (this.looping) return false;
+            if (this.dragging) return false;
 
             if (this.circular) {
                 const count = this.slides.length;
@@ -763,9 +767,12 @@
                     this.applyScrollPosition();
                     return;
                 }
-                if (this.looping) return;
                 this.scrollTo(
-                    this.nearestLoop(rest, this.scrollPosition),
+                    this.nearestLoop(
+                        rest,
+                        this.scrollPosition,
+                        options.direction || 0
+                    ),
                     options
                 );
                 return;
@@ -779,7 +786,6 @@
                 this.applyScrollPosition();
                 return;
             }
-            if (this.looping) return;
             this.scrollTo(target, options);
         }
 
@@ -1157,21 +1163,25 @@
         }
 
         next(options = {}) {
-            if (this.looping) return false;
             if (!this.loop && this.index >= this.maxIndex()) {
                 return false;
             }
-            return this.goTo(this.index + 1, options);
+            return this.goTo(this.index + 1, {
+                ...options,
+                direction: -1,
+            });
         }
 
         prev(options = {}) {
-            if (this.looping) return false;
             if (!this.loop && this.index <= 0) return false;
-            return this.goTo(this.index - 1, options);
+            return this.goTo(this.index - 1, {
+                ...options,
+                direction: 1,
+            });
         }
 
         onWheel(event) {
-            if (event.ctrlKey || this.dragging || this.looping) return;
+            if (event.ctrlKey || this.pointerDown) return;
             if (
                 event.target instanceof Element &&
                 event.target.closest(
