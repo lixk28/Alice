@@ -13,6 +13,10 @@
     --carousel-indicator-active-color: var(--link-color);
     --carousel-indicator-hover-color: var(--link-active-color);
     --carousel-control-icon-size: 1.8em;
+    --carousel-control-size: 2.25em;
+    --carousel-autoplay-size: 2.4em;
+    --carousel-edge-width: 3.5em;
+    --carousel-thumbnail-width: 4.2em;
     --carousel-counter-color: DimGray;
     --carousel-control-bg: White;
     --carousel-control-border: Silver;
@@ -284,18 +288,18 @@
 /* Full-height edge arrows sit on the left/right; keep side captions clear. */
 .carousel.has-edge-navigator
     .carousel-slide-overlay[data-caption-position$="left"] {
-    left: calc(3.5em + var(--carousel-caption-inset));
+    left: calc(var(--carousel-edge-width) + var(--carousel-caption-inset));
     max-width: calc(
-        100% - 3.5em - var(--carousel-caption-inset) -
+        100% - var(--carousel-edge-width) - var(--carousel-caption-inset) -
             var(--carousel-caption-inset)
     );
 }
 
 .carousel.has-edge-navigator
     .carousel-slide-overlay[data-caption-position$="right"] {
-    right: calc(3.5em + var(--carousel-caption-inset));
+    right: calc(var(--carousel-edge-width) + var(--carousel-caption-inset));
     max-width: calc(
-        100% - 3.5em - var(--carousel-caption-inset) -
+        100% - var(--carousel-edge-width) - var(--carousel-caption-inset) -
             var(--carousel-caption-inset)
     );
 }
@@ -303,8 +307,8 @@
 .carousel.has-edge-navigator
     .carousel-slide-overlay[data-caption-position$="center"] {
     max-width: calc(
-        100% - 7em - var(--carousel-caption-inset) -
-            var(--carousel-caption-inset)
+        100% - var(--carousel-edge-width) - var(--carousel-edge-width) -
+            var(--carousel-caption-inset) - var(--carousel-caption-inset)
     );
 }
 
@@ -312,22 +316,22 @@
  * the autoplay button inside them. */
 .carousel.has-edge-navigator
     .carousel-overlay-group[data-position$="left"] {
-    left: calc(3.5em + var(--carousel-autoplay-inset));
+    left: calc(var(--carousel-edge-width) + var(--carousel-autoplay-inset));
 }
 
 .carousel.has-edge-navigator
     .carousel-overlay-group[data-position$="right"] {
-    right: calc(3.5em + var(--carousel-autoplay-inset));
+    right: calc(var(--carousel-edge-width) + var(--carousel-autoplay-inset));
 }
 
 .carousel.has-edge-navigator
     .carousel-autoplay[data-position$="left"] {
-    left: calc(3.5em + var(--carousel-autoplay-inset));
+    left: calc(var(--carousel-edge-width) + var(--carousel-autoplay-inset));
 }
 
 .carousel.has-edge-navigator
     .carousel-autoplay[data-position$="right"] {
-    right: calc(3.5em + var(--carousel-autoplay-inset));
+    right: calc(var(--carousel-edge-width) + var(--carousel-autoplay-inset));
 }
 
 .carousel-caption {
@@ -402,7 +406,7 @@
 
 .carousel-thumbnail {
     display: block;
-    width: 4.2em;
+    width: var(--carousel-thumbnail-width);
     aspect-ratio: 3 / 2;
     padding: 0;
     appearance: none;
@@ -480,8 +484,9 @@
 }
 
 .carousel-overlay-group[data-position$="center"] {
-    left: 50%;
-    transform: translateX(-50%);
+    right: var(--carousel-autoplay-inset);
+    left: var(--carousel-autoplay-inset);
+    justify-content: center;
 }
 
 .carousel-overlay-group[data-position$="right"] {
@@ -599,6 +604,7 @@
 /* Dots and segments share one flex row; spacing lives in the button padding. */
 .carousel-indicator-list {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: 0;
@@ -696,8 +702,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.25em;
-    height: 2.25em;
+    width: var(--carousel-control-size);
+    height: var(--carousel-control-size);
     padding: 0;
     appearance: none;
     border: 0;
@@ -745,8 +751,8 @@
 .carousel-autoplay {
     position: absolute;
     z-index: 8;
-    width: 2.4em;
-    height: 2.4em;
+    width: var(--carousel-autoplay-size);
+    height: var(--carousel-autoplay-size);
     border: .08em solid var(--carousel-control-glass-border);
     border-radius: 50%;
     background-color: var(--carousel-control-glass-bg);
@@ -805,7 +811,7 @@
     top: 0;
     bottom: 0;
     z-index: 5;
-    width: 3.5em;
+    width: var(--carousel-edge-width);
     height: auto;
     padding: 0;
     border-radius: 0;
@@ -824,8 +830,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.6em;
-    height: 2.6em;
+    width: calc(var(--carousel-control-icon-size) + .8em);
+    height: calc(var(--carousel-control-icon-size) + .8em);
     padding: .4em;
     box-sizing: border-box;
     border: .08em solid var(--carousel-control-glass-border);
@@ -1030,6 +1036,16 @@
 
 /* A narrow viewport shows one slide, even when perView asks for more. */
 @media screen and (max-width: 40em) {
+    /* Controls shrink with the viewport: 2.25em buttons and 3.5em edge strips
+     * are oversized on a phone and eat into the image. */
+    :root {
+        --carousel-control-size: 1.9em;
+        --carousel-autoplay-size: 2em;
+        --carousel-control-icon-size: 1.4em;
+        --carousel-edge-width: 2.5em;
+        --carousel-thumbnail-width: 3.2em;
+    }
+
     .carousel[data-carousel] {
         --carousel-per-view: 1 !important;
         --carousel-slide-basis: 100% !important;
@@ -1052,17 +1068,132 @@
     .carousel.is-static .carousel-item {
         flex-basis: 100%;
     }
+
+    /* A slightly larger dot with a 1.5em (24px) hit target. The panel space
+     * grows a little so adjacent targets stay separate. */
+    .carousel-indicator {
+        width: .55em;
+        height: .55em;
+        padding: .32em;
+    }
+
+    .carousel-indicator::before {
+        inset: .32em;
+    }
+
+    .carousel-autoplay .carousel-control-icon {
+        width: 1em;
+        height: 1em;
+    }
+
+    /* Keep prev / indicator / next on one row; the indicator scrolls
+     * sideways instead of wrapping or being pushed to another row. */
+    .carousel-navigator {
+        display: flex;
+        align-items: center;
+        gap: .35em;
+    }
+
+    .carousel-navigator .carousel-zone {
+        flex: 0 1 auto;
+    }
+
+    .carousel-navigator .carousel-zone-center {
+        flex: 1 1 0;
+    }
+
+    .carousel-navigator .carousel-indicator-wrap {
+        flex: 1 1 auto;
+        flex-wrap: nowrap;
+        min-width: 0;
+        max-width: 100%;
+        justify-content: center;
+        justify-content: safe center;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .carousel-navigator .carousel-indicator-wrap::-webkit-scrollbar {
+        display: none;
+    }
+
+    .carousel-navigator .carousel-indicator-list {
+        flex-wrap: nowrap;
+    }
+
+    /* Overlaid indicators scroll too instead of wrapping over the image. */
+    .carousel-overlay-group .carousel-indicator-wrap {
+        flex-wrap: nowrap;
+        min-width: 0;
+        max-width: 100%;
+        justify-content: center;
+        justify-content: safe center;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .carousel-overlay-group .carousel-indicator-wrap::-webkit-scrollbar {
+        display: none;
+    }
+
+    .carousel-overlay-group .carousel-indicator-list {
+        flex-wrap: nowrap;
+    }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 30em) {
+    :root {
+        --carousel-control-size: 1.75em;
+        --carousel-autoplay-size: 1.85em;
+        --carousel-control-icon-size: 1.3em;
+        --carousel-edge-width: 2.3em;
+        --carousel-thumbnail-width: 3em;
+    }
+
     .carousel {
         --carousel-caption-inset: .6em;
         --carousel-autoplay-inset: .6em;
     }
 
     .carousel-navigator {
-        grid-template-columns: 1fr;
-        padding: .35em .4em;
+        gap: .3em;
+        padding: .25em .3em;
+    }
+
+    .carousel-navigator
+        .carousel-indicator-wrap[data-style="thumbnails"],
+    .carousel-navigator
+        .carousel-indicator-wrap[data-style="counter"] {
+        padding: .2em .4em;
+    }
+
+    .carousel-navigator-group {
+        gap: .3em;
+    }
+
+    .carousel-indicator {
+        width: .5em;
+        height: .5em;
+        padding: .3em;
+    }
+
+    .carousel-indicator::before {
+        inset: .3em;
+    }
+
+    .carousel-autoplay .carousel-control-icon {
+        width: .95em;
+        height: .95em;
+    }
+
+    .carousel-counter {
+        font-size: var(--font-size-small);
     }
 
     .carousel-slide-overlay {
