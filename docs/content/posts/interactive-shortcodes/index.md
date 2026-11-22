@@ -113,9 +113,11 @@ A minimal carousel with the default navigator and dots:
 - `aspectFit`: fit inside the frame, preserving aspect ratio — the whole image is visible.
 - `aspectFill`: fill the frame, preserving aspect ratio and cropping the overflow.
 
-Set it on the carousel for a shared default, or on an individual slide to override it. This example uses `aspectFill`:
+Set it on the carousel for a shared default, or on an individual slide to override it. Every carousel keeps a fixed frame: by default it is the ratio of the image shown first, so switching images never changes the carousel height. `aspectFill` crops each image into that frame, `aspectFit` letterboxes it, and `scaleToFill` stretches it. Set `aspectRatio` to choose a different frame (for example `aspectRatio="16/9"`).
 
-{{< carousel label="Aspect fill" contentMode="aspectFill" >}}
+This example uses `aspectFill` with an explicit `3/2` frame:
+
+{{< carousel label="Aspect fill" contentMode="aspectFill" aspectRatio="3/2" >}}
 
 {{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
@@ -149,6 +151,7 @@ These are the options used most often; the full list is in [Carousel parameters]
 | `description` | slide | Overlay description under the caption; supports inline Markdown. |
 | `captionPosition` | both | Caption panel position: `bottom-center` (default) or another corner/edge; a slide overrides the carousel value. |
 | `contentMode` | both | Image fit: `scaleToFill` (default), `aspectFit`, or `aspectFill`. |
+| `aspectRatio` | carousel | Frame ratio such as `3/2` or `16/9`. Default `auto`: the ratio of the image shown first. |
 | `link` | slide | Wrap the image in a link; overrides the lightbox. |
 | `lightbox` | slide | Open the image in the page lightbox; on by default when the page enables one. |
 | `label` | carousel | Accessible name for the region; default `Carousel`. |
@@ -426,6 +429,7 @@ All carousel and slide arguments are optional. `params.carousel` supplies site-w
 | `scrollHint` | Leave slivers of the adjacent slides visible; default `false`. Ignored with `effect="fade"` or when `perView` covers every slide. |
 | `effect` | `slide` (default) or `fade`. |
 | `contentMode` | Default image fit: `scaleToFill` (default), `aspectFit`, or `aspectFill`. A slide can override it. |
+| `aspectRatio` | Frame ratio such as `3/2`, `16/9`, or `1.5`. Default `auto`: the ratio of the image shown first. An explicit ratio overrides it, and `contentMode` crops, fits, or stretches each image inside the frame. With `perView`, each image fills its cell of that frame. |
 | `start` | Zero-based index of the initially active slide; default `0`. Out-of-range values are clamped. |
 
 **Captions**
@@ -493,6 +497,7 @@ Set defaults under `params.carousel` in the site configuration. Autoplay, naviga
     keyboard = true
     effect = "slide"
     contentMode = "scaleToFill"
+    aspectRatio = "auto"
     captionPosition = "bottom-center"
     label = "Carousel"
 

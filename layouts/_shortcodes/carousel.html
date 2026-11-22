@@ -35,6 +35,8 @@
     pause      — pause autoplay on hover/focus: true|false (default: false)
     effect     — "slide" or "fade"
     contentMode — "scaleToFill" (default), "aspectFit", or "aspectFill"
+    aspectRatio — fixed carousel frame ratio, e.g. "3/2", "16/9", or "1.5";
+                  "auto" (default) uses the ratio of the image shown first
     captionPosition — caption overlay position:
                       bottom-left|bottom-center|bottom-right|
                       top-left|top-center|top-right (default: bottom-center; slide can override)
@@ -77,6 +79,7 @@
 	"pause" false
 	"effect" "slide"
 	"contentMode" "scaleToFill"
+	"aspectRatio" "auto"
 	"captionPosition" "bottom-center"
 	"start" 0
 -}}
@@ -205,6 +208,29 @@
 {{- $fit := "fill" -}}
 {{- if eq $contentMode "aspectfit" -}}{{- $fit = "contain" -}}{{- else if eq $contentMode "aspectfill" -}}{{- $fit = "cover" -}}{{- end -}}
 
+{{- /* A fixed ratio gives every slide the same box, so changing images no
+       longer changes the carousel height; contentMode then fits or crops the
+       image inside it. Accept "W/H" or a plain number; "auto" keeps each
+       image's natural height. */ -}}
+{{- $aspectRatio := "" -}}
+{{- with $opts.aspectRatio -}}
+	{{- $raw := replaceRE `\s+` "" (lower (printf "%v" .)) -}}
+	{{- if and (ne $raw "") (ne $raw "auto") -}}
+		{{- $ratio := replace $raw ":" "/" -}}
+		{{- if findRE `^[0-9]*\.?[0-9]+(/[0-9]*\.?[0-9]+)?$` $ratio -}}
+			{{- $parts := split $ratio "/" -}}
+			{{- $w := float (index $parts 0) -}}
+			{{- $h := 1.0 -}}
+			{{- if gt (len $parts) 1 -}}{{- $h = float (index $parts 1) -}}{{- end -}}
+			{{- if and (gt $w 0.0) (gt $h 0.0) -}}
+				{{- $aspectRatio = printf "%v / %v" $w $h -}}
+			{{- end -}}
+		{{- end -}}
+		{{- if not $aspectRatio -}}
+			{{- warnf "carousel shortcode %q: invalid aspectRatio %q; use a value like \"3/2\"" $id (printf "%v" $opts.aspectRatio) -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
 
 {{- $captionPosition := "" -}}
 {{- with $opts.captionPosition -}}
@@ -385,12 +411,15 @@
 	{{- end -}}
 {{- end -}}
 
-<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $scrollHint }} has-scroll-hint{{ end }}{{ if or $navigatorOverlay $indicatorOverlay }} is-overlay{{ end }}{{ if $hasEdgeNavigator }} has-edge-navigator{{ end }}{{ if $hasBelowStrip }} has-bottom{{ end }}{{ if not $hasContent }} no-navigator{{ end }}"
+{{- $rootStyle := printf "--carousel-per-view: %d; --carousel-gap: %s; --carousel-slide-basis: %s; --carousel-scroll-hint: %s" $perView $slideGap $slideBasis (cond $scrollHint "2.4em" "0px") -}}
+{{- with $aspectRatio }}{{ $rootStyle = printf "%s; --carousel-aspect-ratio: %s" $rootStyle . }}{{ end -}}
+
+<div class="carousel{{ with $class }} {{ . }}{{ end }}{{ if $aspectRatio }} has-aspect-ratio{{ end }}{{ if not $interactive }} is-static{{ end }}{{ if gt $perView 1 }} is-multi{{ end }}{{ if $scrollHint }} has-scroll-hint{{ end }}{{ if or $navigatorOverlay $indicatorOverlay }} is-overlay{{ end }}{{ if $hasEdgeNavigator }} has-edge-navigator{{ end }}{{ if $hasBelowStrip }} has-bottom{{ end }}{{ if not $hasContent }} no-navigator{{ end }}"
 	id="{{ $id }}"
 	data-navigator-position="{{ $navigatorPosition }}"
 	data-indicator-position="{{ $indicatorPosition }}"
 	data-caption-position="{{ $captionPosition }}"
-	{{ printf `style="--carousel-per-view: %d; --carousel-gap: %s; --carousel-slide-basis: %s; --carousel-scroll-hint: %s"` $perView $slideGap $slideBasis (cond $scrollHint "2.4em" "0px") | safeHTMLAttr }}
+	{{ printf `style="%s"` $rootStyle | safeHTMLAttr }}
 	{{- if $interactive }} data-carousel
 	data-interval="{{ $effectiveInterval }}"
 	data-loop="{{ $loop }}"
@@ -398,6 +427,7 @@
 	data-pause="{{ $pause }}"
 	data-effect="{{ $effect }}"
 	data-start="{{ $start }}"{{ end }}
+	{{- if and $interactive (not $aspectRatio) }} data-auto-frame{{ end }}
 	role="region"
 	aria-roledescription="carousel"
 	aria-label="{{ $label }}"
@@ -476,7 +506,7 @@
 	<p class="carousel-live" role="status" aria-live="polite" aria-atomic="true"></p>
 	<noscript>
 		<style>
-			#{{ $id }} .carousel-viewport { height: auto !important; overflow: visible; }
+			#{{ $id }} .carousel-viewport { height: auto !important; aspect-ratio: auto !important; overflow: visible; }
 			#{{ $id }} .carousel-track { display: block; transform: none !important; }
 			#{{ $id }} .carousel-item { display: block; position: static !important; visibility: visible !important; opacity: 1 !important; margin-bottom: 1em; }
 			#{{ $id }} .carousel-item:last-child { margin-bottom: 0; }

@@ -47,6 +47,9 @@
         effect = "slide"
         # Image content mode: "scaleToFill" (default), "aspectFit", or "aspectFill".
         contentMode = "scaleToFill"
+        # Fixed carousel frame ratio, e.g. "3/2" or "16/9"; "auto" uses the
+        # ratio of the image shown first, so switching never changes the height.
+        aspectRatio = "auto"
         # Caption overlay position: bottom-left, bottom-center, bottom-right,
         # top-left, top-center, or top-right.
         captionPosition = "bottom-center"

@@ -41,9 +41,6 @@
                 root.querySelectorAll("[data-carousel-goto]")
             );
             this.counter = root.querySelector(".carousel-counter-current");
-            this.thumbnailStrip = root.querySelector(
-                '.carousel-indicator-wrap[data-style="thumbnails"]'
-            );
             this.autoplayButton = root.querySelector(".carousel-autoplay");
             this.status = root.querySelector(".carousel-live");
 
@@ -56,6 +53,11 @@
             this.pauseOnInteraction = toBool(root.dataset.pause, true);
             this.effect = root.dataset.effect === "fade" ? "fade" : "slide";
             this.scrollHint = root.classList.contains("has-scroll-hint");
+            /* A fixed ratio lets CSS own the viewport height. */
+            this.fixedFrame = root.classList.contains("has-aspect-ratio");
+            this.autoFrame = root.hasAttribute("data-auto-frame");
+            this.frameItem = null;
+            this.frameImage = null;
             this.perView = this.readPerView();
             this.circular =
                 this.loop &&
@@ -72,6 +74,12 @@
             if (this.circular && (this.index > 0 || this.scrollHint)) {
                 this.rotateToIndex(this.index);
             }
+            /* The frame follows the image shown first, so a carousel that
+             * starts on a later slide does not wait for a lazy off-screen one. */
+            this.frameItem = this.slides[this.index] || this.slides[0] || null;
+            this.frameImage = this.frameItem
+                ? this.frameItem.querySelector("img")
+                : null;
 
             this.timer = null;
             this.hovering = false;
@@ -181,6 +189,7 @@
                 this.loop &&
                 this.effect === "slide" &&
                 this.perView < this.slides.length;
+            this.applyAutoFrame();
 
             if (this.index > this.maxIndex()) this.index = this.maxIndex();
 
@@ -200,13 +209,14 @@
             this.activate(this.index);
             this.updateTransform(true);
             this.updateHeight();
+            this.applyAutoFrame();
             this.updateControls();
             this.updateLiveMode();
             this.updateStatus();
             this.root.classList.add("is-ready");
             this.updateCaptionClearance();
             this.updateAutoplayCorner();
-            this.revealActiveThumbnail();
+            this.revealActiveIndicator();
             this.observe();
 
             if (this.interval > 0) {
@@ -334,7 +344,10 @@
                     if (!image.complete) {
                         image.addEventListener(
                             "load",
-                            () => this.updateHeight(),
+                            () => {
+                                this.updateHeight();
+                                this.applyAutoFrame();
+                            },
                             { once: true }
                         );
                     }
@@ -553,12 +566,41 @@
             return height;
         }
 
+        /* aspectFill/aspectFit need a frame to fill or fit into. Without an
+         * explicit aspectRatio, use the image shown first so the frame stays
+         * put instead of following the active image. */
+        applyAutoFrame() {
+            if (!this.autoFrame) return;
+            const image = this.frameImage;
+            const item = this.frameItem;
+            if (!image || !item || !image.naturalWidth || !image.naturalHeight) {
+                return;
+            }
+            const cellWidth = item.getBoundingClientRect().width;
+            const viewportWidth = this.viewport.clientWidth;
+            if (!cellWidth || !viewportWidth) return;
+            const frameHeight =
+                cellWidth / (image.naturalWidth / image.naturalHeight);
+            if (!(frameHeight > 0)) return;
+            this.root.style.setProperty(
+                "--carousel-aspect-ratio",
+                String(viewportWidth / frameHeight)
+            );
+            this.root.classList.add("has-aspect-ratio");
+            this.fixedFrame = true;
+            if (this.viewport.style.height) this.viewport.style.height = "";
+            this.updateCaptionClearance();
+            this.updateAutoplayCorner();
+        }
+
         updateHeight() {
-            const height = this.groupHeight(this.index);
-            if (height > 0) {
-                const next = `${height}px`;
-                if (this.viewport.style.height !== next) {
-                    this.viewport.style.height = next;
+            if (!this.fixedFrame) {
+                const height = this.groupHeight(this.index);
+                if (height > 0) {
+                    const next = `${height}px`;
+                    if (this.viewport.style.height !== next) {
+                        this.viewport.style.height = next;
+                    }
                 }
             }
             this.updateCaptionClearance();
@@ -682,7 +724,7 @@
                 }
             }
 
-            this.revealActiveThumbnail();
+            this.revealActiveIndicator();
         }
 
         previewIndicator(index) {
@@ -700,14 +742,16 @@
             this.updateStatus(this.index);
         }
 
-        /* Keep the active preview visible when the thumbnail strip scrolls. */
-        revealActiveThumbnail() {
-            const strip = this.thumbnailStrip;
-            if (!strip || strip.scrollWidth <= strip.clientWidth) return;
-            const active = strip.querySelector(
-                '.carousel-thumbnail[aria-current="true"]'
+        /* Keep the active indicator/preview visible in a scrollable strip. */
+        revealActiveIndicator() {
+            const active = this.root.querySelector(
+                '.carousel-indicator[aria-current="true"], ' +
+                    '.carousel-segment[aria-current="true"], ' +
+                    '.carousel-thumbnail[aria-current="true"]'
             );
             if (!active) return;
+            const strip = active.closest(".carousel-indicator-wrap");
+            if (!strip || strip.scrollWidth <= strip.clientWidth + 1) return;
 
             const stripRect = strip.getBoundingClientRect();
             const activeRect = active.getBoundingClientRect();
@@ -880,7 +924,7 @@
             const targetHeight = this.circularGroupHeight(targetStart);
             this.looping = true;
 
-            if (targetHeight > currentHeight) {
+            if (!this.fixedFrame && targetHeight > currentHeight) {
                 this.viewport.style.height = `${targetHeight}px`;
             }
 
@@ -1193,7 +1237,7 @@
                 ? this.circularGroupHeight(targetStart)
                 : this.circularGroupHeight(currentStart);
             const currentHeight = this.circularGroupHeight(currentStart);
-            if (targetHeight > currentHeight) {
+            if (!this.fixedFrame && targetHeight > currentHeight) {
                 this.viewport.style.height = `${targetHeight}px`;
             }
 

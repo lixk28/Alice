@@ -183,6 +183,40 @@
     display: block;
 }
 
+/* A fixed frame keeps the whole carousel area steady across images with
+ * different natural sizes; contentMode (object-fit) then crops or fits each
+ * image inside it. The script leaves the height alone when this class is
+ * present. Without it (or before the script applies it), the frame falls
+ * back to the image heights. */
+.carousel.has-aspect-ratio:not(.is-static) .carousel-viewport {
+    aspect-ratio: var(--carousel-aspect-ratio);
+    /* Win over any stale script that still writes an inline pixel height. */
+    height: auto !important;
+}
+
+.carousel.has-aspect-ratio:not(.is-static) .carousel-track,
+.carousel.has-aspect-ratio:not(.is-static) .carousel-item,
+.carousel.has-aspect-ratio:not(.is-static) .carousel-slide {
+    height: 100%;
+}
+
+/* A static carousel stacks its slides on small screens, so each slide keeps
+ * the ratio instead of the whole frame. */
+.carousel.has-aspect-ratio.is-static .carousel-slide {
+    aspect-ratio: var(--carousel-aspect-ratio);
+    max-height: 70vh;
+}
+
+.carousel.has-aspect-ratio .carousel-slide > a {
+    height: 100%;
+}
+
+.carousel.has-aspect-ratio .carousel-slide > img,
+.carousel.has-aspect-ratio .carousel-slide > a > img {
+    height: 100%;
+    max-height: none;
+}
+
 /* ---------------------------------------------------------------- caption */
 
 /* Caption and description sit on a frosted panel over the image. The panel is
@@ -1067,6 +1101,7 @@
 
     .carousel-viewport {
         height: auto !important;
+        aspect-ratio: auto !important;
         overflow: visible;
     }
 
@@ -1087,6 +1122,11 @@
 
     .carousel-slide > img,
     .carousel-slide > a > img {
+        max-height: none;
+    }
+
+    /* Print at the ratio's full height instead of the screen 70vh cap. */
+    .carousel.has-aspect-ratio .carousel-slide {
         max-height: none;
     }
 }
