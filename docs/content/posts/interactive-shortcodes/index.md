@@ -193,7 +193,17 @@ This example shows two images at a time with a counter:
 
 `scrollHint=true` narrows each slide slightly so the adjacent slides peek in at both edges. With `loop`, every position has a peek on both sides; with `loop=false`, the first slide has no left peek and the last has no right peek. It is ignored with `effect="fade"` and when `perView` already covers every slide.
 
-{{< carousel label="Scroll hint" scrollHint=true navigatorOverlay=false >}}
+{{< carousel label="Scroll hint" scrollHint=true >}}
+
+{{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
+
+{{< slide image="/img/IMG_5999.webp" alt="Lake Biwa" >}}
+
+{{< slide image="/img/IMG_0183.webp" alt="Kyoto Station with Kyoto Tower" >}}
+
+{{< /carousel >}}
+
+{{< carousel label="Scroll hint" scrollHint=true loop=false >}}
 
 {{< slide image="/img/carousel-example.webp" alt="Kada coast in Wakayama" >}}
 
