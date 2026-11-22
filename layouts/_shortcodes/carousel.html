@@ -81,19 +81,27 @@
 	"start" 0
 -}}
 {{- $siteCarousel := site.Params.carousel | default dict -}}
+{{- /* Hugo lowercases config keys, while shortcode arguments keep the case
+       they were written in. Match both against $defaults so options such as
+       perView, aspectRatio, or contentMode work either way. */ -}}
 {{- $siteOpts := dict -}}
 {{- range $key, $value := $siteCarousel -}}
 	{{- $isGroup := and (in (slice "autoplay" "navigator" "indicator" "icons") $key) (reflect.IsMap $value) -}}
 	{{- if not $isGroup -}}
-		{{- $siteOpts = merge $siteOpts (dict $key $value) -}}
+		{{- $lowerKey := lower $key -}}
+		{{- range $defaultKey, $_ := $defaults -}}
+			{{- if eq (lower $defaultKey) $lowerKey -}}
+				{{- $siteOpts = merge $siteOpts (dict $defaultKey $value) -}}
+			{{- end -}}
+		{{- end -}}
 	{{- end -}}
 {{- end -}}
 {{- with $siteCarousel.autoplay -}}
 	{{- if reflect.IsMap . -}}
 		{{- if isset . "enabled" -}}{{- $siteOpts = merge $siteOpts (dict "autoplay" .enabled) -}}{{- end -}}
 		{{- if isset . "interval" -}}{{- $siteOpts = merge $siteOpts (dict "interval" .interval) -}}{{- end -}}
-		{{- if isset . "progressStyle" -}}{{- $siteOpts = merge $siteOpts (dict "progressStyle" .progressStyle) -}}{{- end -}}
-		{{- if isset . "progressPosition" -}}{{- $siteOpts = merge $siteOpts (dict "progressPosition" .progressPosition) -}}{{- end -}}
+		{{- if isset . "progressstyle" -}}{{- $siteOpts = merge $siteOpts (dict "progressStyle" (index . "progressstyle")) -}}{{- end -}}
+		{{- if isset . "progressposition" -}}{{- $siteOpts = merge $siteOpts (dict "progressPosition" (index . "progressposition")) -}}{{- end -}}
 		{{- if isset . "pause" -}}{{- $siteOpts = merge $siteOpts (dict "pause" .pause) -}}{{- end -}}
 	{{- end -}}
 {{- end -}}
@@ -112,9 +120,19 @@
 	{{- end -}}
 {{- end -}}
 {{- $opts := merge $defaults $siteOpts -}}
-{{- /* Shortcodes without named args expose .Params as []string. */ -}}
+{{- /* Shortcode arguments stay flat; match them case-insensitively too.
+       Shortcodes without named args expose .Params as []string. */ -}}
 {{- if reflect.IsMap .Params -}}
-	{{- $opts = merge $opts .Params -}}
+	{{- $argOpts := dict -}}
+	{{- range $key, $value := .Params -}}
+		{{- $lowerKey := lower $key -}}
+		{{- range $defaultKey, $_ := $defaults -}}
+			{{- if eq (lower $defaultKey) $lowerKey -}}
+				{{- $argOpts = merge $argOpts (dict $defaultKey $value) -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+	{{- $opts = merge $opts $argOpts -}}
 {{- end -}}
 
 {{- $id := printf "carousel-%d" .Ordinal -}}
