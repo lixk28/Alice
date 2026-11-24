@@ -305,10 +305,15 @@
         # everywhere, or leave them off and set tex.math etc. per page.
         math = false
         algorithm = false
+        # Run `npm run build:tikz` to inline pre-rendered SVG. Without that
+        # cache — and in `hugo server` — TikZ falls back to the TikZJax CDN.
         tikz = false
-        # Inline/block delimiter pairs. Empty uses $...$ and $$...$$;
-        # \(...\) and \[...\] always work. Client engines only; "hugo"
-        # reads the passthrough delimiters.
+        # Client engines only; "hugo" reads the Goldmark passthrough delimiters.
+        # Empty uses \(...\) and \[...\], which need the passthrough extension
+        # enabled in the site config (Hugo does not inherit [markup] from a
+        # theme). Set $ / $$ to use the dollar pairs instead; a literal dollar
+        # in prose then needs care, since Goldmark consumes \$ before the
+        # client engine can see it.
         inlineBeginDelimiter = ''
         inlineEndDelimiter = ''
         blockBeginDelimiter = ''

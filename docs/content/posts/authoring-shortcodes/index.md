@@ -247,7 +247,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 {{< sidenote label="another sidenote..." index="1" >}}
-Another freaking sidenote with pythagorean theorem $a^2 + b^2 = c^2$
+Another freaking sidenote with pythagorean theorem \(a^2 + b^2 = c^2\)
 {{< /sidenote >}}
 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
@@ -383,20 +383,24 @@ Math and algorithms share one engine, chosen with `params.tex.engine`:
 
 The `hugo` engine renders with the KaTeX built into Hugo, so the page loads no math script.
 
-### Math
+### Inline Math
 
-Inline math goes between `$...$`, or `\(...\)` which is equivalent and safer on pages that also contain prices or shell prompts starting with `$`:
+Inline math goes in `\(...\)`:
 
 ```md
-Inline math sits in a sentence: $a^2 + b^2 = c^2$.
+Inline math sits in a sentence: \(a^2 + b^2 = c^2\).
 ```
 
-Rendered: inline math sits in a sentence, $a^2 + b^2 = c^2$.
+Rendered: inline math sits in a sentence, \(a^2 + b^2 = c^2\).
 
-Display math takes two forms. A `$$...$$` block:
+`$...$` is off by default so a price like $5 stays text; set `params.tex.inlineBeginDelimiter` and `inlineEndDelimiter` to `$` to use it. The default `\(...\)` needs Hugo's passthrough extension, which the example site enables in `docs/config.toml`.
+
+### Block Math
+
+Display math goes in `\[...\]`:
 
 ```md
-$$
+\[
 A = \begin{pmatrix}
 a_{11} & a_{12} \\
 a_{21} & a_{22}
@@ -406,12 +410,12 @@ f(x) = \begin{cases}
 x^2 & x \ge 0, \\
 -x  & x < 0.
 \end{cases}
-$$
+\]
 ```
 
 Which renders as:
 
-$$
+\[
 A = \begin{pmatrix}
 a_{11} & a_{12} \\
 a_{21} & a_{22}
@@ -421,9 +425,9 @@ f(x) = \begin{cases}
 x^2 & x \ge 0, \\
 -x  & x < 0.
 \end{cases}
-$$
+\]
 
-Or a fence tagged `math`, which keeps long expressions readable in the source:
+A `math` fence keeps long expressions readable in the source:
 
 ````md
 ```math
@@ -440,51 +444,34 @@ Which renders as:
 Aligned equations, with summation and fractions:
 
 ```md
-$$
+\[
 \begin{aligned}
 \nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0}, \\
 \nabla \times \mathbf{B} &= \mu_0 \mathbf{J}
     + \mu_0 \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t}, \\
 \sum_{k=1}^{n} k &= \frac{n(n+1)}{2}.
 \end{aligned}
-$$
+\]
 ```
 
 Which renders as:
 
-$$
+\[
 \begin{aligned}
 \nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0}, \\
 \nabla \times \mathbf{B} &= \mu_0 \mathbf{J}
     + \mu_0 \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t}, \\
 \sum_{k=1}^{n} k &= \frac{n(n+1)}{2}.
 \end{aligned}
-$$
+\]
 
-Inline math also mixes with prose: the norm $\lVert x \rVert_2 = \sqrt{\sum_i x_i^2}$, the inner product $\langle u, v \rangle$, and a small fraction $\frac{a}{b}$ all work mid-sentence.
+`math` is the only math fence name: a fence tagged `katex` or `mathjax` is shown as code. All three engines cover `aligned`, `pmatrix`, and `cases`.
 
-`math` is the only math fence name. `katex` and `mathjax` are not: a fence tagged with either renders as highlighted source instead. Every engine covers `\begin{aligned}`, `\begin{pmatrix}`, and `\begin{cases}`.
-
-With `engine = 'hugo'` the site has to enable the Goldmark passthrough extension, since Hugo does not inherit `[markup]` from a theme, and the delimiters below must match `params.tex.*Delimiter`:
-
-```toml
-[params.tex]
-    engine = 'hugo'
-    math = true
-
-[markup]
-    [markup.goldmark.extensions.passthrough]
-        enable = true
-        [markup.goldmark.extensions.passthrough.delimiters]
-            block = [['\[', '\]'], ['$$', '$$']]
-            inline = [['\(', '\)']]
-```
-
-Because the extension sees every page, a lone `$` in prose such as "costs $5" would otherwise start a formula; write `\$` for the dollar sign. `params.tex.hugo.output` picks the markup: `mathml` (the default, needs no CSS), `html`, or `htmlAndMathml`, and the stylesheet is linked automatically for the last two.
+`$$...$$` is off by default; set `params.tex.blockBeginDelimiter` and `blockEndDelimiter` to `$$` to use it. KaTeX (the `katex` and `hugo` engines) has no CJK glyphs, so use `mathjax` for formulas containing Chinese. With `engine = 'hugo'`, `params.tex.hugo.output` picks `mathml` (the default), `html`, or `htmlAndMathml`; page front matter can override it.
 
 ### Algorithms
 
-Wrap `algorithmic` markup in the `algorithm` shortcode. Math inside is typeset for you, so no delimiters are needed there beyond the usual `$...$`.
+Wrap `algorithmic` markup in the `algorithm` shortcode. Math inside is typeset for you: pseudocode.js has its own `$...$` syntax, independent of `params.tex.*Delimiter`.
 
 ```
 {{</* algorithm */>}}
@@ -570,7 +557,7 @@ Omit a key to keep the library default.
 
 ### TikZ
 
-Wrap TikZ markup in the `tikz` shortcode. A shaded circle with a labelled radius:
+Wrap TikZ markup in the `tikz` shortcode. A fence tagged `tikz` is treated as an ordinary code block (handy for showing the source), so the shortcode is the only way to render a diagram. A shaded circle with a labelled radius:
 
 ```
 {{</* tikz */>}}
@@ -630,7 +617,7 @@ Which renders as:
 
 Only TikZ's base colour set is available (`red`, `blue`, `black`, `gray`, and mixtures like `blue!12`). Names from the extended xcolor sets, such as `AliceBlue`, are not defined unless a site preloads them.
 
-TikZ uses [TikZJax](https://tikzjax.com), which renders in the browser and needs network access. Everything else on this page ships with the theme.
+TikZ is pre-rendered to static SVG by `npm run build:tikz` (`scripts/build-tikz.js`), which runs `node-tikzjax` — a Node + WebAssembly build of [TikZJax](https://tikzjax.com) — writes `assets/tikz/<hash>.svg` plus the Computer Modern fonts the diagrams use, and lets the theme inline the result. A built site then needs neither network access nor a client-side renderer. Both `npm run build` and `npm run build:docs` run the step before `hugo`. Without it — or inside `hugo server`, which keeps editing fast — the block falls back to the TikZJax CDN renderer. Everything else on this page ships with the theme.
 
 ## Diargams
 
@@ -680,7 +667,7 @@ Here are {{< mark >}} some marked text with `some code` {{< /mark >}}
 
 Here are {{< mark >}} some marked text with [some link](https://github.com/lixk28/Alice) {{< /mark >}}
 
-Here are {{< mark >}} some marked text with some equation $a^2 + b^2 = c^2$ {{< /mark >}}
+Here are {{< mark >}} some marked text with some equation \(a^2 + b^2 = c^2\) {{< /mark >}}
 
 Here are {{< mark >}} some marked text with some {{< sidenote label="sidenote" >}} Amazing {{< /sidenote >}} {{< /mark >}}
 

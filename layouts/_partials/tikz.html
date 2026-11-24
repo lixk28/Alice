@@ -1,0 +1,46 @@
+{{- /*
+    Inline one TikZ block.
+
+    `scripts/build-tikz.js` pre-renders every `tikz` shortcode to
+    `assets/tikz/<hash>.svg`, where <hash> is the first 16 hex chars of the
+    SHA-256 of the trimmed source (the same normalization the script applies).
+    When that file exists it is inlined here as a static SVG; `tex.html` declares
+    the font families its text needs once per page, in <head>.
+
+    Without a pre-rendered file the block keeps the classic behaviour: a
+    `<script type="text/tikz">` that TikZJax renders in the browser. During
+    `hugo server` the client renderer is always used, so editing a diagram does
+    not require rerunning the Node script; a production build fails loudly when
+    the cache is missing a block instead of silently shipping an empty diagram.
+
+    `tex.tikz` still decides whether the block renders at all (page front matter
+    overrides the site default), exactly like `tex.math` / `tex.algorithm`.
+
+    Context: dict "inner" (the raw TeX) "page" (the page being rendered).
+*/ -}}
+
+{{- $page := .page -}}
+{{- /* Same lookup as tex.html: page front matter, then params.tex.tikz. */ -}}
+{{- $tikz := $page.Param "tex.tikz" | default ((site.Params.tex | default dict).tikz | default false) -}}
+{{- if $tikz -}}
+    {{- $inner := .inner -}}
+    {{- /* CRLF is normalized because the Node scanner joins lines with "\n". */ -}}
+    {{- $src := replace (strings.TrimSpace (printf "%s" $inner)) "\r\n" "\n" -}}
+    {{- $hash := substr (crypto.SHA256 $src) 0 16 -}}
+    {{- $manifest := resources.Get "tikz/manifest.json" -}}
+    {{- $build := and $manifest (not hugo.IsServer) -}}
+    {{- $svg := "" -}}
+    {{- if $build -}}
+        {{- $svg = resources.Get (printf "tikz/%s.svg" $hash) -}}
+    {{- end -}}
+    {{- with $svg -}}
+<span class="tikz-diagram">{{ .Content | safeHTML }}</span>
+    {{- else -}}
+        {{- if $build -}}
+            {{- errorf "Alice: the TikZ block on %s has no pre-rendered SVG (assets/tikz/%s.svg). Run `npm run build:tikz` before `hugo`, or delete the assets/tikz directory to fall back to the client renderer." $page.RelPermalink $hash -}}
+        {{- end -}}
+<script type="text/tikz">
+{{ $src | safeHTML }}
+</script>
+    {{- end -}}
+{{- end -}}

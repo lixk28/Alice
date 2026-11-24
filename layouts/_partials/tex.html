@@ -12,8 +12,11 @@
     those files with resources.Get and republishes them under /npm/<pkg>@<version>
     (see below). Each engine's version (params.tex.mathjax, params.tex.katex,
     params.tex.hugo) is checked against the installed package.json; a mismatch
-    fails the build. TikZ is the exception and still loads TikZJax from
-    tikzjax.com, see below.
+    fails the build.
+
+    TikZ is pre-rendered by `scripts/build-tikz.js` and inlined as static SVG;
+    only sites that have not run that script fall back to TikZJax from
+    tikzjax.com. See the TikZ section at the end.
 */ -}}
 
 {{- /* ---------- resolve parameters ---------- */ -}}
@@ -53,15 +56,22 @@
 
 {{- /* Client-side delimiters. The hugo engine ignores these: it uses the
        Goldmark passthrough delimiters, which the site configures. */ -}}
-{{- $inlineBegin := .Param "tex.inlineBeginDelimiter" | default "$" -}}
-{{- $inlineEnd := .Param "tex.inlineEndDelimiter" | default "$" -}}
-{{- $blockBegin := .Param "tex.blockBeginDelimiter" | default "$$" -}}
-{{- $blockEnd := .Param "tex.blockEndDelimiter" | default "$$" -}}
+{{- /* Defaults are the backslash pairs. Goldmark escapes `\(` to `(` unless
+       the passthrough extension protects it, so math needs that extension in
+       the site config (Hugo does not inherit [markup] from a theme); the
+       warning below fires when it is missing. `$...$` / `$$...$$` remain
+       available by setting these params, but a literal dollar cannot be
+       escaped for the client engines: Goldmark turns `\$` into `$` before
+       MathJax/KaTeX ever see it. */ -}}
+{{- $inlineBegin := .Param "tex.inlineBeginDelimiter" | default "\\(" -}}
+{{- $inlineEnd := .Param "tex.inlineEndDelimiter" | default "\\)" -}}
+{{- $blockBegin := .Param "tex.blockBeginDelimiter" | default "\\[" -}}
+{{- $blockEnd := .Param "tex.blockEndDelimiter" | default "\\]" -}}
 
 {{- /* Build-time output. Hugo only treats the exact string "mathml" as pure
        MathML and silently renders anything else as HTML, so reject values
        outside the three supported spellings before they get that far. */ -}}
-{{- $hugoOutput := ($tex.hugo | default dict).output | default "mathml" -}}
+{{- $hugoOutput := .Param "tex.hugo.output" | default "mathml" -}}
 {{- if not (in (slice "mathml" "html" "htmlAndMathml") $hugoOutput) -}}
     {{- errorf "Alice: params.tex.hugo.output must be \"mathml\", \"html\", or \"htmlAndMathml\"; got %q." $hugoOutput -}}
 {{- end -}}
@@ -224,6 +234,22 @@
     <script defer src="{{ $pcJS.RelPermalink }}"></script>
 {{- end -}}
 
+{{- /* The default delimiters start with a backslash, which CommonMark would
+       turn into a plain bracket. Probe the page once per build: with the
+       passthrough extension on, render-passthrough.html re-emits the pair, so
+       the backslash survives; without it, Goldmark has already eaten it. */ -}}
+{{- if and $math (ne $engine "hugo") (not (hugo.Store.Get "alice-math-delim-warn")) -}}
+    {{- $probe := .RenderString (printf "%sx%s" $inlineBegin $inlineEnd) -}}
+    {{- if not (strings.Contains $probe $inlineBegin) -}}
+        {{- hugo.Store.Set "alice-math-delim-warn" true -}}
+        {{- warnf "Alice: math is on, but the '%s...%s' delimiters do not survive Goldmark. Enable the Goldmark passthrough extension in this site's config (Hugo does not inherit [markup] from a theme; see the docs), or set params.tex.inlineBeginDelimiter / inlineEndDelimiter / blockBeginDelimiter / blockEndDelimiter to '$' / '$$' and accept that a literal dollar then needs care. If the extension is already on, check the transform.ToMath error reported above." $inlineBegin $inlineEnd -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if $math -}}
+<link rel="stylesheet" href="{{ "css/math.css" | relURL }}">
+{{- end -}}
+
 {{- /* ---------- engine ---------- */ -}}
 {{- if and (eq $engine "mathjax") (or $math $algorithm) -}}
         {{- $jsRes := resources.Get "node_modules/mathjax/es5/tex-chtml-full.js" -}}
@@ -239,6 +265,7 @@
 <script>
 MathJax = {
     tex: {
+{{- if $math }}
         inlineMath: [
             [{{ $inlineBegin | jsonify | safeJS }}, {{ $inlineEnd | jsonify | safeJS }}]{{ if not (and (eq $inlineBegin "\\(") (eq $inlineEnd "\\)")) }},
             ['\\(', '\\)']{{ end }}
@@ -247,8 +274,13 @@ MathJax = {
             [{{ $blockBegin | jsonify | safeJS }}, {{ $blockEnd | jsonify | safeJS }}]{{ if not (and (eq $blockBegin "\\[") (eq $blockEnd "\\]")) }},
             ['\\[', '\\]']{{ end }}
         ],
-        processEscapes: true,
-        processEnvironments: true
+        processEnvironments: true,
+{{- else }}
+        inlineMath: [],
+        displayMath: [],
+        processEnvironments: false,
+{{- end }}
+        processEscapes: true
     },
     startup: {
         ready: () => {
@@ -323,14 +355,35 @@ document.addEventListener("DOMContentLoaded", function() {
 {{- /*
     ---------- TikZ ----------
 
-    TikZJax is the one math-adjacent asset that does not ship from npm: the npm
-    package `node-tikzjax` is a Node + WebAssembly renderer (it depends on
-    jsdom/memfs and exports an async tex2svg()), so it can only run during a
-    Node build step, never inside a Hugo template. Rendering TikZ at build time
-    would need a pre-render script that produces SVGs before `hugo` runs; until
-    then this stays client-side.
+    `scripts/build-tikz.js` (npm run build:tikz) pre-renders every TikZ block to
+    assets/tikz/<hash>.svg with node-tikzjax (Node + WebAssembly), and
+    `_partials/tikz.html` inlines those SVGs. A generated manifest.json marks
+    that mode, so nothing is fetched at page load.
+
+    When the manifest is absent — the script was never run — the block falls back
+    to the classic TikZJax renderer, whose CSS + script still come from the
+    tikzjax.com CDN. `hugo server` also always uses that client path so editing a
+    diagram does not require rerunning the Node script.
 */ -}}
 {{- if $tikz -}}
+    {{- $tikzManifest := resources.Get "tikz/manifest.json" -}}
+    {{- if and $tikzManifest (not hugo.IsServer) -}}
+    {{- /* Build mode: the SVGs are inlined, so publish only the Computer Modern
+           faces their text names. @font-face alone downloads nothing; the
+           browser fetches a file only when a diagram uses that family. */ -}}
+        {{- $faces := slice -}}
+        {{- range (transform.Unmarshal $tikzManifest.Content).fonts | default (slice) -}}
+            {{- $family := . -}}
+            {{- with resources.Get (printf "tikz/fonts/%s.ttf" $family) -}}
+                {{- $font := . | fingerprint -}}
+                {{- $faces = $faces | append (printf "@font-face{font-family:'%s';src:url('%s') format('truetype')}" $family $font.RelPermalink) -}}
+            {{- end -}}
+        {{- end -}}
+        {{- with $faces -}}
+<style>{{ delimit . "\n" | safeCSS }}</style>
+        {{- end -}}
+    {{- else -}}
 <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
 <script defer crossorigin="anonymous" src="https://tikzjax.com/v1/tikzjax.js"></script>
+    {{- end -}}
 {{- end -}}

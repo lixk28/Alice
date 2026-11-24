@@ -2,12 +2,13 @@
   "name": "hugo-alice",
   "version": "1.0.0",
   "private": true,
-  "description": "Node dependencies and build tools for the Alice Hugo theme: KaTeX/MathJax assets plus the SVG icon sprite pipeline.",
+  "description": "Node dependencies and build tools for the Alice Hugo theme: KaTeX/MathJax assets, the SVG icon sprite pipeline, and the TikZ pre-renderer.",
   "scripts": {
     "build:icon": "node scripts/build-sprite.js",
-    "build": "npm run build:icon && hugo",
+    "build:tikz": "node scripts/build-tikz.js",
+    "build": "npm run build:icon && npm run build:tikz && hugo",
     "serve": "npm run build:icon -- --watch & hugo server --bind 0.0.0.0 --port 1313 --disableFastRender",
-    "build:docs": "npm run build:icon && hugo --source=docs",
+    "build:docs": "npm run build:icon && npm run build:tikz -- --source docs && hugo --source=docs",
     "serve:docs": "npm run build:icon -- --watch & hugo server --source=docs --bind 0.0.0.0 --port 1314 --disableFastRender"
   },
   "dependencies": {
@@ -17,6 +18,7 @@
     "pseudocode": "2.4.1"
   },
   "optionalDependencies": {
+    "node-tikzjax": "^1.0.5",
     "svg-sprite": "^2.0.4",
     "svgo": "^3.3.2"
   }

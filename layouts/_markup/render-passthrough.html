@@ -17,7 +17,7 @@
 {{- $math := .Page.Param "tex.math" | default ($tex.math | default false) -}}
 
 {{- if and (eq $engine "hugo") $math -}}
-    {{- $output := ($tex.hugo | default dict).output | default "mathml" -}}
+    {{- $output := .Page.Param "tex.hugo.output" | default "mathml" -}}
     {{- if not (in (slice "mathml" "html" "htmlAndMathml") $output) -}}
         {{- errorf "Alice: params.tex.hugo.output must be \"mathml\", \"html\", or \"htmlAndMathml\"; got %q." $output -}}
     {{- end -}}
@@ -35,7 +35,7 @@
 {{- else -}}
     {{- /* Not rendered on this page: reproduce the delimiters verbatim. */ -}}
     {{- $block := eq .Type "block" -}}
-    {{- $begin := cond $block (.Page.Param "tex.blockBeginDelimiter" | default "$$") (.Page.Param "tex.inlineBeginDelimiter" | default "$") -}}
-    {{- $end := cond $block (.Page.Param "tex.blockEndDelimiter" | default "$$") (.Page.Param "tex.inlineEndDelimiter" | default "$") -}}
+    {{- $begin := cond $block (.Page.Param "tex.blockBeginDelimiter" | default "\\[") (.Page.Param "tex.inlineBeginDelimiter" | default "\\(") -}}
+    {{- $end := cond $block (.Page.Param "tex.blockEndDelimiter" | default "\\]") (.Page.Param "tex.inlineEndDelimiter" | default "\\)") -}}
     {{- printf "%s%s%s" $begin .Inner $end -}}
 {{- end -}}

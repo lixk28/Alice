@@ -1,0 +1,14 @@
+/* Display math stays inside the reading column on narrow screens: wide
+   equations scroll horizontally instead of widening the page. */
+
+.katex-display,
+mjx-container[display="true"] {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: .2em;
+}
+
+/* Build-time MathML output (engine = "hugo"). */
+math[display="block"] {
+    max-width: 100%;
+}

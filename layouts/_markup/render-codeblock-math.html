@@ -10,11 +10,11 @@
 {{- $tex := site.Params.tex | default dict -}}
 {{- $engine := lower (.Page.Param "tex.engine" | default ($tex.engine | default "mathjax")) -}}
 {{- $math := .Page.Param "tex.math" | default ($tex.math | default false) -}}
-{{- $blockBegin := .Page.Param "tex.blockBeginDelimiter" | default "$$" -}}
-{{- $blockEnd := .Page.Param "tex.blockEndDelimiter" | default "$$" -}}
+{{- $blockBegin := .Page.Param "tex.blockBeginDelimiter" | default "\\[" -}}
+{{- $blockEnd := .Page.Param "tex.blockEndDelimiter" | default "\\]" -}}
 
 {{- if and (eq $engine "hugo") $math -}}
-    {{- $output := ($tex.hugo | default dict).output | default "mathml" -}}
+    {{- $output := .Page.Param "tex.hugo.output" | default "mathml" -}}
     {{- if not (in (slice "mathml" "html" "htmlAndMathml") $output) -}}
         {{- errorf "Alice: params.tex.hugo.output must be \"mathml\", \"html\", or \"htmlAndMathml\"; got %q." $output -}}
     {{- end -}}

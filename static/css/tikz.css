@@ -1,0 +1,13 @@
+/* Pre-rendered TikZ diagrams (scripts/build-tikz.js → _partials/tikz.html). */
+
+.tikz-diagram {
+    display: block;
+    margin: 1.2em 0;
+    text-align: center;
+}
+
+.tikz-diagram svg {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+}
