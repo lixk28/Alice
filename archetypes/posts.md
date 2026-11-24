@@ -32,11 +32,14 @@ lightbox:
     # fancybox or glightbox
     vendor: fancybox
 tex:
-    # katex or mathjax
-    engine: katex
+    # mathjax | katex | hugo (build time)
+    engine: mathjax
+    # Site defaults live in params.tex; these are per page.
     math: false
     algorithm: false
     tikz: false
+    # Optional overrides: *Delimiter keys and a pseudocode block.
+    # See the math docs.
 codeeditor:
     # (codemirror5 | cm5) or (codemirror6 | cm6)
     vendor: codemirror5

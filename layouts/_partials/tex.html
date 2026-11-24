@@ -1,13 +1,336 @@
-{{- $texEngine := default "katex" (lower .Params.tex.engine) -}}
+{{- /*
+    Math, TikZ, and algorithm rendering, in one entry point. baseof.html calls
+    this partial when a page (or the site) sets params.tex.
 
-{{- if .Params.tex.algorithm -}}
-    <script src="{{ "js/renderAlgorithm.js" | relURL }}"></script>
-    {{- partial "tex/pseudocode.html" . -}}
-    {{- partial (printf "tex/%s.html" $texEngine) . -}}
-{{- else if .Params.tex.math -}}
-    {{- partial (printf "tex/%s.html" $texEngine) . -}}
+    Engine, params.tex.engine (page front matter may override):
+        mathjax  client-side MathJax 3 (default)
+        katex    client-side KaTeX
+        hugo     build time, via Hugo's built-in KaTeX (transform.ToMath)
+
+    Assets ship from npm: config.toml mounts node_modules/{katex,katex-hugo,
+    mathjax,pseudocode} into assets/node_modules/..., and this partial loads
+    those files with resources.Get and republishes them under /npm/<pkg>@<version>
+    (see below). Each engine's version (params.tex.mathjax, params.tex.katex,
+    params.tex.hugo) is checked against the installed package.json; a mismatch
+    fails the build. TikZ is the exception and still loads TikZJax from
+    tikzjax.com, see below.
+*/ -}}
+
+{{- /* ---------- resolve parameters ---------- */ -}}
+{{- $tex := site.Params.tex | default dict -}}
+{{- $engine := lower (.Param "tex.engine" | default ($tex.engine | default "mathjax")) -}}
+{{- if not (in (slice "mathjax" "katex" "hugo") $engine) -}}
+    {{- errorf "Alice: params.tex.engine must be \"mathjax\", \"katex\", or \"hugo\"; got %q." $engine -}}
 {{- end -}}
 
-{{- if .Params.tex.tikz -}}
-    {{- partial "tex/tikz.html" . -}}
+{{- /* Page front matter wins; params.tex is the site-wide fallback. */ -}}
+{{- $math := .Param "tex.math" | default ($tex.math | default false) -}}
+{{- $algorithm := .Param "tex.algorithm" | default ($tex.algorithm | default false) -}}
+{{- $tikz := .Param "tex.tikz" | default ($tex.tikz | default false) -}}
+
+{{- /* Once per build: the config pins must match the packages npm installed. */ -}}
+{{- if not (hugo.Store.Get "alice-tex-versions") -}}
+    {{- hugo.Store.Set "alice-tex-versions" true -}}
+    {{- $hugo := $tex.hugo | default dict -}}
+    {{- $pseudocode := ($tex.pseudocode | default dict) -}}
+    {{- range slice
+        (dict "key" "params.tex.katex.version" "asset" "node_modules/katex/package.json" "want" (($tex.katex | default dict).version | default "0.19.1"))
+        (dict "key" "params.tex.mathjax.version" "asset" "node_modules/mathjax/package.json" "want" (($tex.mathjax | default dict).version | default "3.2.2"))
+        (dict "key" "params.tex.hugo.version" "asset" "node_modules/katex-hugo/package.json" "want" ($hugo.version | default "0.18.4"))
+        (dict "key" "params.tex.pseudocode.version" "asset" "node_modules/pseudocode/package.json" "want" ($pseudocode.version | default "2.4.1"))
+    -}}
+        {{- $pkg := resources.Get .asset -}}
+        {{- if not $pkg -}}
+            {{- warnf "Alice: %s package.json is not mounted at assets/%s, so %s was not checked." .key .asset .key -}}
+        {{- else -}}
+            {{- $installed := (transform.Unmarshal $pkg.Content).version | default "" -}}
+            {{- if ne (string $installed) (string .want) -}}
+                {{- errorf "Alice: %s is %q but the installed package is %q. Update package.json or the config pin so they match." .key .want $installed -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- /* Client-side delimiters. The hugo engine ignores these: it uses the
+       Goldmark passthrough delimiters, which the site configures. */ -}}
+{{- $inlineBegin := .Param "tex.inlineBeginDelimiter" | default "$" -}}
+{{- $inlineEnd := .Param "tex.inlineEndDelimiter" | default "$" -}}
+{{- $blockBegin := .Param "tex.blockBeginDelimiter" | default "$$" -}}
+{{- $blockEnd := .Param "tex.blockEndDelimiter" | default "$$" -}}
+
+{{- /* Build-time output. Hugo only treats the exact string "mathml" as pure
+       MathML and silently renders anything else as HTML, so reject values
+       outside the three supported spellings before they get that far. */ -}}
+{{- $hugoOutput := ($tex.hugo | default dict).output | default "mathml" -}}
+{{- if not (in (slice "mathml" "html" "htmlAndMathml") $hugoOutput) -}}
+    {{- errorf "Alice: params.tex.hugo.output must be \"mathml\", \"html\", or \"htmlAndMathml\"; got %q." $hugoOutput -}}
+{{- end -}}
+{{- $isHugo := eq $engine "hugo" -}}
+{{- /* HTML output needs the stylesheet. An algorithm needs it too: pseudocode
+       renders its math through the client-side katex, whose classes live in
+       that same stylesheet. */ -}}
+{{- $hugoNeedsKatexCSS := and $isHugo (or (ne $hugoOutput "mathml") $algorithm) -}}
+
+{{- /*
+    ---------- asset publishing ----------
+
+    Every package asset is published under an npm-style path,
+    /npm/<pkg>@<version>/<subdir>/<file>, the same layout jsDelivr serves.
+    The version in the URL makes caching safe across upgrades, which matters
+    because the font files reference each other and keep their upstream names.
+
+    Two independent KaTeX copies, because they answer to different masters:
+
+      katex        the client-side engine (engine = "katex"); bump freely
+      katex-hugo   what the build-time engine needs. Hugo renders with its own
+                   embedded KaTeX, so this must match that version exactly.
+
+    With engine = "hugo", output = "mathml", and no algorithm, nothing is
+    published. An algorithm still needs the hugo copy: its CSS for the KaTeX
+    classes pseudocode emits, and its JS for the `katex` global.
+*/ -}}
+{{- $katexVersion := ($tex.katex | default dict).version | default "0.19.1" -}}
+{{- $mathjaxVersion := ($tex.mathjax | default dict).version | default "3.2.2" -}}
+{{- $katexHugoVersion := ($tex.hugo | default dict).version | default "0.18.4" -}}
+{{- $pseudocodeVersion := ($tex.pseudocode | default dict).version | default "2.4.1" -}}
+
+{{- /*
+    Assets publish to npm/<pkg>@<version>/<subdir>/<file>, the layout jsDelivr
+    serves. The version in the path keeps upgrades cache-safe, which matters
+    because the font files keep their upstream names and reference each other
+    by relative path. Names come from .Name, not .RelPermalink: reading
+    RelPermalink inside a resources.Match loop publishes the original asset too,
+    leaving a duplicate under assets/node_modules/. Integrity uses a throwaway
+    fingerprint so the published file keeps its upstream name.
+*/ -}}
+
+{{- $katex := false -}}
+{{- if and (eq $engine "katex") (or $math $algorithm) -}}
+    {{- $cssRes := resources.Get "node_modules/katex/dist/katex.min.css" -}}
+    {{- $jsRes := resources.Get "node_modules/katex/dist/katex.min.js" -}}
+    {{- $autoRenderRes := resources.Get "node_modules/katex/dist/contrib/auto-render.min.js" -}}
+    {{- if not (and $cssRes $jsRes $autoRenderRes) -}}
+        {{- errorf "Alice: KaTeX assets not found. Run `hugo mod npm pack` then `npm install` in the site root so node_modules/katex is mounted at assets/node_modules/katex/dist." -}}
+    {{- end -}}
+    {{- $base := printf "npm/katex@%s/dist" $katexVersion -}}
+    {{- $css := $cssRes | resources.Copy (printf "%s/%s" $base (path.Base $cssRes.Name)) -}}
+    {{- $js := $jsRes | resources.Copy (printf "%s/%s" $base (path.Base $jsRes.Name)) -}}
+    {{- $autoRender := $autoRenderRes | resources.Copy (printf "%s/contrib/%s" $base (path.Base $autoRenderRes.Name)) -}}
+    {{- /* katex.min.css loads its fonts by relative path, so publish them next to it. */ -}}
+    {{- range resources.Match "node_modules/katex/dist/fonts/*.woff2" -}}
+        {{- $_ := (. | resources.Copy (printf "%s/fonts/%s" $base (path.Base .Name))).RelPermalink -}}
+    {{- end -}}
+    {{- $katex = dict
+        "css" (dict "res" $css "sri" (($cssRes | fingerprint).Data.Integrity))
+        "js" (dict "res" $js "sri" (($jsRes | fingerprint).Data.Integrity))
+        "autoRender" (dict "res" $autoRender "sri" (($autoRenderRes | fingerprint).Data.Integrity))
+    -}}
+{{- end -}}
+{{- $katexHugo := false -}}
+{{- if and $isHugo (or $hugoNeedsKatexCSS $algorithm) -}}
+    {{- $css := false -}}
+    {{- $js := false -}}
+    {{- $base := printf "npm/katex@%s/dist" $katexHugoVersion -}}
+    {{- if $hugoNeedsKatexCSS -}}
+        {{- $cssRes := resources.Get "node_modules/katex-hugo/dist/katex.min.css" -}}
+        {{- if not $cssRes -}}
+            {{- errorf "Alice: KaTeX (hugo engine) stylesheet not found. Run `hugo mod npm pack` then `npm install` in the site root so node_modules/katex-hugo is mounted at assets/node_modules/katex-hugo/dist, or set params.tex.hugo.output = 'mathml' (which needs no CSS)." -}}
+        {{- end -}}
+        {{- $css = dict
+            "res" ($cssRes | resources.Copy (printf "%s/%s" $base (path.Base $cssRes.Name)))
+            "sri" (($cssRes | fingerprint).Data.Integrity)
+        -}}
+        {{- range resources.Match "node_modules/katex-hugo/dist/fonts/*.woff2" -}}
+            {{- $_ := (. | resources.Copy (printf "%s/fonts/%s" $base (path.Base .Name))).RelPermalink -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if $algorithm -}}
+        {{- $jsRes := resources.Get "node_modules/katex-hugo/dist/katex.min.js" -}}
+        {{- if not $jsRes -}}
+            {{- errorf "Alice: KaTeX (hugo engine) script not found. tex.algorithm needs the client-side `katex` global for pseudocode.js; run `hugo mod npm pack` then `npm install` so node_modules/katex-hugo is mounted at assets/node_modules/katex-hugo/dist." -}}
+        {{- end -}}
+        {{- $js = dict
+            "res" ($jsRes | resources.Copy (printf "%s/%s" $base (path.Base $jsRes.Name)))
+            "sri" (($jsRes | fingerprint).Data.Integrity)
+        -}}
+    {{- end -}}
+    {{- $katexHugo = dict "css" $css "js" $js -}}
+{{- end -}}
+
+{{- /* ---------- algorithm (pseudocode.js) ---------- */ -}}
+{{- if $algorithm -}}
+    {{- $pcCSS := resources.Get "node_modules/pseudocode/build/pseudocode.min.css" -}}
+    {{- $pcJS := resources.Get "node_modules/pseudocode/build/pseudocode.min.js" -}}
+    {{- if not (and $pcCSS $pcJS) -}}
+        {{- errorf "Alice: pseudocode.js assets not found. Run `hugo mod npm pack` then `npm install` in the site root so node_modules/pseudocode is mounted at assets/node_modules/pseudocode/build." -}}
+    {{- end -}}
+    {{- /*
+        Options follow the global options of pseudocode.js:
+        https://github.com/SaswatPadhi/pseudocode.js#global-options
+
+        Hugo lowercases param keys, so the dict cannot be jsonified directly:
+        pseudocode.js expects camelCase names like indentSize. Rebuild the
+        object with the exact keys it reads. A key the site omits is left out,
+        so the library default applies.
+    */ -}}
+    {{- $pc := $tex.pseudocode | default dict -}}
+    {{- if .Param "tex.pseudocode" -}}
+        {{- $pc = merge $pc (.Param "tex.pseudocode") -}}
+    {{- end -}}
+    {{- $pcOpts := dict -}}
+    {{- /* Keys are lowercase here because Hugo lowercases param names. */ -}}
+    {{- with $pc.indentsize -}}{{- $pcOpts = merge $pcOpts (dict "indentSize" .) -}}{{- end -}}
+    {{- with $pc.commentdelimiter -}}{{- $pcOpts = merge $pcOpts (dict "commentDelimiter" .) -}}{{- end -}}
+    {{- with $pc.linenumberpunc -}}{{- $pcOpts = merge $pcOpts (dict "lineNumberPunc" .) -}}{{- end -}}
+    {{- with $pc.titleprefix -}}{{- $pcOpts = merge $pcOpts (dict "titlePrefix" .) -}}{{- end -}}
+    {{- if isset $pc "linenumber" -}}{{- $pcOpts = merge $pcOpts (dict "lineNumber" $pc.linenumber) -}}{{- end -}}
+    {{- if isset $pc "noend" -}}{{- $pcOpts = merge $pcOpts (dict "noEnd" $pc.noend) -}}{{- end -}}
+    {{- if isset $pc "scopelines" -}}{{- $pcOpts = merge $pcOpts (dict "scopeLines" $pc.scopelines) -}}{{- end -}}
+    {{- if isset $pc "captioncount" -}}{{- $pcOpts = merge $pcOpts (dict "captionCount" $pc.captioncount) -}}{{- end -}}
+    {{- /*
+        The upstream stylesheet starts with `@import url(...KaTeX/0.16.7...)`,
+        which would pull a second, mismatched KaTeX build from a CDN and fight
+        the one this theme ships. Drop the import and rely on the stylesheet
+        the active engine already loaded.
+    */ -}}
+    {{- $pcCSS = replaceRE `@import url\([^)]*\);\s*` "" $pcCSS.Content | resources.FromString "node_modules/pseudocode/build/pseudocode.min.css" | resources.Copy (printf "npm/pseudocode@%s/build/pseudocode.min.css" $pseudocodeVersion) -}}
+    {{- $pcJS = $pcJS | resources.Copy (printf "npm/pseudocode@%s/build/%s" $pseudocodeVersion (path.Base $pcJS.Name)) -}}
+    <link rel="stylesheet" href="{{ $pcCSS.RelPermalink }}">
+    <style>
+        div.ps-root {
+            font-size: 1.2em !important;
+        }
+        @media screen and (max-width: 600px) {
+            div.ps-root {
+                font-size: 1em !important;
+            }
+        }
+
+        div.ps-root p.ps-line {
+            line-height: 1.4em !important;
+        }
+        div[class^=ps-algorithmic] > div.ps-block {
+            margin-left: 1.4em !important;
+        }
+        span.ps-linenum {
+            width: 2.2em !important;
+            padding-left: 0 !important;
+            padding-right: .6em !important;
+        }
+    </style>
+    {{- /* jsonify escapes "<" to \u003c, so a stray "</script>" in an option cannot break out. */ -}}
+    <script>window.ALICE_PSEUDOCODE_OPTIONS = {{ $pcOpts | jsonify | safeJS }};</script>
+    <script src="{{ "js/renderAlgorithm.js" | relURL }}"></script>
+    <script defer src="{{ $pcJS.RelPermalink }}"></script>
+{{- end -}}
+
+{{- /* ---------- engine ---------- */ -}}
+{{- if and (eq $engine "mathjax") (or $math $algorithm) -}}
+        {{- $jsRes := resources.Get "node_modules/mathjax/es5/tex-chtml-full.js" -}}
+        {{- if not $jsRes -}}
+            {{- errorf "Alice: MathJax assets not found. Run `hugo mod npm pack` then `npm install` in the site root so node_modules/mathjax is mounted at assets/node_modules/mathjax/es5." -}}
+        {{- end -}}
+        {{- $js := $jsRes | resources.Copy (printf "npm/mathjax@%s/es5/%s" $mathjaxVersion (path.Base $jsRes.Name)) -}}
+        {{- /* MathJax resolves its CHTML fonts relative to the script, so keep
+               them under output/chtml/fonts/woff-v2 beside it. */ -}}
+        {{- range resources.Match "node_modules/mathjax/es5/output/chtml/fonts/woff-v2/*.woff" -}}
+            {{- $_ := (. | resources.Copy (printf "npm/mathjax@%s/es5/output/chtml/fonts/woff-v2/%s" $mathjaxVersion (path.Base .Name))).RelPermalink -}}
+        {{- end -}}
+<script>
+MathJax = {
+    tex: {
+        inlineMath: [
+            [{{ $inlineBegin | jsonify | safeJS }}, {{ $inlineEnd | jsonify | safeJS }}]{{ if not (and (eq $inlineBegin "\\(") (eq $inlineEnd "\\)")) }},
+            ['\\(', '\\)']{{ end }}
+        ],
+        displayMath: [
+            [{{ $blockBegin | jsonify | safeJS }}, {{ $blockEnd | jsonify | safeJS }}]{{ if not (and (eq $blockBegin "\\[") (eq $blockEnd "\\]")) }},
+            ['\\[', '\\]']{{ end }}
+        ],
+        processEscapes: true,
+        processEnvironments: true
+    },
+    startup: {
+        ready: () => {
+            MathJax.startup.defaultReady();
+{{ if $algorithm }}            renderAlgorithm();
+{{ end }}        }
+    }
+}
+</script>
+<script defer src="{{ $js.RelPermalink }}" integrity="{{ ($jsRes | fingerprint).Data.Integrity }}" crossorigin="anonymous"></script>
+
+{{- else if and (eq $engine "katex") (or $math $algorithm) -}}
+<link rel="stylesheet" href="{{ $katex.css.res.RelPermalink }}" integrity="{{ $katex.css.sri }}" crossorigin="anonymous">
+<script defer src="{{ $katex.js.res.RelPermalink }}" integrity="{{ $katex.js.sri }}" crossorigin="anonymous"></script>
+{{- if $math -}}
+<script defer src="{{ $katex.autoRender.res.RelPermalink }}" integrity="{{ $katex.autoRender.sri }}" crossorigin="anonymous"></script>
+{{- end -}}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+{{- if $math }}
+    renderMathInElement(document.body, {
+        // https://katex.org/docs/autorender.html
+        // Rules are processed in order, so block delimiters must come before
+        // their inline counterparts (otherwise $$ is read as an empty $...$).
+        delimiters: [
+            { left: {{ $blockBegin | jsonify | safeJS }}, right: {{ $blockEnd | jsonify | safeJS }}, display: true }{{ if not (and (eq $blockBegin "\\[") (eq $blockEnd "\\]")) }},
+            { left: '\\[', right: '\\]', display: true }{{ end }},
+            { left: {{ $inlineBegin | jsonify | safeJS }}, right: {{ $inlineEnd | jsonify | safeJS }}, display: false }{{ if not (and (eq $inlineBegin "\\(") (eq $inlineEnd "\\)")) }},
+            { left: '\\(', right: '\\)', display: false }{{ end }}
+        ],
+        throwOnError : false
+    });
+{{- end }}
+{{- if $algorithm }}
+    renderAlgorithm();
+{{- end }}
+});
+</script>
+
+{{- else if $isHugo -}}
+    {{- /*
+        The build-time work happens in render-passthrough.html (delimited
+        snippets) and render-codeblock-math.html (fenced blocks), so the page
+        loads no client math engine. What still ships:
+          * output = "mathml" and no algorithm: nothing
+          * output other than "mathml": the katex-hugo stylesheet, because
+            HTML output needs the classes from Hugo's embedded KaTeX
+          * tex.algorithm: the katex-hugo stylesheet and script, because
+            pseudocode.js typesets through the client-side `katex` global
+    */ -}}
+    {{- /* The passthrough extension is site config and cannot be inherited
+           from the theme. Probe with both delimiter families the docs
+           configure, so a site that kept only one of them is not warned. */ -}}
+    {{- if and $math (not (or (strings.Contains (.RenderString "$$x$$") "katex") (strings.Contains (.RenderString `\[x\]`) "katex"))) -}}
+        {{- warnf "Alice: engine \"hugo\" needs the Goldmark passthrough extension. Add the [markup.goldmark.extensions.passthrough] block from the docs to this site's config, otherwise math is left unrendered." -}}
+    {{- end -}}
+    {{- with $katexHugo -}}
+        {{- with .css -}}
+<link rel="stylesheet" href="{{ .res.RelPermalink }}" integrity="{{ .sri }}" crossorigin="anonymous">
+        {{- end -}}
+        {{- with .js -}}
+<script defer src="{{ .res.RelPermalink }}" integrity="{{ .sri }}" crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderAlgorithm();
+});
+</script>
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- /*
+    ---------- TikZ ----------
+
+    TikZJax is the one math-adjacent asset that does not ship from npm: the npm
+    package `node-tikzjax` is a Node + WebAssembly renderer (it depends on
+    jsdom/memfs and exports an async tex2svg()), so it can only run during a
+    Node build step, never inside a Hugo template. Rendering TikZ at build time
+    would need a pre-render script that produces SVGs before `hugo` runs; until
+    then this stays client-side.
+*/ -}}
+{{- if $tikz -}}
+<link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
+<script defer crossorigin="anonymous" src="https://tikzjax.com/v1/tikzjax.js"></script>
 {{- end -}}

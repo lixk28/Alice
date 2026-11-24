@@ -32,7 +32,9 @@
 	{{- if .Params.lightbox -}}
 		{{- partial "lightbox.html" . -}}
 	{{- end -}}
-	{{- if .Params.tex -}}
+	{{- /* Fire when either the page or the site configures tex; tex.html emits
+	       nothing unless tex.math / tex.algorithm / tex.tikz is on. */ -}}
+	{{- if or .Params.tex site.Params.tex -}}
 		{{- partial "tex.html" . -}}
 	{{- end -}}
 	{{- if .Params.mermaid -}}

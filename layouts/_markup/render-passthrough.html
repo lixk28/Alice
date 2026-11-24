@@ -1,0 +1,41 @@
+{{- /*
+    Build-time math rendering for the "hugo" engine.
+
+    Hugo does not merge [markup] from a theme, so the Goldmark passthrough
+    extension must be enabled by the site; see the math docs for the snippet.
+    Once it is on, every delimited snippet site-wide reaches this hook,
+    including snippets on pages that did not opt into math.
+
+    Pages opt in with `tex.math: true` (front matter or params.tex.math).
+    On pages that did not opt in the delimiters are re-emitted so the text
+    stays as authored. The hook cannot see which delimiter pair matched, so
+    params.tex.<...>Delimiter is used; keep those values in sync with the
+    passthrough delimiters when using this engine.
+*/ -}}
+{{- $tex := site.Params.tex | default dict -}}
+{{- $engine := lower (.Page.Param "tex.engine" | default ($tex.engine | default "mathjax")) -}}
+{{- $math := .Page.Param "tex.math" | default ($tex.math | default false) -}}
+
+{{- if and (eq $engine "hugo") $math -}}
+    {{- $output := ($tex.hugo | default dict).output | default "mathml" -}}
+    {{- if not (in (slice "mathml" "html" "htmlAndMathml") $output) -}}
+        {{- errorf "Alice: params.tex.hugo.output must be \"mathml\", \"html\", or \"htmlAndMathml\"; got %q." $output -}}
+    {{- end -}}
+    {{- $opts := dict
+        "output" $output
+        "displayMode" (eq .Type "block")
+    -}}
+    {{- with try (transform.ToMath .Inner $opts) -}}
+        {{- with .Err -}}
+            {{- errorf "Alice: transform.ToMath failed at %s: %s" $.Position . -}}
+        {{- else -}}
+            {{- .Value -}}
+        {{- end -}}
+    {{- end -}}
+{{- else -}}
+    {{- /* Not rendered on this page: reproduce the delimiters verbatim. */ -}}
+    {{- $block := eq .Type "block" -}}
+    {{- $begin := cond $block (.Page.Param "tex.blockBeginDelimiter" | default "$$") (.Page.Param "tex.inlineBeginDelimiter" | default "$") -}}
+    {{- $end := cond $block (.Page.Param "tex.blockEndDelimiter" | default "$$") (.Page.Param "tex.inlineEndDelimiter" | default "$") -}}
+    {{- printf "%s%s%s" $begin .Inner $end -}}
+{{- end -}}

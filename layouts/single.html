@@ -66,6 +66,21 @@
 		{{- if and (not .Draft) .Site.Params.waline.enable -}}
 			{{- if .Params.waline -}}
 				<div id="waline"></div>
+				{{- /*
+					Comment math follows the page engine. MathJax and KaTeX each
+					render with the library the page already loaded. The build-time
+					"hugo" engine loads neither, so no texRender is passed and Waline
+					shows the TeX source.
+				*/ -}}
+				{{- $texRender := "undefined" -}}
+				{{- if (.Param "tex.math" | default (site.Params.tex.math | default false)) -}}
+					{{- $engine := lower (.Param "tex.engine" | default (site.Params.tex.engine | default "mathjax")) -}}
+					{{- if eq $engine "mathjax" -}}
+						{{- $texRender = `(blockMode, tex) => window.MathJax.startup.adaptor.outerHTML(window.MathJax.tex2svg(tex, { display: blockMode }))` -}}
+					{{- else if eq $engine "katex" -}}
+						{{- $texRender = `(blockMode, tex) => katex.renderToString(tex, { displayMode: blockMode, throwOnError: false })` -}}
+					{{- end -}}
+				{{- end -}}
 				<script type="module">
 					import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
 					init({
@@ -73,11 +88,7 @@
 						serverURL: '{{ .Site.Params.waline.serverURL }}',
 						lang: '{{ .Params.waline.language | default .Site.Params.waline.language }}',
 						reaction: {{ .Params.waline.reaction | default .Site.Params.waline.reaction }},
-						texRender: (blockMode, tex) => window.MathJax.startup.adaptor.outerHTML(
-							window.MathJax.tex2svg(tex, {
-								display: blockMode,
-							}),
-						),
+						texRender: {{ $texRender | safeJS }},
 					});
 				</script>
 			{{- end -}}

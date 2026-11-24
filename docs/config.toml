@@ -298,12 +298,42 @@ themesDir = "../.."
             close = "svg/ui-oval/x-close.svg"
 
     [params.tex]
-        # mathjax or katex
+        # mathjax | katex | hugo
         engine = 'mathjax'
+        # Site-wide defaults; a page can override any of them in front matter.
+        math = false
+        algorithm = false
+        tikz = false
+        # Delimiters for inline and block math, set as a begin/end pair.
+        # Leave a pair empty to use the defaults: $...$ inline and $$...$$ block.
+        # A configured pair replaces its default; \(...\) and \[...\] are always
+        # recognized too. Example: '\(' and '\)'.
+        # Only the client-side engines use these; "hugo" uses the passthrough
+        # delimiters under [markup].
         inlineBeginDelimiter = ''
         inlineEndDelimiter = ''
         blockBeginDelimiter = ''
         blockEndDelimiter = ''
+        [params.tex.mathjax]
+            version = '3.2.2'
+        [params.tex.katex]
+            version = '0.19.1'
+        [params.tex.hugo]
+            # KaTeX embedded in this Hugo release. Not params.tex.katex.version.
+            version = '0.18.4'
+            # mathml (no CSS) | html | htmlAndMathml (needs that KaTeX's CSS).
+            # Only "mathml", "html", and "htmlAndMathml" are accepted.
+            output = 'mathml'
+
+        [params.tex.pseudocode]
+            version = '2.4.1'
+            indentSize = '1.6em'
+            commentDelimiter = '//'
+            lineNumber = true
+            lineNumberPunc = ''
+            noEnd = true
+            scopeLines = false
+            titlePrefix = 'Algorithm'
 
     [params.imgproc]
         enable = false
@@ -338,11 +368,49 @@ themesDir = "../.."
         addons = []
 
 
+# The theme mounts node_modules/katex, node_modules/mathjax, and
+# node_modules/pseudocode. In this repository the dependencies are installed at
+# the theme root, so point the example site at those copies as well.
+[module]
+    [[module.mounts]]
+        source = "../node_modules/katex/dist"
+        target = "assets/node_modules/katex/dist"
+    [[module.mounts]]
+        source = "../node_modules/katex/package.json"
+        target = "assets/node_modules/katex/package.json"
+    [[module.mounts]]
+        source = "../node_modules/katex-hugo/dist"
+        target = "assets/node_modules/katex-hugo/dist"
+    [[module.mounts]]
+        source = "../node_modules/katex-hugo/package.json"
+        target = "assets/node_modules/katex-hugo/package.json"
+    [[module.mounts]]
+        source = "../node_modules/mathjax/es5"
+        target = "assets/node_modules/mathjax/es5"
+    [[module.mounts]]
+        source = "../node_modules/mathjax/package.json"
+        target = "assets/node_modules/mathjax/package.json"
+    [[module.mounts]]
+        source = "../node_modules/pseudocode/build"
+        target = "assets/node_modules/pseudocode/build"
+    [[module.mounts]]
+        source = "../node_modules/pseudocode/package.json"
+        target = "assets/node_modules/pseudocode/package.json"
+
 # Hugo parameters with Alice default initialization
 [markup]
     defaultMarkdownHandler = "goldmark"
     [markup.goldmark.renderer]
         unsafe = true
+    # Required by params.tex.engine = "hugo"; Hugo does not merge [markup]
+    # from a theme, so every site using that engine enables this itself.
+    # No '$' / '$' pair: the extension runs on every page, so "$5 and $10"
+    # would be parsed as math. Inline math is \(...\) only.
+    [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+            block = [['\[', '\]'], ['$$', '$$']]
+            inline = [['\(', '\)']]
     [markup.goldmark.parser]
         wrapStandAloneImageWithinParagraph = false
         [markup.goldmark.parser.attribute]

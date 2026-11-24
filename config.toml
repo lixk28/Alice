@@ -298,12 +298,52 @@
             close = "svg/ui-oval/x-close.svg"
 
     [params.tex]
-        # mathjax or katex
+        # mathjax (default, client) | katex (client) | hugo (build time, hugo's transform.ToMath)
         engine = 'mathjax'
+        # Site-wide defaults; a page can override any of them in front matter.
+        # Pages opt in because math is expensive: turn these on to enable it
+        # everywhere, or leave them off and set tex.math etc. per page.
+        math = false
+        algorithm = false
+        tikz = false
+        # Inline/block delimiter pairs. Empty uses $...$ and $$...$$;
+        # \(...\) and \[...\] always work. Client engines only; "hugo"
+        # reads the passthrough delimiters.
         inlineBeginDelimiter = ''
         inlineEndDelimiter = ''
         blockBeginDelimiter = ''
         blockEndDelimiter = ''
+        # Checked against the installed package.json; a mismatch fails the build.
+        [params.tex.mathjax]
+            version = '3.2.2'
+        [params.tex.katex]
+            version = '0.19.1'
+        # Build-time rendering. version is the KaTeX embedded in Hugo,
+        # not params.tex.katex.version.
+        [params.tex.hugo]
+            version = '0.18.4'
+            # https://gohugo.io/functions/transform/tomath/#output
+            # mathml (default, no CSS) | html | htmlAndMathml (needs CSS).
+            # Any other value fails the build.
+            output = 'mathml'
+
+        # pseudocode.js (tex.algorithm). Options match
+        # https://github.com/SaswatPadhi/pseudocode.js#global-options;
+        # omit one to use the library default.
+        [params.tex.pseudocode]
+            version = '2.4.1'
+            # Indent in a control block; needs an "em" unit.
+            indentSize = '1.6em'
+            # Whole-line comment marker.
+            commentDelimiter = '//'
+            lineNumber = true
+            lineNumberPunc = ''
+            # Hide "end if", "end procedure", ...
+            noEnd = true
+            # Vertical lines for nested scopes.
+            scopeLines = false
+            titlePrefix = 'Algorithm'
+            # Restart the caption counter here; omit to keep it running.
 
     [params.imgproc]
         enable = false
@@ -342,6 +382,59 @@
         language = 'en'
         reaction = false
 
+
+# Node-installed math assets (katex, mathjax). The theme declares the mounts, so
+# a site only needs to install the dependencies:
+#   hugo mod npm pack
+#   npm install
+# Defining module.mounts replaces the module defaults, so the standard theme
+# directories are mounted explicitly here as well.
+[module]
+    [[module.mounts]]
+        source = "archetypes"
+        target = "archetypes"
+    [[module.mounts]]
+        source = "assets"
+        target = "assets"
+    [[module.mounts]]
+        source = "content"
+        target = "content"
+    [[module.mounts]]
+        source = "data"
+        target = "data"
+    [[module.mounts]]
+        source = "i18n"
+        target = "i18n"
+    [[module.mounts]]
+        source = "layouts"
+        target = "layouts"
+    [[module.mounts]]
+        source = "static"
+        target = "static"
+    [[module.mounts]]
+        source = "node_modules/katex/dist"
+        target = "assets/node_modules/katex/dist"
+    [[module.mounts]]
+        source = "node_modules/katex/package.json"
+        target = "assets/node_modules/katex/package.json"
+    [[module.mounts]]
+        source = "node_modules/katex-hugo/dist"
+        target = "assets/node_modules/katex-hugo/dist"
+    [[module.mounts]]
+        source = "node_modules/katex-hugo/package.json"
+        target = "assets/node_modules/katex-hugo/package.json"
+    [[module.mounts]]
+        source = "node_modules/mathjax/es5"
+        target = "assets/node_modules/mathjax/es5"
+    [[module.mounts]]
+        source = "node_modules/mathjax/package.json"
+        target = "assets/node_modules/mathjax/package.json"
+    [[module.mounts]]
+        source = "node_modules/pseudocode/build"
+        target = "assets/node_modules/pseudocode/build"
+    [[module.mounts]]
+        source = "node_modules/pseudocode/package.json"
+        target = "assets/node_modules/pseudocode/package.json"
 
 # Hugo parameters with Alice default initialization
 [markup]

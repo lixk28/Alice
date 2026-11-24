@@ -1,0 +1,30 @@
+{{- /*
+    ```math fence. Display math, so it is always block.
+
+    This is the single code fence for math; there is no per-engine fence. With
+    the hugo engine the fence is rendered at build time here, because code
+    fence output does not go through render-passthrough.html. Every other
+    engine gets the configured block delimiters so the client-side engine picks
+    the expression up on page load.
+*/ -}}
+{{- $tex := site.Params.tex | default dict -}}
+{{- $engine := lower (.Page.Param "tex.engine" | default ($tex.engine | default "mathjax")) -}}
+{{- $math := .Page.Param "tex.math" | default ($tex.math | default false) -}}
+{{- $blockBegin := .Page.Param "tex.blockBeginDelimiter" | default "$$" -}}
+{{- $blockEnd := .Page.Param "tex.blockEndDelimiter" | default "$$" -}}
+
+{{- if and (eq $engine "hugo") $math -}}
+    {{- $output := ($tex.hugo | default dict).output | default "mathml" -}}
+    {{- if not (in (slice "mathml" "html" "htmlAndMathml") $output) -}}
+        {{- errorf "Alice: params.tex.hugo.output must be \"mathml\", \"html\", or \"htmlAndMathml\"; got %q." $output -}}
+    {{- end -}}
+    {{- with try (transform.ToMath .Inner (dict "output" $output "displayMode" true)) -}}
+        {{- with .Err -}}
+            {{- errorf "Alice: transform.ToMath failed on %s: %s" $.Position . -}}
+        {{- else -}}
+            {{- .Value -}}
+        {{- end -}}
+    {{- end -}}
+{{- else -}}
+    {{- printf "%s\n%s\n%s" $blockBegin .Inner $blockEnd | safeHTML -}}
+{{- end -}}

@@ -362,11 +362,160 @@ hello world
 
 ## $\LaTeX$ Support
 
-### Pseudocode and Algorithms
+Three independent features, each off until you enable it. Set them site-wide in `params.tex`, or per page in front matter:
 
-https://saswat.padhi.me/pseudocode.js
+```yaml
+tex:
+  math: true       # formulas
+  algorithm: true  # algorithm blocks
+  tikz: true       # tikz diagrams
+```
 
-This quicksort algorithm is extracted from Chapter 7, Introduction to Algorithms (3rd edition)
+Page front matter wins over the site value, so a site-wide `math: true` can still be turned off on a single page.
+
+Math and algorithms share one engine, chosen with `params.tex.engine`:
+
+| `engine` | Renders | Good for |
+|---|---|---|
+| `mathjax` (default) | in the browser | the widest LaTeX coverage |
+| `katex` | in the browser | faster startup |
+| `hugo` | at build time | pages that should ship no math JavaScript |
+
+The `hugo` engine renders with the KaTeX built into Hugo, so the page loads no math script.
+
+### Math
+
+Inline math goes between `$...$`, or `\(...\)` which is equivalent and safer on pages that also contain prices or shell prompts starting with `$`:
+
+```md
+Inline math sits in a sentence: $a^2 + b^2 = c^2$.
+```
+
+Rendered: inline math sits in a sentence, $a^2 + b^2 = c^2$.
+
+Display math takes two forms. A `$$...$$` block:
+
+```md
+$$
+A = \begin{pmatrix}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{pmatrix},
+\qquad
+f(x) = \begin{cases}
+x^2 & x \ge 0, \\
+-x  & x < 0.
+\end{cases}
+$$
+```
+
+Which renders as:
+
+$$
+A = \begin{pmatrix}
+a_{11} & a_{12} \\
+a_{21} & a_{22}
+\end{pmatrix},
+\qquad
+f(x) = \begin{cases}
+x^2 & x \ge 0, \\
+-x  & x < 0.
+\end{cases}
+$$
+
+Or a fence tagged `math`, which keeps long expressions readable in the source:
+
+````md
+```math
+\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+```
+````
+
+Which renders as:
+
+```math
+\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+```
+
+Aligned equations, with summation and fractions:
+
+```md
+$$
+\begin{aligned}
+\nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0}, \\
+\nabla \times \mathbf{B} &= \mu_0 \mathbf{J}
+    + \mu_0 \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t}, \\
+\sum_{k=1}^{n} k &= \frac{n(n+1)}{2}.
+\end{aligned}
+$$
+```
+
+Which renders as:
+
+$$
+\begin{aligned}
+\nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0}, \\
+\nabla \times \mathbf{B} &= \mu_0 \mathbf{J}
+    + \mu_0 \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t}, \\
+\sum_{k=1}^{n} k &= \frac{n(n+1)}{2}.
+\end{aligned}
+$$
+
+Inline math also mixes with prose: the norm $\lVert x \rVert_2 = \sqrt{\sum_i x_i^2}$, the inner product $\langle u, v \rangle$, and a small fraction $\frac{a}{b}$ all work mid-sentence.
+
+`math` is the only math fence name. `katex` and `mathjax` are not: a fence tagged with either renders as highlighted source instead. Every engine covers `\begin{aligned}`, `\begin{pmatrix}`, and `\begin{cases}`.
+
+With `engine = 'hugo'` the site has to enable the Goldmark passthrough extension, since Hugo does not inherit `[markup]` from a theme, and the delimiters below must match `params.tex.*Delimiter`:
+
+```toml
+[params.tex]
+    engine = 'hugo'
+    math = true
+
+[markup]
+    [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+            block = [['\[', '\]'], ['$$', '$$']]
+            inline = [['\(', '\)']]
+```
+
+Because the extension sees every page, a lone `$` in prose such as "costs $5" would otherwise start a formula; write `\$` for the dollar sign. `params.tex.hugo.output` picks the markup: `mathml` (the default, needs no CSS), `html`, or `htmlAndMathml`, and the stylesheet is linked automatically for the last two.
+
+### Algorithms
+
+Wrap `algorithmic` markup in the `algorithm` shortcode. Math inside is typeset for you, so no delimiters are needed there beyond the usual `$...$`.
+
+```
+{{</* algorithm */>}}
+\begin{algorithm}
+\caption{Quicksort}
+\begin{algorithmic}
+\PROCEDURE{Quicksort}{$A, p, r$}
+    \IF{$p < r$}
+        \STATE $q = $ \CALL{Partition}{$A, p, r$}
+        \STATE \CALL{Quicksort}{$A, p, q - 1$}
+        \STATE \CALL{Quicksort}{$A, q + 1, r$}
+    \ENDIF
+\ENDPROCEDURE
+\PROCEDURE{Partition}{$A, p, r$}
+    \STATE $x = A[r]$
+    \STATE $i = p - 1$
+    \FOR{$j = p$ \TO $r - 1$}
+        \IF{$A[j] < x$}
+            \STATE $i = i + 1$
+            \STATE exchange
+            $A[i]$ with     $A[j]$
+        \ENDIF
+        \STATE exchange $A[i]$ with $A[r]$
+    \ENDFOR
+\ENDPROCEDURE
+\end{algorithmic}
+\end{algorithm}
+{{</* /algorithm */>}}
+```
+
+Which renders as:
 
 {{< algorithm >}}
 \begin{algorithm}
@@ -395,9 +544,93 @@ This quicksort algorithm is extracted from Chapter 7, Introduction to Algorithms
 \end{algorithm}
 {{< /algorithm >}}
 
-### TikZ Graphics
+The grammar is [pseudocode.js](https://saswat.padhi.me/pseudocode.js)': `\STATE`, `\IF`/`\ENDIF`, `\FOR`/`\ENDFOR`, `\WHILE`/`\ENDWHILE`, `\PROCEDURE`, `\CALL`, `\RETURN`, and `$...$` for math.
 
-https://tikzjax.com
+Appearance is configured under `params.tex.pseudocode`, and a page can override it:
+
+```yaml
+tex:
+  pseudocode:
+    lineNumber: true
+    titlePrefix: "Algo"
+```
+
+| Key | Default | Meaning |
+|---|---|---|
+| `indentSize` | `1.6em` | Indent inside a control block. Must carry an `em` unit. |
+| `commentDelimiter` | `//` | Line comment marker. Only whole-line comments work. |
+| `lineNumber` | `true` | Show line numbers. |
+| `lineNumberPunc` | `''` | Punctuation after a line number. |
+| `noEnd` | `true` | Hide `end if`, `end procedure`, and friends. |
+| `scopeLines` | `false` | Draw vertical lines for nested block scopes. |
+| `titlePrefix` | `Algorithm` | Prefix before the caption number. |
+| `captionCount` | unset | Restart the caption counter at this number. |
+
+Omit a key to keep the library default.
+
+### TikZ
+
+Wrap TikZ markup in the `tikz` shortcode. A shaded circle with a labelled radius:
+
+```
+{{</* tikz */>}}
+\begin{tikzpicture}[scale=1.2]
+\draw[thick, fill=blue!12] (0,0) circle (1.5cm);
+\draw[->, thick] (0,0) -- (1.5,0) node[midway, below] {$r$};
+\fill (0,0) circle (2pt) node[below left] {$O$};
+\draw[dashed] (-1.5,0) -- (1.5,0);
+\end{tikzpicture}
+{{</* /tikz */>}}
+```
+
+Which renders as:
+
+{{< tikz >}}
+\begin{tikzpicture}[scale=1.2]
+\draw[thick, fill=blue!12] (0,0) circle (1.5cm);
+\draw[->, thick] (0,0) -- (1.5,0) node[midway, below] {$r$};
+\fill (0,0) circle (2pt) node[below left] {$O$};
+\draw[dashed] (-1.5,0) -- (1.5,0);
+\end{tikzpicture}
+{{< /tikz >}}
+
+A commutative square, where TikZ beats a picture:
+
+```
+{{</* tikz */>}}
+\begin{tikzpicture}[scale=1]
+\node (A) at (0,1.4) {$A$};
+\node (B) at (3,1.4) {$B$};
+\node (C) at (0,0) {$C$};
+\node (D) at (3,0) {$D$};
+\draw[->] (A) -- node[above] {$f$} (B);
+\draw[->] (A) -- node[left] {$g$} (C);
+\draw[->] (B) -- node[right] {$h$} (D);
+\draw[->] (C) -- node[below] {$k$} (D);
+\draw[->, dashed] (A) to[bend right=20] node[above left] {$\exists!$} (D);
+\end{tikzpicture}
+{{</* /tikz */>}}
+```
+
+Which renders as:
+
+{{< tikz >}}
+\begin{tikzpicture}[scale=1]
+\node (A) at (0,1.4) {$A$};
+\node (B) at (3,1.4) {$B$};
+\node (C) at (0,0) {$C$};
+\node (D) at (3,0) {$D$};
+\draw[->] (A) -- node[above] {$f$} (B);
+\draw[->] (A) -- node[left] {$g$} (C);
+\draw[->] (B) -- node[right] {$h$} (D);
+\draw[->] (C) -- node[below] {$k$} (D);
+\draw[->, dashed] (A) to[bend right=20] node[above left] {$\exists!$} (D);
+\end{tikzpicture}
+{{< /tikz >}}
+
+Only TikZ's base colour set is available (`red`, `blue`, `black`, `gray`, and mixtures like `blue!12`). Names from the extended xcolor sets, such as `AliceBlue`, are not defined unless a site preloads them.
+
+TikZ uses [TikZJax](https://tikzjax.com), which renders in the browser and needs network access. Everything else on this page ships with the theme.
 
 ## Diargams
 

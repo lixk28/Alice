@@ -2,7 +2,7 @@
   "name": "hugo-alice",
   "version": "1.0.0",
   "private": true,
-  "description": "Build tools for the Alice Hugo theme: optimize SVG icons with svgo and bundle them into a single sprite served by Hugo.",
+  "description": "Node dependencies and build tools for the Alice Hugo theme: KaTeX/MathJax assets plus the SVG icon sprite pipeline.",
   "scripts": {
     "build:icon": "node scripts/build-sprite.js",
     "build": "npm run build:icon && hugo",
@@ -10,8 +10,14 @@
     "build:docs": "npm run build:icon && hugo --source=docs",
     "serve:docs": "npm run build:icon -- --watch & hugo server --source=docs --bind 0.0.0.0 --port 1314 --disableFastRender"
   },
-  "devDependencies": {
-    "svgo": "^3.3.2",
-    "svg-sprite": "^2.0.4"
+  "dependencies": {
+    "katex": "0.19.1",
+    "katex-hugo": "npm:katex@0.18.4",
+    "mathjax": "3.2.2",
+    "pseudocode": "2.4.1"
+  },
+  "optionalDependencies": {
+    "svg-sprite": "^2.0.4",
+    "svgo": "^3.3.2"
   }
 }
