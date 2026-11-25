@@ -9,16 +9,17 @@
 {{- $isFloat := strings.Contains $classes "float" -}}
 
 {{- $lightboxVendor := .Page.Params.lightbox.vendor | default "none" }}
+{{- $src := partial "image-url.html" (dict "url" .Destination "page" .Page) }}
 
 <figure {{ with $classes }}class="{{ . }}"{{ end }} {{ if $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }} >
-    <a href="{{ $.Destination | safeURL }}"
+    <a href="{{ $src | safeURL }}"
     {{- if eq $lightboxVendor "fancybox" -}}
         data-fancybox="gallery"
     {{- else if eq $lightboxVendor "glightbox" -}}
         class="glightbox" data-gallery="gallery"
     {{- end -}}
     >
-    <img loading="lazy" src="{{ .Destination | safeURL }}" {{ if not $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }}
+    <img loading="lazy" src="{{ $src | safeURL }}" {{ if not $isFloat }}style="{{ $sizeCSS | safeCSS }}"{{ end }}
         {{- with .PlainText }} alt="{{ . }}"{{ end -}}
         {{- with .Title }} title="{{ . }}"{{ end -}}
     >

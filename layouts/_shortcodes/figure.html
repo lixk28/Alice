@@ -6,13 +6,7 @@
         {{ end }}>
         {{- end -}}
 
-        {{- $u := urls.Parse (.Get "src") -}}
-        {{- $src := $u.String -}}
-        {{- if not $u.IsAbs -}}
-        {{- with or (.Page.Resources.Get $u.Path) (resources.Get $u.Path) -}}
-        {{- $src = .RelPermalink -}}
-        {{- end -}}
-        {{- end -}}
+        {{- $src := partial "image-url.html" (dict "url" (.Get "src") "page" .Page) -}}
 
         <img src="{{ $src }}" {{- if or (.Get "alt" ) (.Get "caption" ) }} alt="{{ with .Get " alt" }}{{ . }}{{ else
             }}{{ .Get "caption" | markdownify| plainify }}{{ end }}" {{- end -}} {{- with .Get "width" }}

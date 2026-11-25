@@ -33,16 +33,7 @@
 		"overlay" false
 	) -}}
 {{- end -}}
-{{- $src := "" -}}
-{{- with $image -}}
-	{{- $u := urls.Parse . -}}
-	{{- $src = $u.String -}}
-	{{- if not $u.IsAbs -}}
-		{{- with or ($.Page.Resources.Get $u.Path) (resources.Get $u.Path) -}}
-			{{- $src = .RelPermalink -}}
-		{{- end -}}
-	{{- end -}}
-{{- end -}}
+{{- $src := partial "image-url.html" (dict "url" $image "page" $.Page) -}}
 
 {{- $alt := "" -}}
 {{- if and (reflect.IsMap .Params) (isset .Params "alt") -}}

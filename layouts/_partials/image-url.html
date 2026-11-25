@@ -1,0 +1,56 @@
+{{- /*
+  Resolve an image reference from content or a shortcode argument.
+
+  Lookup order:
+    1. page resource (page bundle)       → .Resources.Get
+    2. static file (site or theme)       → os.FileExists "static/<path>"
+    3. asset (assets/ pipeline)          → resources.Get
+    4. anything else                     → relURL against the site root
+
+  Absolute URLs (https:, data:, //host) are returned unchanged. A leading
+  slash is stripped before lookup, so "img/a.png" and "/img/a.png" behave the
+  same, and every result is baseURL-aware (a subpath deployment works). A
+  path that already includes the baseURL path is left alone rather than
+  prefixed twice.
+
+  Args:
+    url  — page resource, static path, asset path, or absolute URL
+    page — the current Page, used for page-resource lookup (optional)
+*/ -}}
+
+{{- $src := "" -}}
+{{- with .url -}}
+	{{- $u := urls.Parse . -}}
+	{{- if or $u.IsAbs $u.Host -}}
+		{{- $src = $u.String -}}
+	{{- else -}}
+		{{- $basePath := strings.TrimSuffix "/" (urls.Parse site.BaseURL).Path -}}
+		{{- $prefixed := and (ne $basePath "") (or (eq $u.Path $basePath) (strings.HasPrefix $u.Path (printf "%s/" $basePath))) -}}
+		{{- if $prefixed -}}
+			{{- $src = $u.String -}}
+		{{- else -}}
+			{{- $path := strings.TrimPrefix "/" $u.Path -}}
+			{{- $suffix := "" -}}
+			{{- with $u.RawQuery -}}{{- $suffix = printf "?%s" . -}}{{- end -}}
+			{{- with $u.Fragment -}}{{- $suffix = printf "%s#%s" $suffix . -}}{{- end -}}
+			{{- $res := "" -}}
+			{{- with $path -}}
+				{{- with $.page -}}{{- $res = .Resources.Get $path -}}{{- end -}}
+			{{- end -}}
+			{{- if $res -}}
+				{{- $src = $res.RelPermalink -}}
+			{{- else if and $path (os.FileExists (path.Join "static" $path)) -}}
+				{{- $src = printf "%s%s" ($path | relURL) $suffix -}}
+			{{- else -}}
+				{{- $asset := "" -}}
+				{{- with $path -}}{{- $asset = resources.Get $path -}}{{- end -}}
+				{{- if $asset -}}
+					{{- $src = $asset.RelPermalink -}}
+				{{- else -}}
+					{{- with $path -}}{{- $src = printf "%s%s" ($path | relURL) $suffix -}}{{- end -}}
+				{{- end -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+{{- return $src -}}
