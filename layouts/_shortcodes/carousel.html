@@ -318,15 +318,6 @@
 {{- end -}}
 {{- if not $autoplayPosition -}}{{- $autoplayPosition = "top-right" -}}{{- end -}}
 
-{{- $counterHTML := "" -}}
-{{- if and $showIndicator (eq $indicatorStyle "counter") -}}
-	{{- $counterCurrent := add $start 1 -}}
-	{{- if gt $perView 1 -}}
-		{{- $counterCurrent = printf "%d–%d" (add $start 1) (add $start $perView) -}}
-	{{- end -}}
-	{{- $counterHTML = partial "carousel/counter.html" (dict "current" $counterCurrent "total" $n) -}}
-{{- end -}}
-
 {{- $iconDefaults := dict
 	"prev" "svg/ui-oval/chevron-left.svg"
 	"next" "svg/ui-oval/chevron-right.svg"
@@ -373,13 +364,13 @@
 		"total" $n
 		"start" $start
 		"maxIndex" $indicatorMax
-		"counterHTML" $counterHTML
+		"perView" $perView
 	) -}}
 {{- end -}}
 
 {{- $navigatorBarHTML := "" -}}
 {{- if $barHasContent -}}
-	{{- $navigatorBarHTML = partial "carousel/navigator-bar.html" (dict
+	{{- $navigatorBarHTML = partial "carousel/navigator.html" (dict
 		"showNavigator" $barShowNavigator
 		"showIndicator" $barShowIndicator
 		"navigatorPosition" $navigatorPosition

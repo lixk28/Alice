@@ -9,7 +9,7 @@
     total       — slide count
     start       — initial position
     maxIndex    — last valid position
-    counterHTML — rendered counter partial (counter style)
+    perView     — slides visible at once (counter shows the visible range)
 */ -}}
 {{- $style := .style -}}
 <div class="carousel-indicator-wrap" data-style="{{ $style }}">
@@ -40,14 +40,31 @@
 		{{- end }}
 	</ol>
 	{{- else if eq $style "counter" }}
-	{{- .counterHTML | safeHTML -}}
+	{{- $current := add .start 1 -}}
+	{{- if gt .perView 1 -}}
+		{{- $current = printf "%d–%d" (add .start 1) (add .start .perView) -}}
+	{{- end }}
+	<span class="carousel-counter" aria-hidden="true">
+		<span class="carousel-counter-current">{{ $current }}</span>
+		{{- partial "svg-icon.html" (dict
+			"path" "svg/ui-oval/slash-divider.svg"
+			"class" "carousel-counter-separator"
+		) -}}
+		<span class="carousel-counter-total">{{ .total }}</span>
+	</span>
 	{{- else if eq $style "thumbnails" }}
-	{{- partial "carousel/thumbnails.html" (dict
-		"id" .id
-		"slides" .slides
-		"total" .total
-		"start" .start
-		"maxIndex" .maxIndex
-	) -}}
+	<ol class="carousel-thumbnails">
+		{{- range $i, $s := .slides }}
+		<li{{ if gt $i $.maxIndex }} hidden{{ end }}>
+			<button type="button" class="carousel-thumbnail"
+				data-carousel-goto="{{ $i }}"
+				aria-label="Go to slide {{ add $i 1 }} of {{ $.total }}"
+				aria-controls="{{ $.id }}"
+				{{- if eq $i $.start }} aria-current="true"{{ end }}>
+				{{- with $s.Src }}<img src="{{ . | safeURL }}" alt="" loading="lazy" decoding="async">{{ end }}
+			</button>
+		</li>
+		{{- end }}
+	</ol>
 	{{- end }}
 </div>
