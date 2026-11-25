@@ -1,0 +1,172 @@
+{{- /*
+Breadcrumb navigation rendered under the header by baseof.html.
+
+The crumb trail follows the URL path after the site's baseURL (the home path), not the content section
+hierarchy: `/posts/foo/` becomes Home / Posts / Foo, and a taxonomy term becomes Home / Tags / Foo.
+Each prefix is matched against site.Pages so a real page's `.Title` and `.RelPermalink` win; a path with
+no page behind it (e.g. a custom `url`) falls back to `humanize` + the path and is rendered as plain text
+instead of a dead link.
+
+Configuration (params.breadcrumb):
+  enable    (bool, default true)  : show the bar. A page's `breadcrumb: false` front matter overrides it.
+  label     (string, default "Breadcrumb") : aria-label for the nav landmark.
+  separator (string, default "svg/ui-oval/slash-divider.svg") : an icon path, or literal text / HTML.
+                                     Set it to "" to render no separator.
+
+The Home crumb's text and icon come from the menu.main Home entry. A page may override the current
+crumb through front matter:
+  breadcrumb:
+    enable: false
+    label: "Page trail"
+    separator: "›"
+    title: "Custom crumb text"
+*/ -}}
+{{- $config := dict -}}
+{{- $pageConfig := dict -}}
+{{- $enabled := true -}}
+{{- if isset site.Params "breadcrumb" -}}
+	{{- $param := site.Params.breadcrumb -}}
+	{{- if reflect.IsMap $param -}}
+		{{- $config = $param -}}
+		{{- if isset $param "enable" -}}{{- $enabled = $param.enable -}}{{- end -}}
+	{{- else -}}
+		{{- $enabled = $param -}}
+	{{- end -}}
+{{- end -}}
+{{- if isset .Params "breadcrumb" -}}
+	{{- $param := .Params.breadcrumb -}}
+	{{- if reflect.IsMap $param -}}
+		{{- $pageConfig = $param -}}
+		{{- if isset $param "enable" -}}{{- $enabled = $param.enable -}}{{- end -}}
+	{{- else -}}
+		{{- $enabled = $param -}}
+	{{- end -}}
+{{- end -}}
+{{- if $enabled -}}
+
+{{- $label := $config.label | default "Breadcrumb" -}}
+{{- $separator := "svg/ui-oval/slash-divider.svg" -}}
+{{- if isset $config "separator" -}}{{- $separator = $config.separator -}}{{- end -}}
+{{- $pageTitle := "" -}}
+{{- with $pageConfig.label -}}{{- $label = . -}}{{- end -}}
+{{- if isset $pageConfig "separator" -}}{{- $separator = $pageConfig.separator -}}{{- end -}}
+{{- with $pageConfig.title -}}{{- $pageTitle = . -}}{{- end -}}
+{{- $separatorIsIcon := false -}}
+{{- if $separator -}}{{- $separatorIsIcon = strings.HasSuffix (lower $separator) ".svg" -}}{{- end -}}
+
+{{- /* Home path (baseURL subpath included) and the current page's path after it. */ -}}
+{{- $homePath := path.Clean site.Home.RelPermalink -}}
+{{- if eq $homePath "/" -}}{{- $homePath = "" -}}{{- end -}}
+{{- $homeRoot := printf "%s/" $homePath -}}
+{{- $rel := .RelPermalink -}}
+{{- $path := $rel -}}
+{{- if strings.HasPrefix $rel $homeRoot -}}
+	{{- $path = strings.TrimPrefix $homeRoot $rel -}}
+{{- end -}}
+{{- $path = strings.Trim $path "/" -}}
+
+{{- /* Build page/menu maps once per production build. In hugo server, rebuild them per page so
+       content and menu changes never come from a stale hugo.Store. */ -}}
+{{- $cacheable := not hugo.IsServer -}}
+{{- $dataKey := printf "alice-breadcrumb-data-%s-%s" site.Language.Lang site.BaseURL -}}
+{{- $data := dict -}}
+{{- if $cacheable -}}{{- $data = hugo.Store.Get $dataKey | default dict -}}{{- end -}}
+{{- if not $data -}}
+	{{- $pages := newScratch -}}
+	{{- range site.Pages -}}
+		{{- $key := .RelPermalink -}}
+		{{- if strings.HasPrefix $key $homeRoot -}}{{- $key = strings.TrimPrefix $homeRoot $key -}}{{- end -}}
+		{{- $key = strings.Trim $key "/" -}}
+		{{- if $key -}}{{- $pages.SetInMap "pages" $key . -}}{{- end -}}
+	{{- end -}}
+	{{- $menuIcons := dict -}}
+	{{- $menuNames := dict -}}
+	{{- range site.Menus.main -}}
+		{{- if not (strings.Contains .URL "://") -}}
+			{{- $key := .URL -}}
+			{{- if strings.HasPrefix $key $homeRoot -}}{{- $key = strings.TrimPrefix $homeRoot $key -}}{{- end -}}
+			{{- $key = strings.Trim $key "/" -}}
+			{{- $menuNames = merge $menuNames (dict $key .Name) -}}
+			{{- with .Params.icon.path -}}
+				{{- $menuIcons = merge $menuIcons (dict $key .) -}}
+			{{- end -}}
+		{{- end -}}
+		{{- range .Children -}}
+			{{- if not (strings.Contains .URL "://") -}}
+				{{- $key := .URL -}}
+				{{- if strings.HasPrefix $key $homeRoot -}}{{- $key = strings.TrimPrefix $homeRoot $key -}}{{- end -}}
+				{{- $key = strings.Trim $key "/" -}}
+				{{- $menuNames = merge $menuNames (dict $key .Name) -}}
+				{{- with .Params.icon.path -}}
+					{{- $menuIcons = merge $menuIcons (dict $key .) -}}
+				{{- end -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+	{{- $data = dict "pages" ($pages.Get "pages" | default dict) "icons" $menuIcons "names" $menuNames -}}
+	{{- if $cacheable -}}{{- hugo.Store.Set $dataKey $data -}}{{- end -}}
+{{- end -}}
+{{- $pageMap := $data.pages -}}
+{{- $menuIcons := $data.icons -}}
+{{- $menuNames := $data.names -}}
+{{- $homeIcon := index $menuIcons "" -}}
+{{- $homeLabel := index $menuNames "" | default "Home" -}}
+
+{{- $segments := slice -}}
+{{- range split $path "/" -}}
+	{{- if . -}}{{- $segments = $segments | append . -}}{{- end -}}
+{{- end -}}
+{{- $last := sub (len $segments) 1 -}}
+
+<nav id="breadcrumb" aria-label="{{ $label }}">
+	<ol class="breadcrumb-list">
+		<li class="breadcrumb-item breadcrumb-home">
+			{{- with $homeIcon -}}
+				{{ partial "svg-icon.html" (dict "path" . "class" "breadcrumb-icon breadcrumb-home-icon") }}
+			{{- end -}}
+			{{- if $segments -}}
+			<a href="{{ site.Home.RelPermalink }}">{{- $homeLabel -}}</a>
+			{{- else -}}
+			<span class="breadcrumb-current" aria-current="page">{{- $homeLabel -}}</span>
+			{{- end -}}
+		</li>
+		{{- $accum := "" -}}
+		{{- range $index, $segment := $segments -}}
+			{{- $accum = path.Join $accum $segment -}}
+			{{- $entry := index $pageMap $accum -}}
+			{{- $title := "" -}}
+			{{- with $entry -}}{{- $title = .Title -}}{{- end -}}
+			{{- if not $title -}}
+				{{- $segmentTitle := strings.TrimSuffix ".html" $segment -}}
+				{{- if findRE `^[0-9]+$` $segmentTitle -}}
+					{{- $title = $segmentTitle -}}
+				{{- else -}}
+					{{- $title = humanize $segmentTitle -}}
+				{{- end -}}
+			{{- end -}}
+			{{- $url := printf "%s/%s/" $homePath $accum -}}
+			{{- with $entry -}}{{- $url = .RelPermalink -}}{{- end -}}
+		<li class="breadcrumb-item">
+			{{- if $separator -}}
+				{{- if $separatorIsIcon -}}
+					{{ partial "svg-icon.html" (dict "path" $separator "class" "breadcrumb-separator") }}
+				{{- else -}}
+					<span class="breadcrumb-separator breadcrumb-separator-text" aria-hidden="true">{{ $separator | safeHTML }}</span>
+				{{- end -}}
+			{{- end -}}
+			{{- with index $menuIcons $accum -}}
+				{{ partial "svg-icon.html" (dict "path" . "class" "breadcrumb-icon breadcrumb-section-icon") }}
+			{{- end -}}
+			{{- if eq $index $last -}}
+				{{- with $pageTitle -}}{{- $title = . -}}{{- end -}}
+			<span class="breadcrumb-current" aria-current="page">{{ $title | plainify }}</span>
+			{{- else if $entry -}}
+			<a href="{{ $url }}">{{ $title | plainify }}</a>
+			{{- else -}}
+			<span class="breadcrumb-unmatched">{{ $title | plainify }}</span>
+			{{- end -}}
+		</li>
+		{{- end -}}
+	</ol>
+</nav>
+{{- end -}}

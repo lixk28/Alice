@@ -53,7 +53,7 @@ The build flow for a site in three steps:
 
 ## Components
 
-`layouts/baseof.html` wraps every page: the header partial, the `main` block, and the footer partial. It always links `static/css/style.css`. That file sets the global page (fonts, colors, lists, headings, footnotes) and `@import`s the shared component sheets, so those sheets are loaded on every page. Put page-wide rules in `style.css`. Put a component's rules in its own sheet under `static/css/`, and `@import` that sheet from `style.css` when it should load everywhere. `baseof.html` links the other sheets only when a page turns that feature on.
+`layouts/baseof.html` wraps every page: the header partial, the breadcrumb partial, the `main` block, and the footer partial. It always links `static/css/style.css`. That file sets the global page (fonts, colors, lists, headings, footnotes) and `@import`s the shared component sheets, so those sheets are loaded on every page. Put page-wide rules in `style.css`. Put a component's rules in its own sheet under `static/css/`, and `@import` that sheet from `style.css` when it should load everywhere. `baseof.html` links the other sheets only when a page turns that feature on.
 
 Pages:
 
@@ -62,6 +62,7 @@ Pages:
   - Styles: `static/css/home.css`, `static/css/paginator.css`.
 - `layouts/single.html` renders one post.
   - Pieces: table of contents, featured image, title, `post-meta.html`, `post-tldr.html`, content, previous/next (`post-prext.html`), related posts (`post-related.html`), jump buttons. Front matter `prext` / `related` default on; set either to `false` to hide that block.
+  - Sets `body.post-page` through the `body-class` block so the global breadcrumb can align to the article column.
   - Styles: `static/css/post.css` (article layout), `static/css/toc.css`, `static/css/img.css` (featured image and figures), `static/css/prext.css`, `static/css/related.css`, `static/css/jump.css`.
 - `layouts/posts/section.html` renders `/posts/`.
   - Calls `post-list.html` with `groupBy "PublishDate"` so pinned posts come first, then the rest under publish-year headings.
@@ -76,12 +77,13 @@ Pages:
   - Cards come from the `friend` and `frienmily` shortcodes.
   - Styles: `static/css/friend.css`.
 - `layouts/about.html` renders `/about/`. Spacing for `.about-content` is in `style.css`.
-- `layouts/404.html` renders the 404 page and has no separate stylesheet.
+- `layouts/404.html` renders the 404 page through `baseof.html` and has no separate stylesheet.
 - Chrome on every page:
   - `layouts/_partials/header.html`. Styles: `static/css/header.css`.
     - Menu entries: `layouts/_partials/header/menu-entry.html`, reused by the desktop `<nav id="menu">` (in `header.html`) and the mobile `layouts/_partials/header/hamburger-menu.html`.
     - Menu icon: `layouts/_partials/svg-icon.html` renders a self-contained inline `<svg aria-hidden="true"><use href="..."/></svg>` from a flat dict — `path` (the icon's key relative to `rootDir=static`, like `svg/ui-oval/home-03.svg`, read from a menu entry's `[menu.main.params.icon]`); optional `class` (a string or a list, joined with spaces) is appended to the header's hard-coded default `menu-icon menu-<id>-icon`; `id` or raw `attrs` set more attribute(s) on the `<svg>` (aria-hidden is always present). It reads `<rootDir>/<spriteDir>/sprites.json` (`{ "enabled", "map" }`) ONCE, caches it in `hugo.Store`; when `enabled` is truthy it resolves `path` → `(sprite | relURL)#<id>` from the map, otherwise it uses the loose `path` file directly, falling back to `svg/placeholder.svg` only when `path` is absent/invalid — each entry's `sprite` points at whichever sprite holds that icon, so multiple sprites are supported.
   - `layouts/_partials/footer.html`. Styles: `static/css/footer.css`.
+  - `layouts/_partials/breadcrumb.html`, called by `baseof.html` directly under the header. Styles: `static/css/breadcrumb.css`. The trail is built from the URL path after the home path (baseURL subpath removed): each segment is matched against `site.Pages`, so a real page supplies its `.Title` / `.RelPermalink`, and an unmatched segment falls back to `humanize` + the path (and is rendered as plain text instead of a dead link). The Home crumb (text and icon) and section icons reuse the matching `menu.main` entry (children included), so the header menu is the single source. `params.breadcrumb.enable` defaults to `true` (page front matter `breadcrumb: false` overrides it); `.separator` takes an icon path or literal text (default `svg/ui-oval/slash-divider.svg`, `""` disables it), and `.label` tunes the landmark label. A page may override `enable` / `label` / `separator` / `title` with a `breadcrumb` front matter map. The page/menu lookup maps are built inline in this partial: production builds cache them in `hugo.Store`, while `hugo server` rebuilds them per page so content and menu changes never come from a stale cache. Post pages get `body.post-page` from `single.html`, which the breadcrumb CSS uses for its article-column offset.
   - `layouts/_partials/head-extra.html`: empty hook called at the end of `<head>` in `baseof.html`. Sites override it to inject page CSS/JS without copying `baseof`.
 
 Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the friends page. Unless noted, their CSS is imported by `style.css`:

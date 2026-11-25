@@ -1,0 +1,85 @@
+:root {
+    --breadcrumb-font-size: var(--font-size-small);
+    --breadcrumb-current-color: Navy;
+    --breadcrumb-current-bgcolor: rgba(112, 128, 144, 0.1); /* SlateGray @ 10% */
+    --breadcrumb-separator-color: SlateGray;
+    --breadcrumb-icon-color: var(--menu-icon-color);
+}
+
+/* breadcrumb bar: full width, directly under the header */
+nav#breadcrumb {
+    width: 100%;
+    padding: .4em 1em 0;
+    font-family: var(--sans-font);
+    font-size: var(--breadcrumb-font-size);
+    line-height: 1.5;
+    color: var(--font-color);
+    background: none;
+}
+
+nav#breadcrumb ol.breadcrumb-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+nav#breadcrumb li.breadcrumb-item {
+    min-width: 0;
+    max-width: 100%;
+}
+
+nav#breadcrumb .breadcrumb-current {
+    padding: .05em .35em;
+    border-radius: .2em;
+    color: var(--breadcrumb-current-color);
+    background-color: var(--breadcrumb-current-bgcolor);
+    font-weight: 600;
+}
+
+nav#breadcrumb .breadcrumb-unmatched {
+    color: var(--breadcrumb-separator-color);
+}
+
+/* home icon and separator icon (both are inline <svg> from the icon sprite) */
+svg.breadcrumb-icon {
+    width: 1em;
+    height: 1em;
+    margin-right: .25em;
+    vertical-align: -0.15em;
+    color: var(--breadcrumb-icon-color);
+}
+
+svg.breadcrumb-separator {
+    width: .8em;
+    height: .8em;
+    margin: 0 .45em;
+    vertical-align: -0.15em;
+    color: var(--breadcrumb-separator-color);
+}
+
+span.breadcrumb-separator-text {
+    margin: 0 .35em;
+    color: var(--breadcrumb-separator-color);
+}
+
+@media screen and (min-width: 721px) {
+    /* post pages: line up with the article card's left edge (the sidetoc gutter) */
+    body.post-page nav#breadcrumb {
+        padding-left: var(--post-sidetoc-proportion);
+    }
+}
+
+@media screen and (max-width: 720px) {
+    nav#breadcrumb {
+        padding: .3em 1em 0;
+        font-size: var(--font-size-tiny);
+    }
+
+    svg.breadcrumb-separator {
+        margin: 0 .3em;
+    }
+}

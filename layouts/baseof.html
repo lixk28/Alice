@@ -164,8 +164,9 @@
 	<meta name="msapplication-TileColor" content="#655bd5">
 	{{- partial "head-extra.html" . -}}
 </head>
-<body>
+<body class="{{ block "body-class" . }}{{ end }}">
 	{{- partial "header" . -}}
+	{{- partial "breadcrumb.html" . -}}
 	{{- block "main" . -}}{{- end -}}
 	{{- partial "footer" . -}}
 </body>
