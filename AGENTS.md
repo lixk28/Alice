@@ -155,6 +155,7 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
   - Images use the page lightbox vendor when the page enables one; a slide `link` overrides it. `contentMode` picks the image `object-fit`: `scaleToFill` (default, `fill`), `aspectFit` (`contain`), or `aspectFill` (`cover`); set it on the carousel for a shared default or on a slide to override. `aspectRatio` (default `auto` = the ratio of the image shown first) fixes the carousel frame so its height never follows the active image; the script leaves the viewport height to CSS when the frame is fixed, and `contentMode` crops, fits, or stretches inside it. `effect="fade"` cross-fades instead of sliding; without scripting the frame falls back to the image heights.
 - `tab` and `tabpanel`: `static/css/tabs.css`.
 - `kbd`: `static/css/kbd.css`.
+- `ruby`: `static/css/ruby.css`.
 - `shell`, `cmd`, and `cmdout`: `static/css/shell.css`.
 - `secret`: `static/css/secret.css`.
 - `sidenote`: `static/css/sidenote.css`. On docs pages the right gutter belongs to the snaketoc, so `static/css/docs.css` renders `span.sidenote-content` inline instead of floating.

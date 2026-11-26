@@ -1,0 +1,13 @@
+{{- $base := .Get 0 -}}
+{{- $rt := .Get 1 -}}
+{{- $lang := .Get 2 -}}
+{{- $class := "" -}}
+{{- if .IsNamedParams -}}
+    {{- $base = .Get "base" -}}
+    {{- $rt = .Get "rt" -}}
+    {{- $lang = .Get "lang" -}}
+    {{- $class = .Get "class" -}}
+{{- end -}}
+{{- with $base -}}
+<ruby{{ with $class }} class="{{ . }}"{{ end }}>{{ . }}{{- with $rt }}<rp>(</rp><rt{{ with $lang }} lang="{{ . }}"{{ end }}>{{ . }}</rt><rp>)</rp>{{ end }}</ruby>
+{{- end -}}

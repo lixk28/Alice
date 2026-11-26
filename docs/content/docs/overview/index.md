@@ -30,7 +30,7 @@ site turn those components on or off.
       carousel, and the code editor.
     - [Authoring Shortcodes](../shortcodes/authoring-shortcodes/) covers
       attachments, sidenotes, commands, math, diagrams, dropcaps, secrets,
-      keyboard keys, and other content helpers.
+      keyboard keys, ruby annotations, and other content helpers.
     - [Miscellaneous Shortcodes](../shortcodes/miscellaneous-shortcodes/)
       covers the smaller helpers that do not belong to a component.
 - [Configuration and Customizations](../configuration-and-customizations/)

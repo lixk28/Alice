@@ -1,0 +1,9 @@
+ruby {
+    ruby-position: over;
+}
+
+rt {
+    font-size: .6em;
+    line-height: 1.2;
+    color: SlateGray;
+}
