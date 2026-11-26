@@ -1,0 +1,169 @@
+/*
+ * Checkbox component — used by the `checkbox` shortcode.
+ *
+ * A theme-styled square box: a thin SlateGray border and a small inset shadow
+ * while unchecked, filled with the theme's CornflowerBlue with the ui-oval
+ * check icon on top while checked. A native checkbox input sits underneath, so
+ * the control works before JavaScript loads and keeps the browser's keyboard
+ * and screen-reader behavior.
+ *
+ * Geometry, colors, and motion are --checkbox-* variables, so a site
+ * stylesheet can retheme every checkbox.
+ */
+
+:root {
+    /* Layout and type */
+    --checkbox-font-size: var(--font-size-normal);
+    --checkbox-gap: .5em;
+    --checkbox-label-color: var(--font-color);
+
+    /* Box and check */
+    --checkbox-box-size: 1.1em;
+    --checkbox-box-radius: .2em;
+    --checkbox-box-bg: White;
+    --checkbox-border-width: 1px;
+    --checkbox-border-color: SlateGray;
+    --checkbox-checked-bg: CornflowerBlue;
+    --checkbox-check-color: White;
+
+    /* Depth and motion */
+    --checkbox-box-shadow: inset 0 .06em .12em rgba(0, 0, 0, .12);
+    --checkbox-box-shadow-hover: inset 0 .06em .14em rgba(0, 0, 0, .2);
+    --checkbox-transition: var(--transition-duration-fast) ease;
+
+    /* Focus */
+    --checkbox-focus-color: RoyalBlue;
+    --checkbox-focus-width: 2px;
+    --checkbox-focus-offset: .18em;
+
+    --checkbox-disabled-opacity: .5;
+}
+
+.checkbox {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--checkbox-gap);
+    font-family: var(--sans-font);
+    font-size: var(--checkbox-font-size);
+    line-height: 1.2;
+    color: var(--checkbox-label-color);
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* The real control: hidden from sight, not from assistive technology. */
+.checkbox-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+    opacity: 0;
+}
+
+.checkbox-box {
+    position: relative;
+    display: block;
+    flex: none;
+    box-sizing: border-box;
+    width: var(--checkbox-box-size);
+    height: var(--checkbox-box-size);
+    background-color: var(--checkbox-box-bg);
+    border: var(--checkbox-border-width) solid var(--checkbox-border-color);
+    border-radius: var(--checkbox-box-radius);
+    box-shadow: var(--checkbox-box-shadow);
+    transition: background-color var(--checkbox-transition),
+        border-color var(--checkbox-transition),
+        box-shadow var(--checkbox-transition),
+        transform var(--checkbox-transition);
+}
+
+/* The check mark is the theme's ui-oval check icon, resolved through
+   svg-icon.html and laid over the box. It is revealed when the input is
+   checked; the icon's currentColor follows --checkbox-check-color. */
+.checkbox-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    width: .9em;
+    height: .9em;
+    color: var(--checkbox-check-color);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.6);
+    pointer-events: none;
+    transition: opacity var(--checkbox-transition),
+        transform var(--checkbox-transition);
+}
+
+.checkbox-input:checked + .checkbox-box {
+    background-color: var(--checkbox-checked-bg);
+    border-color: var(--checkbox-checked-bg);
+}
+
+.checkbox-input:checked + .checkbox-box .checkbox-mark {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+@media (hover: hover) {
+    .checkbox:hover .checkbox-input:not(:checked) + .checkbox-box {
+        border-color: DimGray;
+        box-shadow: var(--checkbox-box-shadow-hover);
+    }
+}
+
+.checkbox:active .checkbox-box {
+    transform: scale(.96);
+}
+
+.checkbox-input:focus-visible + .checkbox-box {
+    outline: var(--checkbox-focus-width) solid var(--checkbox-focus-color);
+    outline-offset: var(--checkbox-focus-offset);
+}
+
+.checkbox-label {
+    min-width: 0;
+}
+
+/* Checkboxes written on consecutive lines share one paragraph, so the
+   browser collapses the newline to a single space. Add a little more room
+   between adjacent checkboxes; blank-line-separated options get paragraph
+   spacing instead. */
+.checkbox + .checkbox {
+    margin-left: .75em;
+}
+
+.checkbox-small {
+    --checkbox-font-size: var(--font-size-small);
+    --checkbox-box-size: 1em;
+}
+
+.checkbox-large {
+    --checkbox-font-size: var(--font-size-big);
+    --checkbox-box-size: 1.2em;
+}
+
+.checkbox-disabled {
+    cursor: not-allowed;
+    opacity: var(--checkbox-disabled-opacity);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .checkbox-box,
+    .checkbox-mark {
+        transition: none;
+    }
+
+    .checkbox:active .checkbox-box {
+        transform: none;
+    }
+}

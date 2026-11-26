@@ -1,0 +1,288 @@
+{{- /*
+  Checkbox shortcode — a theme-styled checkbox modelled on the control's
+  native square box.
+
+  Usage:
+    {{< checkbox label="Subscribe" checked=true >}}
+    {{< checkbox label="Remember me" name="remember" value="yes" >}}
+    {{< checkbox label="Large option" size="large" tintColor="RoyalBlue" >}}
+    {{< checkbox label="Run a script" js="console.log(el.id, el.checked)" >}}
+
+  Several `checkbox` shortcodes that share a `name` submit as one form field,
+  so the browser sends one value per checked option. Without `name`, each
+  checkbox gets a unique name and works on its own. There is no exclusive
+  behavior: a checkbox group is just a set of options that share a name.
+  Wrap the options in a `buttongroup` to add a fieldset/legend; the group id
+  becomes their default name unless a child sets its own.
+
+  Args (all optional):
+    label       — visible text, inline Markdown
+    name        — form field name (default: checkbox-<ordinal>, unique per
+                  shortcode; inside a buttongroup the group id is the default.
+                  Give several checkboxes the same name to submit them as one
+                  field)
+    value       — value submitted by the form (default: the plain-text label,
+                  or "on" when there is no label)
+    checked     — initial state: true|false; `selected` and `on` are aliases
+                  (default: false)
+    disabled    — disabled state; a disabled buttongroup disables every child
+    size        — small|s, medium|m (default), or large|l; a buttongroup can
+                  supply a default
+    tintColor   — checked box fill (default: the theme's CornflowerBlue)
+    checkColor  — check mark color (default: White)
+    borderColor — unchecked box border (default: SlateGray)
+    ariaLabel   — accessible name when there is no visible label
+                  (default: "Checkbox")
+    id          — input id (default: checkbox-<ordinal>, or
+                  <group-id>-checkbox-<ordinal> inside a buttongroup)
+    class       — extra classes on the label wrapper
+    js          — a script URL/path, or inline JavaScript source. A URL/path
+                  (http(s)://, //, /, ./, ../, a bare *.js path, a page-bundle
+                  resource, or an assets/ resource) is loaded once per page
+                  with <script src>; anything else is attached to the input
+                  event
+    jsMode      — "auto" (default), "src", or "inline"; forces how js is read
+    jsEvent     — event that runs inline js (default: "change");
+                  "load" runs it once after the DOM is ready
+
+  Site defaults live under params.checkbox; inside a buttongroup, the group's
+  size argument is a fallback (a child's own size still wins). Colors,
+  geometry, sizes, and motion are --checkbox-* variables in
+  static/css/checkbox.css.
+
+  The control is a native checkbox input under the styled box, so it works
+  without JavaScript and keeps the browser's keyboard and screen-reader
+  behavior: Tab focuses it and Space toggles it. Inline js runs as an event
+  handler: `this` and `el` are the input element, `event` is the event, and
+  `el.checked` is the new state. With jsEvent="load" the code runs after
+  DOMContentLoaded instead, so `el` is available and `event` is not.
+*/ -}}
+
+{{- /* Site defaults. Hugo lowercases config keys, while shortcode arguments
+       keep the case they were written in, so match the two case-insensitively. */ -}}
+{{- $siteCheckbox := site.Params.checkbox | default dict -}}
+{{- $siteOpts := dict -}}
+{{- $defaultKeys := slice "size" "tintColor" "checkColor" "borderColor" "class" -}}
+{{- if reflect.IsMap $siteCheckbox -}}
+	{{- range $key, $value := $siteCheckbox -}}
+		{{- range $defaultKey := $defaultKeys -}}
+			{{- if eq (lower $defaultKey) (lower $key) -}}
+				{{- $siteOpts = merge $siteOpts (dict $defaultKey $value) -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* A checkbox inside a buttongroup inherits the group's id as its default
+       form name and child-id base, plus the group's size and disabled state.
+       Hugo renders the nested shortcode before its parent, so derive the same
+       group id from .Parent and read its arguments directly. */ -}}
+{{- $parent := .Parent -}}
+{{- $inGroup := and $parent (eq $parent.Name "buttongroup") -}}
+{{- $groupID := "" -}}
+{{- if $inGroup -}}
+	{{- $groupID = $parent.Get "id" | default (printf "buttongroup-%d" $parent.Ordinal) -}}
+{{- end -}}
+
+{{- $id := .Get "id" | default "" -}}
+{{- if not $id -}}
+	{{- if $inGroup -}}
+		{{- $id = printf "%s-checkbox-%d" $groupID .Ordinal -}}
+	{{- else -}}
+		{{- $id = printf "checkbox-%d" .Ordinal -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $sizes := dict
+	"small" "small" "s" "small"
+	"medium" "medium" "m" "medium"
+	"large" "large" "l" "large"
+-}}
+{{- $sizeArg := "" -}}
+{{- with .Get "size" -}}{{- $sizeArg = lower (printf "%v" .) -}}{{- end -}}
+{{- if and (not $sizeArg) $inGroup -}}
+	{{- with $parent.Get "size" -}}{{- $sizeArg = lower (printf "%v" .) -}}{{- end -}}
+{{- end -}}
+{{- if not $sizeArg -}}
+	{{- with index $siteOpts "size" -}}{{- $sizeArg = lower (printf "%v" .) -}}{{- end -}}
+{{- end -}}
+{{- if not $sizeArg -}}{{- $sizeArg = "medium" -}}{{- end -}}
+{{- $size := "medium" -}}
+{{- if isset $sizes $sizeArg -}}
+	{{- $size = index $sizes $sizeArg -}}
+{{- else -}}
+	{{- warnf "checkbox shortcode %q: unknown size %q; using \"medium\"" $id $sizeArg -}}
+{{- end -}}
+
+{{- /* checked: a shortcode argument wins even when it is false. Accept the
+       AppKit-ish `selected` and the switch-like `on` as aliases. */ -}}
+{{- $checkedRaw := false -}}
+{{- if reflect.IsMap .Params -}}
+	{{- if isset .Params "checked" -}}
+		{{- $checkedRaw = .Get "checked" -}}
+	{{- else if isset .Params "selected" -}}
+		{{- $checkedRaw = .Get "selected" -}}
+	{{- else if isset .Params "on" -}}
+		{{- $checkedRaw = .Get "on" -}}
+	{{- end -}}
+{{- end -}}
+{{- $checked := in (slice "true" "yes" "1" "on") (lower (printf "%v" $checkedRaw)) -}}
+
+{{- $disabled := in (slice "true" "yes" "1" "on") (lower (printf "%v" (.Get "disabled" | default false))) -}}
+{{- if $inGroup -}}
+	{{- $groupDisabled := in (slice "true" "yes" "1" "on") (lower (printf "%v" ($parent.Get "disabled" | default false))) -}}
+	{{- if $groupDisabled -}}{{- $disabled = true -}}{{- end -}}
+{{- end -}}
+
+{{- /* tintColor, checkColor, and borderColor are CSS colors. Validate them so
+       they cannot escape the style attribute. An empty value leaves the theme
+       variables in charge. */ -}}
+{{- $colorVars := dict "tintColor" "--checkbox-checked-bg" "checkColor" "--checkbox-check-color" "borderColor" "--checkbox-border-color" -}}
+{{- $styleParts := slice -}}
+{{- range $colorKey, $prop := $colorVars -}}
+	{{- $value := index $siteOpts $colorKey | default "" -}}
+	{{- with $.Get $colorKey -}}{{- $value = . -}}{{- end -}}
+	{{- with $value -}}
+		{{- $css := replaceRE `\s+` " " (printf "%v" .) | strings.TrimSpace -}}
+		{{- if findRE `^[#A-Za-z0-9_(),.%+/ -]+$` $css -}}
+			{{- $styleParts = $styleParts | append (printf "%s: %s" $prop $css) -}}
+		{{- else -}}
+			{{- warnf "checkbox shortcode %q: invalid %s %q; using the theme default" $id $colorKey $css -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+{{- $style := delimit $styleParts "; " -}}
+
+{{- $label := .Get "label" | default "" -}}
+{{- $labelHTML := "" -}}
+{{- $labelText := "" -}}
+{{- with $label -}}
+	{{- $labelHTML = . | markdownify | strings.TrimSpace -}}
+	{{- $labelHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $labelHTML -}}
+	{{- $labelText = $labelHTML | plainify | strings.TrimSpace -}}
+{{- end -}}
+
+{{- /* name: a form field name. Inside a buttongroup the group id is the
+       default, so its checkboxes submit as one field; an explicit name still
+       wins for a subgroup. Otherwise use a unique per-shortcode value so a
+       standalone checkbox never joins another control's field by accident. */ -}}
+{{- $name := trim (printf "%v" (.Get "name" | default "")) " \t\r\n" -}}
+{{- if not $name -}}
+	{{- if $inGroup -}}
+		{{- $name = $groupID -}}
+	{{- else -}}
+		{{- $name = printf "checkbox-%d" .Ordinal -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* value: use the plain-text label when no value is given, so a group of
+       options submits readable values. */ -}}
+{{- $value := "" -}}
+{{- if reflect.IsMap .Params -}}
+	{{- if isset .Params "value" -}}
+		{{- $value = trim (printf "%v" (.Get "value")) " \t\r\n" -}}
+	{{- end -}}
+{{- end -}}
+{{- if not $value -}}{{- $value = $labelText | default "on" -}}{{- end -}}
+
+{{- $ariaLabel := .Get "ariaLabel" | default "" -}}
+{{- if not $ariaLabel -}}
+	{{- if not $labelText -}}{{- $ariaLabel = "Checkbox" -}}{{- end -}}
+{{- end -}}
+
+{{- $class := .Get "class" | default (index $siteOpts "class") | default "" -}}
+{{- $classes := slice "checkbox" (printf "checkbox-%s" $size) -}}
+{{- if $disabled -}}{{- $classes = $classes | append "checkbox-disabled" -}}{{- end -}}
+{{- with $class -}}{{- $classes = $classes | append (printf "%v" .) -}}{{- end -}}
+{{- $classAttr := delimit $classes " " -}}
+
+{{- /* js: auto-detect a URL/path, otherwise treat the value as source. */ -}}
+{{- $jsRaw := trim (printf "%v" (.Get "js" | default "")) " \t\r\n" -}}
+{{- $jsMode := lower (printf "%v" (.Get "jsMode" | default "auto")) -}}
+{{- if not (in (slice "auto" "src" "inline") $jsMode) -}}
+	{{- warnf "checkbox shortcode %q: unknown jsMode %q; using \"auto\"" $id $jsMode -}}
+	{{- $jsMode = "auto" -}}
+{{- end -}}
+{{- $jsIsSrc := false -}}
+{{- if $jsRaw -}}
+	{{- if eq $jsMode "src" -}}
+		{{- $jsIsSrc = true -}}
+	{{- else if eq $jsMode "inline" -}}
+		{{- $jsIsSrc = false -}}
+	{{- else if not (findRE `\s` $jsRaw) -}}
+		{{- if or
+			(hasPrefix $jsRaw "http://")
+			(hasPrefix $jsRaw "https://")
+			(hasPrefix $jsRaw "//")
+			(hasPrefix $jsRaw "/")
+			(hasPrefix $jsRaw "./")
+			(hasPrefix $jsRaw "../")
+			(findRE `^[A-Za-z0-9_@%+~./-]+\.js([?#].*)?$` $jsRaw)
+		-}}
+			{{- $jsIsSrc = true -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $jsEvent := lower (printf "%v" (.Get "jsEvent" | default "change")) -}}
+{{- if not (findRE `^[a-z][a-z0-9_:-]*$` $jsEvent) -}}
+	{{- warnf "checkbox shortcode %q: invalid jsEvent %q; using \"change\"" $id $jsEvent -}}
+	{{- $jsEvent = "change" -}}
+{{- end -}}
+
+<label class="{{ $classAttr }}"{{ with $style }} style="{{ . | safeCSS }}"{{ end }}>
+	<input class="checkbox-input" id="{{ $id }}" type="checkbox" name="{{ $name }}" value="{{ $value }}"
+		{{- if $checked }} checked{{ end }}
+		{{- if $disabled }} disabled{{ end }}
+		{{- with $ariaLabel }} aria-label="{{ . }}"{{ end }}>
+	<span class="checkbox-box" aria-hidden="true">
+		{{- partial "svg-icon.html" (dict "path" "svg/ui-oval/check.svg" "class" "checkbox-mark") -}}
+	</span>
+	{{- with $labelHTML }}
+	<span class="checkbox-label">{{ . | safeHTML }}</span>
+	{{- end }}
+</label>
+
+{{- if and $jsRaw $jsIsSrc -}}
+	{{- $remote := or (hasPrefix $jsRaw "http://") (hasPrefix $jsRaw "https://") (hasPrefix $jsRaw "//") -}}
+	{{- $jsURL := "" -}}
+	{{- if $remote -}}
+		{{- $jsURL = $jsRaw -}}
+	{{- else -}}
+		{{- /* A page-bundle resource is published and referenced directly;
+		       a global asset is published the same way; anything else is a
+		       site-relative path. */ -}}
+		{{- with .Page.Resources.GetMatch $jsRaw -}}{{- $jsURL = .RelPermalink -}}{{- end -}}
+		{{- if not $jsURL -}}
+			{{- with resources.Get $jsRaw -}}{{- $jsURL = .RelPermalink -}}{{- end -}}
+		{{- end -}}
+		{{- if not $jsURL -}}{{- $jsURL = $jsRaw | relURL -}}{{- end -}}
+	{{- end -}}
+	{{- $registered := .Page.Store.Get "alice-checkbox-js" | default slice -}}
+	{{- if not (in $registered $jsURL) -}}
+		{{- .Page.Store.Set "alice-checkbox-js" ($registered | append $jsURL) -}}
+<script src="{{ $jsURL }}" defer></script>
+	{{- end -}}
+{{- else if $jsRaw -}}
+	{{- $jsCode := replaceRE "(?i)</(script)" "<\\/$1" $jsRaw -}}
+	{{- if eq $jsEvent "load" -}}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	{{ $jsCode | safeJS }}
+});
+</script>
+	{{- else -}}
+<script>
+(function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	el.addEventListener({{ $jsEvent }}, function (event) {
+		if (el.disabled) return;
+		{{ $jsCode | safeJS }}
+	});
+})();
+</script>
+	{{- end -}}
+{{- end -}}
