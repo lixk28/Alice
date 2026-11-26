@@ -1,0 +1,270 @@
+{{- /*
+  Button shortcode — a theme-styled action button modelled on Bootstrap 4.
+
+  Usage:
+    {{< button label="Read more" href="/posts/" >}}
+    {{< button label="Hello" js="alert('Hi!')" >}}
+    {{< button label="Load" js="/js/demo.js" >}}
+
+  Args (all optional):
+    label      — visible text, inline Markdown (default: "button");
+                 set label="" for an icon-only button
+    class      — extra classes on the button
+    js         — a script URL to load, or JavaScript source to run on the
+                 button. A URL/path (http(s)://, //, /, ./, ../, or a bare
+                 *.js path) is loaded with <script src>; anything
+                 else is treated as source
+    jsMode     — "auto" (default), "src", or "inline"; forces how js is read
+    jsEvent    — event that runs inline js (default: "click");
+                 "load" runs it once after the DOM is ready
+    href       — link target; when set the button is an <a role="button">
+    target     — link target attribute
+    rel        — link rel attribute (default: noopener noreferrer for _blank)
+    download   — link download attribute: true, or a suggested file name
+    type       — plain|primary|secondary|download|link
+                 (default: params.button.type; "default" aliases "plain")
+    borderColor — CSS border color (overrides the type default)
+    tintColor  — CSS background/tint color; "transparent" gives an outline button
+    textColor  — CSS label/icon color (overrides the type default)
+    size       — sm|md|lg (default: params.button.size)
+    block      — full-width button: true|false (default: params.button.block)
+    active     — pressed appearance + aria-pressed="true"
+    disabled   — disabled state
+    icon       — icon path under static/, resolved by svg-icon.html
+    iconPos    — icon placement: start|end (default: start)
+    title      — native tooltip
+    ariaLabel  — accessible name when the visible label is empty or differs
+    id         — element id (default: button-<ordinal>)
+
+  Site defaults live under params.button. The stylesheet is
+  static/css/button.css and exposes :root variables for retheming.
+
+  Inline js runs as an event handler: `this` is the button, `event` is the
+  event, and `el` is the button element. With jsEvent="load" the code runs
+  after DOMContentLoaded instead, so `el` is available and `event` is not.
+*/ -}}
+
+{{- $site := site.Params.button | default dict -}}
+
+{{- /* Allow label="" (icon-only); ordinary default is "button". */ -}}
+{{- $label := "button" -}}
+{{- if reflect.IsMap .Params -}}
+	{{- if isset .Params "label" -}}
+		{{- $label = .Get "label" -}}
+	{{- end -}}
+{{- end -}}
+{{- $labelHTML := $label | markdownify | strings.TrimSpace -}}
+{{- $labelHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $labelHTML -}}
+{{- $labelText := $labelHTML | plainify | strings.TrimSpace -}}
+
+{{- $id := .Get "id" | default (printf "button-%d" .Ordinal) -}}
+
+{{- $types := slice "plain" "primary" "secondary" "download" "link" -}}
+{{- $type := lower (printf "%v" (.Get "type" | default $site.type | default "plain")) -}}
+{{- if eq $type "default" -}}{{- $type = "plain" -}}{{- end -}}
+{{- if not (in $types $type) -}}
+	{{- warnf "button shortcode %q: unknown type %q; using \"plain\"" $id $type -}}
+	{{- $type = "plain" -}}
+{{- end -}}
+
+{{- $sizes := dict "small" "sm" "medium" "md" "normal" "md" "large" "lg" -}}
+{{- $size := lower (printf "%v" (.Get "size" | default $site.size | default "md")) -}}
+{{- if isset $sizes $size -}}{{- $size = index $sizes $size -}}{{- end -}}
+{{- if not (in (slice "sm" "md" "lg") $size) -}}
+	{{- warnf "button shortcode %q: unknown size %q; using \"md\"" $id $size -}}
+	{{- $size = "md" -}}
+{{- end -}}
+
+{{- $truthy := slice "true" "yes" "1" "on" -}}
+{{- $falsy := slice "false" "no" "0" "off" -}}
+{{- $blockRaw := $site.block | default false -}}
+{{- with .Get "block" -}}{{- $blockRaw = . -}}{{- end -}}
+{{- $block := in $truthy (lower (printf "%v" $blockRaw)) -}}
+{{- $active := in $truthy (lower (printf "%v" (.Get "active" | default false))) -}}
+{{- $disabled := in $truthy (lower (printf "%v" (.Get "disabled" | default false))) -}}
+
+{{- $class := .Get "class" | default $site.class | default "" -}}
+
+{{- /* Per-button color overrides. The values are CSS colors and are
+       validated so they cannot escape the style attribute. */ -}}
+{{- $colorStyle := slice -}}
+{{- range $name := slice "borderColor" "tintColor" "textColor" -}}
+	{{- with $.Get $name -}}
+		{{- $value := replaceRE `\s+` " " (printf "%v" .) | strings.TrimSpace -}}
+		{{- if findRE `^[#A-Za-z0-9_(),.%+/ -]+$` $value -}}
+			{{- $prop := "fg" -}}
+			{{- if eq $name "borderColor" -}}{{- $prop = "border" -}}
+			{{- else if eq $name "tintColor" -}}{{- $prop = "bg" -}}
+			{{- end -}}
+			{{- $colorStyle = $colorStyle | append (printf "--_base-%s: %s" $prop $value) -}}
+			{{- $colorStyle = $colorStyle | append (printf "--_hover-%s: %s" $prop $value) -}}
+		{{- else -}}
+			{{- warnf "button shortcode %q: invalid %s %q; using the type default" $id $name $value -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+{{- $colorStyle = delimit $colorStyle "; " -}}
+
+{{- $href := .Get "href" -}}
+{{- $target := .Get "target" -}}
+{{- $rel := .Get "rel" -}}
+{{- if and (eq $target "_blank") (not $rel) -}}
+	{{- $rel = "noopener noreferrer" -}}
+{{- end -}}
+
+{{- $download := .Get "download" -}}
+{{- $downloadBool := false -}}
+{{- $downloadFile := "" -}}
+{{- with $download -}}
+	{{- $dv := lower (printf "%v" .) -}}
+	{{- if in $falsy $dv -}}
+	{{- else if in $truthy $dv -}}
+		{{- $downloadBool = true -}}
+	{{- else -}}
+		{{- $downloadFile = printf "%v" . -}}
+	{{- end -}}
+{{- end -}}
+{{- /* The download type is a preset: on a link it turns on the download
+       attribute unless the author opted out with download=false. */ -}}
+{{- $downloadExplicit := false -}}
+{{- if reflect.IsMap .Params -}}{{- $downloadExplicit = isset .Params "download" -}}{{- end -}}
+{{- if and (eq $type "download") $href (not $downloadExplicit) -}}
+	{{- $downloadBool = true -}}
+{{- end -}}
+
+{{- $title := .Get "title" -}}
+{{- $ariaLabel := .Get "ariaLabel" -}}
+{{- if and (not $ariaLabel) (not $labelText) -}}
+	{{- $ariaLabel = $title | default "button" -}}
+{{- end -}}
+
+{{- $iconPos := lower (printf "%v" (.Get "iconPos" | default "start")) -}}
+{{- if in (slice "before" "begin") $iconPos -}}
+	{{- $iconPos = "start" -}}
+{{- else if eq $iconPos "after" -}}
+	{{- $iconPos = "end" -}}
+{{- end -}}
+{{- if not (in (slice "start" "end") $iconPos) -}}
+	{{- warnf "button shortcode %q: unknown iconPos %q; using \"start\"" $id $iconPos -}}
+	{{- $iconPos = "start" -}}
+{{- end -}}
+{{- $iconHTML := "" -}}
+{{- with .Get "icon" -}}
+	{{- $iconHTML = partial "svg-icon.html" (dict "path" . "class" "button-icon") -}}
+{{- else -}}
+	{{- if eq $type "download" -}}
+		{{- $iconHTML = `<svg class="button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $labelBlock := "" -}}
+{{- with $labelHTML -}}
+	{{- $labelBlock = printf `<span class="button-label">%s</span>` . -}}
+{{- end -}}
+
+{{- $content := "" -}}
+{{- if and $iconHTML $labelBlock -}}
+	{{- if eq $iconPos "start" -}}
+		{{- $content = printf "%s%s" $iconHTML $labelBlock -}}
+	{{- else -}}
+		{{- $content = printf "%s%s" $labelBlock $iconHTML -}}
+	{{- end -}}
+{{- else -}}
+	{{- $content = printf "%s%s" $iconHTML $labelBlock -}}
+{{- end -}}
+
+{{- $classes := slice "button" -}}
+{{- if ne $type "plain" -}}{{- $classes = $classes | append (printf "button-%s" $type) -}}{{- end -}}
+{{- if eq $size "sm" -}}{{- $classes = $classes | append "button-sm" -}}
+{{- else if eq $size "lg" -}}{{- $classes = $classes | append "button-lg" -}}{{- end -}}
+{{- if $block -}}{{- $classes = $classes | append "button-block" -}}{{- end -}}
+{{- if $active -}}{{- $classes = $classes | append "active" -}}{{- end -}}
+{{- if $disabled -}}{{- $classes = $classes | append "disabled" -}}{{- end -}}
+{{- with $class -}}{{- $classes = $classes | append (printf "%v" .) -}}{{- end -}}
+{{- $classAttr := delimit $classes " " -}}
+
+{{- /* js: auto-detect a URL/path, otherwise treat the value as source. */ -}}
+{{- $jsRaw := trim (printf "%v" (.Get "js" | default "")) " \t\r\n" -}}
+{{- $jsMode := lower (printf "%v" (.Get "jsMode" | default "auto")) -}}
+{{- if not (in (slice "auto" "src" "inline") $jsMode) -}}
+	{{- warnf "button shortcode %q: unknown jsMode %q; using \"auto\"" $id $jsMode -}}
+	{{- $jsMode = "auto" -}}
+{{- end -}}
+{{- $jsIsSrc := false -}}
+{{- if $jsRaw -}}
+	{{- if eq $jsMode "src" -}}
+		{{- $jsIsSrc = true -}}
+	{{- else if eq $jsMode "inline" -}}
+		{{- $jsIsSrc = false -}}
+	{{- else if not (findRE `\s` $jsRaw) -}}
+		{{- if or
+			(hasPrefix $jsRaw "http://")
+			(hasPrefix $jsRaw "https://")
+			(hasPrefix $jsRaw "//")
+			(hasPrefix $jsRaw "/")
+			(hasPrefix $jsRaw "./")
+			(hasPrefix $jsRaw "../")
+			(findRE `^[A-Za-z0-9_@%+~./-]+\.js([?#].*)?$` $jsRaw)
+		-}}
+			{{- $jsIsSrc = true -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $jsEvent := lower (printf "%v" (.Get "jsEvent" | default "click")) -}}
+{{- if not (findRE `^[a-z][a-z0-9_:-]*$` $jsEvent) -}}
+	{{- warnf "button shortcode %q: invalid jsEvent %q; using \"click\"" $id $jsEvent -}}
+	{{- $jsEvent = "click" -}}
+{{- end -}}
+
+{{- if $href -}}
+<a class="{{ $classAttr }}" id="{{ $id }}" href="{{ $href }}" role="button"
+	{{- with $target }} target="{{ . }}"{{ end }}
+	{{- with $rel }} rel="{{ . }}"{{ end }}
+	{{- if $downloadBool }} download{{ else if $downloadFile }} download="{{ $downloadFile }}"{{ end }}
+	{{- if $disabled }} aria-disabled="true" tabindex="-1"{{ end }}
+	{{- if $active }} aria-pressed="true"{{ end }}
+	{{- with $title }} title="{{ . }}"{{ end }}
+	{{- with $ariaLabel }} aria-label="{{ . }}"{{ end }}
+	{{- with $colorStyle }} style="{{ . | safeCSS }}"{{ end }}>{{ $content | safeHTML }}</a>
+{{- else -}}
+<button class="{{ $classAttr }}" id="{{ $id }}" type="button"
+	{{- if $disabled }} disabled{{ end }}
+	{{- if $active }} aria-pressed="true"{{ end }}
+	{{- with $title }} title="{{ . }}"{{ end }}
+	{{- with $ariaLabel }} aria-label="{{ . }}"{{ end }}
+	{{- with $colorStyle }} style="{{ . | safeCSS }}"{{ end }}>{{ $content | safeHTML }}</button>
+{{- end -}}
+
+{{- if and $jsRaw $jsIsSrc -}}
+	{{- $remote := or (hasPrefix $jsRaw "http://") (hasPrefix $jsRaw "https://") (hasPrefix $jsRaw "//") -}}
+	{{- $jsURL := $jsRaw -}}
+	{{- if not $remote -}}{{- $jsURL = $jsRaw | relURL -}}{{- end -}}
+	{{- $registered := .Page.Store.Get "alice-button-js" | default slice -}}
+	{{- if not (in $registered $jsURL) -}}
+		{{- .Page.Store.Set "alice-button-js" ($registered | append $jsURL) -}}
+<script src="{{ $jsURL }}" defer></script>
+	{{- end -}}
+{{- else if $jsRaw -}}
+	{{- $jsCode := replaceRE "(?i)</(script)" "<\\/$1" $jsRaw -}}
+	{{- if eq $jsEvent "load" -}}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	{{ $jsCode | safeJS }}
+});
+</script>
+	{{- else -}}
+<script>
+(function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	el.addEventListener({{ $jsEvent }}, function (event) {
+		if (el.disabled || el.classList.contains("disabled") || el.getAttribute("aria-disabled") === "true") return;
+		{{ $jsCode | safeJS }}
+	});
+})();
+</script>
+	{{- end -}}
+{{- end -}}

@@ -1,0 +1,235 @@
+/*
+ * Button component — used by the `button` shortcode.
+ *
+ * The default look follows the theme: a paper-like panel with a thin
+ * SlateGray border, a small offset shadow, and a modest radius. Geometry,
+ * colors, and the active/disabled treatment are :root variables, so a site
+ * can retheme every button from its own stylesheet without touching the
+ * template. Variants only re-point the internal --_base-* / --_hover-*
+ * variables consumed by .button.
+ */
+
+:root {
+    /* Geometry and motion */
+    --button-font-size: var(--font-size-normal);
+    --button-font-weight: 500;
+    --button-line-height: 1.2;
+    --button-padding-block: .35em;
+    --button-padding-inline: .85em;
+    --button-border-width: 1px;
+    --button-border-radius: .3em;
+    --button-gap: .4em;
+    --button-icon-size: 1em;
+    --button-shadow: .1em .1em .2em Silver;
+    --button-shadow-hover: .16em .16em .28em LightSlateGray;
+    --button-shadow-active: inset .1em .1em .2em rgba(0, 0, 0, .18);
+    --button-disabled-opacity: .55;
+    --button-transition: var(--transition-duration-fast) ease;
+    --button-focus-color: RoyalBlue;
+    --button-focus-width: 2px;
+    --button-focus-offset: 2px;
+    --button-block-margin: .5em 0;
+    --button-link-padding-inline: .2em;
+
+    --button-sm-font-size: var(--font-size-small);
+    --button-sm-padding-block: .2em;
+    --button-sm-padding-inline: .6em;
+
+    --button-lg-font-size: var(--font-size-big);
+    --button-lg-padding-block: .5em;
+    --button-lg-padding-inline: 1.1em;
+
+    /* plain: black on white */
+    --button-plain-fg: Black;
+    --button-plain-bg: White;
+    --button-plain-border: Black;
+    --button-plain-hover-fg: White;
+    --button-plain-hover-bg: Black;
+    --button-plain-hover-border: Black;
+
+    /* secondary: navy on white smoke */
+    --button-secondary-fg: Navy;
+    --button-secondary-bg: WhiteSmoke;
+    --button-secondary-border: SlateGray;
+    --button-secondary-hover-fg: Navy;
+    --button-secondary-hover-bg: Gainsboro;
+    --button-secondary-hover-border: Navy;
+
+    /* primary: white on cornflower blue */
+    --button-primary-fg: White;
+    --button-primary-bg: CornflowerBlue;
+    --button-primary-border: Navy;
+    --button-primary-hover-fg: White;
+    --button-primary-hover-bg: RoyalBlue;
+    --button-primary-hover-border: Navy;
+
+    /* download: the download action preset */
+    --button-download-fg: White;
+    --button-download-bg: Navy;
+    --button-download-border: Black;
+    --button-download-hover-fg: White;
+    --button-download-hover-bg: RoyalBlue;
+    --button-download-hover-border: Navy;
+
+    /* link: a text link dressed as a button */
+    --button-link-fg: var(--link-color);
+    --button-link-hover-fg: var(--link-active-color);
+    --button-link-border: var(--link-color);
+    --button-link-hover-border: var(--link-active-color);
+}
+
+.button {
+    --_base-fg: var(--button-plain-fg);
+    --_base-bg: var(--button-plain-bg);
+    --_base-border: var(--button-plain-border);
+    --_hover-fg: var(--button-plain-hover-fg);
+    --_hover-bg: var(--button-plain-hover-bg);
+    --_hover-border: var(--button-plain-hover-border);
+    --_fg: var(--_base-fg);
+    --_bg: var(--_base-bg);
+    --_border: var(--_base-border);
+    --_shadow: var(--button-shadow);
+    --_hover-shadow: var(--button-shadow-hover);
+    --_active-shadow: var(--button-shadow-active);
+    --_hover-transform: translateY(-1px);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--button-gap);
+    box-sizing: border-box;
+    max-width: 100%;
+    margin: 0;
+    padding: var(--button-padding-block) var(--button-padding-inline);
+    font-family: var(--sans-font);
+    font-size: var(--button-font-size);
+    font-weight: var(--button-font-weight);
+    line-height: var(--button-line-height);
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    color: var(--_fg);
+    background-color: var(--_bg);
+    border: var(--button-border-width) solid var(--_border);
+    border-radius: var(--button-border-radius);
+    box-shadow: var(--_shadow);
+    cursor: pointer;
+    user-select: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: color var(--button-transition),
+        background-color var(--button-transition),
+        border-color var(--button-transition),
+        box-shadow var(--button-transition),
+        transform var(--button-transition);
+}
+
+.button-secondary {
+    --_base-fg: var(--button-secondary-fg);
+    --_base-bg: var(--button-secondary-bg);
+    --_base-border: var(--button-secondary-border);
+    --_hover-fg: var(--button-secondary-hover-fg);
+    --_hover-bg: var(--button-secondary-hover-bg);
+    --_hover-border: var(--button-secondary-hover-border);
+}
+
+.button-primary {
+    --_base-fg: var(--button-primary-fg);
+    --_base-bg: var(--button-primary-bg);
+    --_base-border: var(--button-primary-border);
+    --_hover-fg: var(--button-primary-hover-fg);
+    --_hover-bg: var(--button-primary-hover-bg);
+    --_hover-border: var(--button-primary-hover-border);
+}
+
+.button-download {
+    --_base-fg: var(--button-download-fg);
+    --_base-bg: var(--button-download-bg);
+    --_base-border: var(--button-download-border);
+    --_hover-fg: var(--button-download-hover-fg);
+    --_hover-bg: var(--button-download-hover-bg);
+    --_hover-border: var(--button-download-hover-border);
+}
+
+/* Link type: transparent panel, a link-colored border, and the theme's
+   inset underline. It comes after the other type rules so it always wins. */
+.button-link {
+    --_base-fg: var(--button-link-fg);
+    --_base-bg: transparent;
+    --_base-border: var(--button-link-border);
+    --_hover-fg: var(--button-link-hover-fg);
+    --_hover-bg: transparent;
+    --_hover-border: var(--button-link-hover-border);
+    --_shadow: inset 0 -.1em 0 var(--_fg);
+    --_hover-shadow: inset 0 -.15em 0 var(--_hover-fg);
+    --_active-shadow: inset 0 -.15em 0 var(--_hover-fg);
+    --_hover-transform: none;
+    padding-inline: var(--button-link-padding-inline);
+}
+
+.button:not(:disabled):not(.disabled):hover {
+    color: var(--_hover-fg);
+    background-color: var(--_hover-bg);
+    border-color: var(--_hover-border);
+    box-shadow: var(--_hover-shadow);
+    transform: var(--_hover-transform);
+}
+
+.button:not(:disabled):not(.disabled):active,
+.button:not(:disabled):not(.disabled).active {
+    color: var(--_hover-fg);
+    background-color: var(--_hover-bg);
+    border-color: var(--_hover-border);
+    box-shadow: var(--_active-shadow);
+    transform: translateY(0);
+}
+
+.button:focus-visible {
+    outline: var(--button-focus-width) solid var(--button-focus-color);
+    outline-offset: var(--button-focus-offset);
+}
+
+.button:disabled,
+.button.disabled {
+    opacity: var(--button-disabled-opacity);
+    box-shadow: none;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+}
+
+.button-sm {
+    font-size: var(--button-sm-font-size);
+    padding: var(--button-sm-padding-block) var(--button-sm-padding-inline);
+}
+
+.button-lg {
+    font-size: var(--button-lg-font-size);
+    padding: var(--button-lg-padding-block) var(--button-lg-padding-inline);
+}
+
+.button-block {
+    display: flex;
+    width: 100%;
+    margin: var(--button-block-margin);
+}
+
+.button-icon {
+    flex: none;
+    width: var(--button-icon-size);
+    height: var(--button-icon-size);
+}
+
+.button-label {
+    min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button {
+        transition: none;
+    }
+
+    .button:not(:disabled):not(.disabled):hover {
+        transform: none;
+    }
+}

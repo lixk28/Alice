@@ -167,6 +167,12 @@
 <body class="{{ block "body-class" . }}{{ end }}">
 	{{- partial "header" . -}}
 	{{- partial "breadcrumb.html" . -}}
+	{{- /* Reset the button script registry before content renders. Page.Store
+	       survives hugo server rebuilds, so without this a shortcode/template
+	       edit would skip scripts already registered by the previous render. */ -}}
+	{{- if .HasShortcode "button" -}}
+		{{- .Store.Delete "alice-button-js" -}}
+	{{- end -}}
 	{{- if .HasShortcode "switch" -}}
 		{{- .Store.Delete "alice-switch-js" -}}
 	{{- end -}}

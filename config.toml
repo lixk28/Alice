@@ -31,6 +31,17 @@
         # "hover" (default) or "click"
         mode = "hover"
 
+    # Button shortcode defaults ({{< button >}}). Any shortcode argument wins.
+    [params.button]
+        # plain|primary|secondary|download|link
+        type = "plain"
+        # sm|md|lg
+        size = "md"
+        # Full width of the content column.
+        block = false
+        # Extra classes added to every button.
+        class = ""
+
     # Switch shortcode defaults ({{< switch >}}). Any shortcode argument wins.
     [params.switch]
         # Initial state: on (true) or off (false).
