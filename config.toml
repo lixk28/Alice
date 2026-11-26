@@ -120,6 +120,42 @@
         # Extra classes added to every slider.
         class = ""
 
+    # TextLine shortcode defaults ({{< textline >}}). Any shortcode argument
+    # wins.
+    [params.textline]
+        # Initial text.
+        value = ""
+        # Hint shown while the field is empty.
+        placeholder = ""
+        # small|s, medium|m, or large|l
+        size = "medium"
+        # Icon placement: start (left) or end (right).
+        iconPos = "start"
+        # Width of the whole control (any CSS length or percentage).
+        # Empty uses 100% for a block field and 12em for an inline one.
+        width = ""
+        # Extra classes added to every text line.
+        class = ""
+
+    # TextField shortcode defaults ({{< textfield >}}). Any shortcode argument
+    # wins.
+    [params.textfield]
+        # Hint shown while the field is empty.
+        placeholder = ""
+        # Initial height in text rows.
+        rows = 4
+        # small|s, medium|m, or large|l
+        size = "medium"
+        # Icon placement: start (left) or end (right).
+        iconPos = "start"
+        # Native resize handle: none|vertical|horizontal|both
+        resize = "vertical"
+        # Width of the whole control (any CSS length or percentage).
+        # Empty uses 100%.
+        width = ""
+        # Extra classes added to every text field.
+        class = ""
+
     # Breadcrumb bar under the header. Shown on every page by default; set
     # enable = false here, or `breadcrumb: false` in a page's front matter.
     # The Home crumb (text and icon) and section icons reuse menu.main entries.

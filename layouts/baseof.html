@@ -188,6 +188,12 @@
 	{{- if .HasShortcode "slider" -}}
 		{{- .Store.Delete "alice-slider-js" -}}
 	{{- end -}}
+	{{- if .HasShortcode "textline" -}}
+		{{- .Store.Delete "alice-textline-js" -}}
+	{{- end -}}
+	{{- if .HasShortcode "textfield" -}}
+		{{- .Store.Delete "alice-textfield-js" -}}
+	{{- end -}}
 	{{- block "main" . -}}{{- end -}}
 	{{- partial "footer" . -}}
 </body>
