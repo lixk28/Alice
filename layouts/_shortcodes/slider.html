@@ -1,0 +1,354 @@
+{{- /*
+  Slider shortcode — a theme-styled horizontal range control modelled on
+  Apple's UISlider.
+
+  Usage:
+    {{< slider label="Volume" value=60 >}}
+    {{< slider label="Text size" min=10 max=24 step=1 value=16 unit=" pt" >}}
+    {{< slider label="Opacity" min=0 max=1 step=0.05 value=0.65 >}}
+    {{< slider label="Run a script" js="/js/demo.js" >}}
+
+  Args (all optional):
+    value      — initial value (default: params.slider.value or 50). Clamped
+                 to [min, max] and snapped to the nearest step.
+    min        — minimum value (default: params.slider.min or 0)
+    max        — maximum value (default: params.slider.max or 100)
+    step       — increment (default: params.slider.step or 1); must be > 0
+    label      — visible text, inline Markdown
+    unit       — suffix appended to the value readout, e.g. "%" or " px"
+                 (default: params.slider.unit or "")
+    showValue  — show the current value beside the label: true|false
+                 (default: params.slider.showValue or true)
+    size       — small|s, medium|m (default), or large|l
+    tintColor  — minimum-track color (default: the theme's CornflowerBlue)
+    trackColor — remaining-track color (default: Gainsboro)
+    thumbColor — thumb color (default: White)
+    minIcon    — icon path under static/ drawn before the track
+                 (UISlider's minimumValueImage); resolved by svg-icon.html
+    maxIcon    — icon path under static/ drawn after the track
+                 (UISlider's maximumValueImage)
+    disabled   — disabled state
+    name       — form field name
+    ariaLabel  — accessible name when there is no visible label
+    id         — input id (default: slider-<ordinal>)
+    class      — extra classes on the wrapper
+    width      — CSS width of the whole control, e.g. "20em" or "60%"
+                 (default: params.slider.width, or 100%)
+    inline     — render as an inline-flex box that can share a line with
+                 text instead of a full-width block: true|false
+    js         — a script URL/path, or inline JavaScript source. A URL/path
+                 (http(s)://, //, /, ./, ../, a bare *.js path, a page-bundle
+                 resource, or an assets/ resource) is loaded once per page
+                 with <script src>; anything else is attached to the input
+                 event
+    jsMode     — "auto" (default), "src", or "inline"; forces how js is read
+    jsEvent    — event that runs inline js (default: "input");
+                 "load" runs it once after the DOM is ready
+
+  Site defaults live under params.slider. Colors, geometry, sizes, and
+  motion are --slider-* variables in static/css/slider.css.
+
+  The control is a native <input type="range">, so keyboard and screen-reader
+  behavior comes for free and it works without JavaScript. static/js/slider.js
+  only syncs the colored minimum track and the value readout; the initial
+  fill percentage is computed at build time. Inline js runs as an event
+  handler: `this` and `el` are the input, `event` is the event, and
+  `el.value` is the new value. With jsEvent="load" the code runs after
+  DOMContentLoaded instead, so `el` is available and `event` is not.
+*/ -}}
+
+{{- /* Site defaults. Hugo lowercases config keys, while shortcode arguments
+       keep the case they were written in, so match the two case-insensitively. */ -}}
+{{- $siteSlider := site.Params.slider | default dict -}}
+{{- $siteOpts := dict -}}
+{{- $defaultKeys := slice "value" "min" "max" "step" "unit" "showValue" "size" "tintColor" "trackColor" "thumbColor" "width" "class" -}}
+{{- if reflect.IsMap $siteSlider -}}
+	{{- range $key, $value := $siteSlider -}}
+		{{- range $defaultKey := $defaultKeys -}}
+			{{- if eq (lower $defaultKey) (lower $key) -}}
+				{{- $siteOpts = merge $siteOpts (dict $defaultKey $value) -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Resolve every default, letting a shortcode argument win even when it
+       is 0 or false. */ -}}
+{{- $opts := dict -}}
+{{- range $key := $defaultKeys -}}
+	{{- if isset $siteOpts $key -}}
+		{{- $opts = merge $opts (dict $key (index $siteOpts $key)) -}}
+	{{- end -}}
+	{{- if reflect.IsMap $.Params -}}
+		{{- if isset $.Params $key -}}
+			{{- $opts = merge $opts (dict $key ($.Get $key)) -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $id := .Get "id" | default (printf "slider-%d" .Ordinal) -}}
+{{- $numRE := `^-?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)$` -}}
+
+{{- /* Numeric arguments. Each is validated so a typo warns instead of
+       failing the build, then falls back to the built-in default. */ -}}
+{{- $value := 50.0 -}}
+{{- if isset $opts "value" -}}
+	{{- $raw := trim (printf "%v" (index $opts "value")) " \t\r\n" -}}
+	{{- if findRE $numRE $raw -}}
+		{{- $value = float $raw -}}
+	{{- else -}}
+		{{- warnf "slider shortcode %q: invalid value %q; using 50" $id $raw -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $min := 0.0 -}}
+{{- if isset $opts "min" -}}
+	{{- $raw := trim (printf "%v" (index $opts "min")) " \t\r\n" -}}
+	{{- if findRE $numRE $raw -}}
+		{{- $min = float $raw -}}
+	{{- else -}}
+		{{- warnf "slider shortcode %q: invalid min %q; using 0" $id $raw -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $max := 100.0 -}}
+{{- if isset $opts "max" -}}
+	{{- $raw := trim (printf "%v" (index $opts "max")) " \t\r\n" -}}
+	{{- if findRE $numRE $raw -}}
+		{{- $max = float $raw -}}
+	{{- else -}}
+		{{- warnf "slider shortcode %q: invalid max %q; using 100" $id $raw -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $step := 1.0 -}}
+{{- if isset $opts "step" -}}
+	{{- $raw := trim (printf "%v" (index $opts "step")) " \t\r\n" -}}
+	{{- if findRE $numRE $raw -}}
+		{{- $step = float $raw -}}
+	{{- else -}}
+		{{- warnf "slider shortcode %q: invalid step %q; using 1" $id $raw -}}
+	{{- end -}}
+{{- end -}}
+
+{{- if ge $min $max -}}
+	{{- warnf "slider shortcode %q: min (%v) must be less than max (%v); using 0 and 100" $id $min $max -}}
+	{{- $min = 0.0 -}}
+	{{- $max = 100.0 -}}
+{{- end -}}
+{{- if le $step 0.0 -}}
+	{{- warnf "slider shortcode %q: step (%v) must be greater than 0; using 1" $id $step -}}
+	{{- $step = 1.0 -}}
+{{- end -}}
+
+{{- /* Clamp into range, snap to the step grid, and trim float noise before
+       writing the attributes and the initial readout. */ -}}
+{{- if lt $value $min -}}{{- $value = $min -}}{{- end -}}
+{{- if gt $value $max -}}{{- $value = $max -}}{{- end -}}
+{{- $stepsFromMin := math.Round (div (sub $value $min) $step) -}}
+{{- $value = add $min (mul $stepsFromMin $step) -}}
+{{- $value = div (math.Round (mul $value 1000000)) 1000000 -}}
+{{- if lt $value $min -}}{{- $value = $min -}}{{- end -}}
+{{- if gt $value $max -}}{{- $value = $max -}}{{- end -}}
+
+{{- $pct := 0.0 -}}
+{{- if gt $max $min -}}
+	{{- $pct = mul (div (sub $value $min) (sub $max $min)) 100 -}}
+{{- end -}}
+{{- $pct = div (math.Round (mul $pct 100)) 100 -}}
+
+{{- /* showValue: a shortcode argument wins even when it is false. */ -}}
+{{- $showValue := true -}}
+{{- if isset $opts "showValue" -}}
+	{{- $showValue = in (slice "true" "yes" "1" "on") (lower (printf "%v" (index $opts "showValue"))) -}}
+{{- end -}}
+
+{{- $disabled := in (slice "true" "yes" "1" "on") (lower (printf "%v" (.Get "disabled" | default false))) -}}
+
+{{- /* Sizes; accept the same aliases as the other controls. */ -}}
+{{- $sizes := dict
+	"small" "small" "s" "small"
+	"medium" "medium" "m" "medium"
+	"large" "large" "l" "large"
+-}}
+{{- $sizeArg := "medium" -}}
+{{- if isset $opts "size" -}}{{- $sizeArg = lower (printf "%v" (index $opts "size")) -}}{{- end -}}
+{{- if not $sizeArg -}}{{- $sizeArg = "medium" -}}{{- end -}}
+{{- $size := "medium" -}}
+{{- if isset $sizes $sizeArg -}}
+	{{- $size = index $sizes $sizeArg -}}
+{{- else -}}
+	{{- warnf "slider shortcode %q: unknown size %q; using \"medium\"" $id $sizeArg -}}
+{{- end -}}
+
+{{- $unit := "" -}}
+{{- if isset $opts "unit" -}}{{- $unit = printf "%v" (index $opts "unit") -}}{{- end -}}
+{{- $valueText := printf "%v%s" $value $unit -}}
+
+{{- /* width is any CSS length/percentage. It is validated so it cannot
+       escape the style attribute; empty leaves the layout defaults alone. */ -}}
+{{- $width := "" -}}
+{{- if isset $opts "width" -}}
+	{{- $w := replaceRE `\s+` " " (printf "%v" (index $opts "width")) | strings.TrimSpace -}}
+	{{- with $w -}}
+		{{- if findRE `^[#A-Za-z0-9_(),.%+/ -]+$` . -}}
+			{{- $width = . -}}
+		{{- else -}}
+			{{- warnf "slider shortcode %q: invalid width %q; using the default" $id . -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $inline := in (slice "true" "yes" "1" "on") (lower (printf "%v" (.Get "inline" | default false))) -}}
+
+{{- /* tintColor, trackColor, and thumbColor are CSS colors. Validate them so
+       they cannot escape the style attribute. An empty value leaves the theme
+       variables in charge. */ -}}
+{{- $colorVars := dict "tintColor" "--slider-min-bg" "trackColor" "--slider-track-bg" "thumbColor" "--slider-thumb-bg" -}}
+{{- $styleParts := slice (printf "--slider-fill: %v%%" $pct) -}}
+{{- with $width -}}{{- $styleParts = $styleParts | append (printf "--slider-width: %s" .) -}}{{- end -}}
+{{- range $name, $prop := $colorVars -}}
+	{{- $value := "" -}}
+	{{- if isset $opts $name -}}{{- $value = printf "%v" (index $opts $name) -}}{{- end -}}
+	{{- with $value -}}
+		{{- $css := replaceRE `\s+` " " (printf "%v" .) | strings.TrimSpace -}}
+		{{- if findRE `^[#A-Za-z0-9_(),.%+/ -]+$` $css -}}
+			{{- $styleParts = $styleParts | append (printf "%s: %s" $prop $css) -}}
+		{{- else -}}
+			{{- warnf "slider shortcode %q: invalid %s %q; using the theme default" $id $name $css -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+{{- $style := delimit $styleParts "; " -}}
+
+{{- $label := .Get "label" | default "" -}}
+{{- $labelHTML := "" -}}
+{{- $labelText := "" -}}
+{{- with $label -}}
+	{{- $labelHTML = . | markdownify | strings.TrimSpace -}}
+	{{- $labelHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $labelHTML -}}
+	{{- $labelText = $labelHTML | plainify | strings.TrimSpace -}}
+{{- end -}}
+
+{{- $ariaLabel := .Get "ariaLabel" | default "" -}}
+{{- if not $ariaLabel -}}
+	{{- if not $labelText -}}{{- $ariaLabel = "Slider" -}}{{- end -}}
+{{- end -}}
+
+{{- $minIconHTML := "" -}}
+{{- with .Get "minIcon" -}}{{- $minIconHTML = partial "svg-icon.html" (dict "path" . "class" "slider-endcap-icon") -}}{{- end -}}
+{{- $maxIconHTML := "" -}}
+{{- with .Get "maxIcon" -}}{{- $maxIconHTML = partial "svg-icon.html" (dict "path" . "class" "slider-endcap-icon") -}}{{- end -}}
+
+{{- $class := "" -}}
+{{- if isset $opts "class" -}}{{- $class = printf "%v" (index $opts "class") -}}{{- end -}}
+{{- $classes := slice "slider" (printf "slider-%s" $size) -}}
+{{- if $inline -}}{{- $classes = $classes | append "slider-inline" -}}{{- end -}}
+{{- if $disabled -}}{{- $classes = $classes | append "slider-disabled" -}}{{- end -}}
+{{- with $class -}}{{- $classes = $classes | append (printf "%v" .) -}}{{- end -}}
+{{- $classAttr := delimit $classes " " -}}
+
+{{- /* js: auto-detect a URL/path, otherwise treat the value as source. */ -}}
+{{- $jsRaw := trim (printf "%v" (.Get "js" | default "")) " \t\r\n" -}}
+{{- $jsMode := lower (printf "%v" (.Get "jsMode" | default "auto")) -}}
+{{- if not (in (slice "auto" "src" "inline") $jsMode) -}}
+	{{- warnf "slider shortcode %q: unknown jsMode %q; using \"auto\"" $id $jsMode -}}
+	{{- $jsMode = "auto" -}}
+{{- end -}}
+{{- $jsIsSrc := false -}}
+{{- if $jsRaw -}}
+	{{- if eq $jsMode "src" -}}
+		{{- $jsIsSrc = true -}}
+	{{- else if eq $jsMode "inline" -}}
+		{{- $jsIsSrc = false -}}
+	{{- else if not (findRE `\s` $jsRaw) -}}
+		{{- if or
+			(hasPrefix $jsRaw "http://")
+			(hasPrefix $jsRaw "https://")
+			(hasPrefix $jsRaw "//")
+			(hasPrefix $jsRaw "/")
+			(hasPrefix $jsRaw "./")
+			(hasPrefix $jsRaw "../")
+			(findRE `^[A-Za-z0-9_@%+~./-]+\.js([?#].*)?$` $jsRaw)
+		-}}
+			{{- $jsIsSrc = true -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $jsEvent := lower (printf "%v" (.Get "jsEvent" | default "input")) -}}
+{{- if not (findRE `^[a-z][a-z0-9_:-]*$` $jsEvent) -}}
+	{{- warnf "slider shortcode %q: invalid jsEvent %q; using \"input\"" $id $jsEvent -}}
+	{{- $jsEvent = "input" -}}
+{{- end -}}
+
+<span class="{{ $classAttr }}" data-slider{{ with $style }} style="{{ . | safeCSS }}"{{ end }}>
+	{{- if or $labelHTML $showValue }}
+	<span class="slider-header">
+		{{- with $labelHTML }}
+		<label class="slider-label" for="{{ $id }}">{{ . | safeHTML }}</label>
+		{{- end }}
+		{{- if $showValue }}
+		<output class="slider-value" for="{{ $id }}" aria-hidden="true">{{ $valueText }}</output>
+		{{- end }}
+	</span>
+	{{- end }}
+	<span class="slider-control">
+		{{- with $minIconHTML }}
+		<span class="slider-endcap slider-endcap-min" aria-hidden="true">{{ . | safeHTML }}</span>
+		{{- end }}
+		<input class="slider-input" type="range" id="{{ $id }}"
+			min="{{ $min }}" max="{{ $max }}" step="{{ $step }}" value="{{ $value }}"
+			{{- with .Get "name" }} name="{{ . }}"{{ end }}
+			{{- if $disabled }} disabled{{ end }}
+			{{- with $ariaLabel }} aria-label="{{ . }}"{{ end }}
+			{{- if $unit }} aria-valuetext="{{ $valueText }}" data-unit="{{ $unit }}"{{ end }}>
+		{{- with $maxIconHTML }}
+		<span class="slider-endcap slider-endcap-max" aria-hidden="true">{{ . | safeHTML }}</span>
+		{{- end }}
+	</span>
+</span>
+
+{{- if and $jsRaw $jsIsSrc -}}
+	{{- $remote := or (hasPrefix $jsRaw "http://") (hasPrefix $jsRaw "https://") (hasPrefix $jsRaw "//") -}}
+	{{- $jsURL := "" -}}
+	{{- if $remote -}}
+		{{- $jsURL = $jsRaw -}}
+	{{- else -}}
+		{{- /* A page-bundle resource is published and referenced directly;
+		       a global asset is published the same way; anything else is a
+		       site-relative path. */ -}}
+		{{- with .Page.Resources.GetMatch $jsRaw -}}{{- $jsURL = .RelPermalink -}}{{- end -}}
+		{{- if not $jsURL -}}
+			{{- with resources.Get $jsRaw -}}{{- $jsURL = .RelPermalink -}}{{- end -}}
+		{{- end -}}
+		{{- if not $jsURL -}}{{- $jsURL = $jsRaw | relURL -}}{{- end -}}
+	{{- end -}}
+	{{- $registered := .Page.Store.Get "alice-slider-js" | default slice -}}
+	{{- if not (in $registered $jsURL) -}}
+		{{- .Page.Store.Set "alice-slider-js" ($registered | append $jsURL) -}}
+<script src="{{ $jsURL }}" defer></script>
+	{{- end -}}
+{{- else if $jsRaw -}}
+	{{- $jsCode := replaceRE "(?i)</(script)" "<\\/$1" $jsRaw -}}
+	{{- if eq $jsEvent "load" -}}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	{{ $jsCode | safeJS }}
+});
+</script>
+	{{- else -}}
+<script>
+(function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	el.addEventListener({{ $jsEvent }}, function (event) {
+		if (el.disabled) return;
+		{{ $jsCode | safeJS }}
+	});
+})();
+</script>
+	{{- end -}}
+{{- end -}}

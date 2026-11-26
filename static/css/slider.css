@@ -1,0 +1,254 @@
+/*
+ * Slider component — used by the `slider` shortcode.
+ *
+ * Modelled on Apple's UISlider: a thin rounded track with a tinted minimum
+ * side, a white circular thumb lifted by a soft shadow, and a short ease.
+ * The control is a native <input type="range">, so it is keyboard- and
+ * screen-reader-friendly and works before JavaScript loads. The minimum
+ * track is painted with a gradient driven by --slider-fill, which the
+ * template sets inline at build time and static/js/slider.js updates live.
+ *
+ * Every geometry, color, and motion value is a --slider-* variable on
+ * :root, so a site stylesheet can retheme the control.
+ */
+
+:root {
+    /* Layout and type */
+    --slider-font-size: var(--font-size-normal);
+    --slider-gap: .4em;
+    --slider-control-gap: .6em;
+    --slider-label-color: var(--font-color);
+    --slider-value-color: DimGray;
+    --slider-value-font-size: var(--font-size-small);
+    --slider-endcap-color: DimGray;
+    --slider-endcap-size: 1.1em;
+
+    /* Geometry */
+    --slider-track-height: .35em;
+    --slider-thumb-size: 1.5em;
+    --slider-fill: 50%;
+
+    /* Colors */
+    --slider-track-bg: Gainsboro;
+    --slider-min-bg: CornflowerBlue;
+    --slider-thumb-bg: White;
+
+    /* Depth and motion */
+    --slider-thumb-shadow: 0 .1em .22em rgba(0, 0, 0, .22),
+        0 .02em .05em rgba(0, 0, 0, .12);
+    --slider-thumb-shadow-hover: 0 .16em .3em rgba(0, 0, 0, .26),
+        0 .03em .07em rgba(0, 0, 0, .14);
+    --slider-transition: var(--transition-duration-fast) ease;
+
+    /* Focus */
+    --slider-focus-shadow: 0 0 0 .14em White,
+        0 0 0 calc(.14em + 2px) RoyalBlue;
+
+    --slider-disabled-opacity: .5;
+
+    /* Sizes */
+    --slider-sm-font-size: var(--font-size-small);
+    --slider-sm-track-height: .28em;
+    --slider-sm-thumb-size: 1.15em;
+    --slider-sm-value-font-size: var(--font-size-tiny);
+
+    --slider-lg-font-size: var(--font-size-big);
+    --slider-lg-track-height: .42em;
+    --slider-lg-thumb-size: 1.8em;
+    --slider-lg-endcap-size: 1.2em;
+}
+
+.slider {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slider-gap);
+    width: var(--slider-width, 100%);
+    margin: 1em 0;
+    font-family: var(--sans-font);
+    font-size: var(--slider-font-size);
+    line-height: 1.2;
+    color: var(--slider-label-color);
+}
+
+.slider-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1em;
+    min-width: 0;
+}
+
+.slider-label {
+    min-width: 0;
+    cursor: pointer;
+}
+
+.slider-value {
+    flex: none;
+    font-family: var(--mono-font);
+    font-size: var(--slider-value-font-size);
+    color: var(--slider-value-color);
+    font-variant-numeric: tabular-nums;
+}
+
+.slider-control {
+    display: flex;
+    align-items: center;
+    gap: var(--slider-control-gap);
+    min-width: 0;
+}
+
+.slider-endcap {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    color: var(--slider-endcap-color);
+}
+
+.slider-endcap-icon {
+    width: var(--slider-endcap-size);
+    height: var(--slider-endcap-size);
+}
+
+/* The real control. Its height is a comfortable hit target around the thumb;
+   the track is centered within it by the browser. */
+.slider-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    height: calc(var(--slider-thumb-size) + .6em);
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.slider-input:focus {
+    outline: none;
+}
+
+/* WebKit/Blink: the gradient paints the minimum and remaining track in one
+   pass, since the runnable track has no separate "progress" pseudo-element. */
+.slider-input::-webkit-slider-runnable-track {
+    height: var(--slider-track-height);
+    border-radius: calc(var(--slider-track-height) / 2);
+    background: linear-gradient(
+        to right,
+        var(--slider-min-bg) 0,
+        var(--slider-min-bg) var(--slider-fill),
+        var(--slider-track-bg) var(--slider-fill),
+        var(--slider-track-bg) 100%
+    );
+}
+
+.slider-input::-webkit-slider-thumb {
+    box-sizing: border-box;
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
+    margin-top: calc((var(--slider-track-height) - var(--slider-thumb-size)) / 2);
+    background-color: var(--slider-thumb-bg);
+    border: 0;
+    border-radius: 50%;
+    box-shadow: var(--slider-thumb-shadow);
+    -webkit-appearance: none;
+    appearance: none;
+    transition: box-shadow var(--slider-transition),
+        background-color var(--slider-transition);
+}
+
+/* Gecko: the track and its filled progress bar are separate pseudo-elements. */
+.slider-input::-moz-range-track {
+    height: var(--slider-track-height);
+    border-radius: calc(var(--slider-track-height) / 2);
+    background: var(--slider-track-bg);
+}
+
+.slider-input::-moz-range-progress {
+    height: var(--slider-track-height);
+    border-radius: calc(var(--slider-track-height) / 2);
+    background: var(--slider-min-bg);
+}
+
+.slider-input::-moz-range-thumb {
+    box-sizing: border-box;
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
+    background-color: var(--slider-thumb-bg);
+    border: 0;
+    border-radius: 50%;
+    box-shadow: var(--slider-thumb-shadow);
+    transition: box-shadow var(--slider-transition),
+        background-color var(--slider-transition);
+}
+
+.slider-input:focus-visible::-webkit-slider-thumb {
+    box-shadow: var(--slider-focus-shadow), var(--slider-thumb-shadow);
+}
+
+.slider-input:focus-visible::-moz-range-thumb {
+    box-shadow: var(--slider-focus-shadow), var(--slider-thumb-shadow);
+}
+
+@media (hover: hover) {
+    .slider-input:hover::-webkit-slider-thumb {
+        box-shadow: var(--slider-thumb-shadow-hover);
+    }
+
+    .slider-input:hover::-moz-range-thumb {
+        box-shadow: var(--slider-thumb-shadow-hover);
+    }
+
+    .slider-input:hover:focus-visible::-webkit-slider-thumb {
+        box-shadow: var(--slider-focus-shadow), var(--slider-thumb-shadow-hover);
+    }
+
+    .slider-input:hover:focus-visible::-moz-range-thumb {
+        box-shadow: var(--slider-focus-shadow), var(--slider-thumb-shadow-hover);
+    }
+}
+
+.slider-input:disabled {
+    cursor: not-allowed;
+}
+
+.slider-disabled {
+    opacity: var(--slider-disabled-opacity);
+}
+
+/* Inline mode: the wrapper is a <span>, so this also stays valid inside a
+   paragraph. Without an explicit width it shrinks to the 12em track; an
+   explicit width still lets the input grow to fill the box. */
+.slider-inline {
+    display: inline-flex;
+    width: var(--slider-width, auto);
+    margin: 0 .3em;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.slider-inline .slider-input {
+    width: 12em;
+}
+
+.slider-small {
+    --slider-font-size: var(--slider-sm-font-size);
+    --slider-track-height: var(--slider-sm-track-height);
+    --slider-thumb-size: var(--slider-sm-thumb-size);
+    --slider-value-font-size: var(--slider-sm-value-font-size);
+}
+
+.slider-large {
+    --slider-font-size: var(--slider-lg-font-size);
+    --slider-track-height: var(--slider-lg-track-height);
+    --slider-thumb-size: var(--slider-lg-thumb-size);
+    --slider-endcap-size: var(--slider-lg-endcap-size);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .slider-input::-webkit-slider-thumb,
+    .slider-input::-moz-range-thumb {
+        transition: none;
+    }
+}
