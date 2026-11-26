@@ -1,0 +1,170 @@
+/*
+ * Radio component — used by the `radio` shortcode.
+ *
+ * Modelled on Apple's AppKit NSButton radio type: a small circular ring that
+ * fills with the accent color and reveals a centered dot when selected. A
+ * native radio input sits underneath, so the control works before JavaScript
+ * loads and keeps the browser's keyboard and screen-reader behavior.
+ *
+ * Geometry, colors, and motion are --radio-* variables, so a site stylesheet
+ * can retheme every radio.
+ */
+
+:root {
+    /* Layout and type */
+    --radio-font-size: var(--font-size-normal);
+    --radio-gap: .5em;
+    --radio-label-color: var(--font-color);
+
+    /* Ring and mark */
+    --radio-dot-size: 1.1em;
+    --radio-dot-bg: White;
+    --radio-dot-border-width: 1px;
+    --radio-dot-border-color: SlateGray;
+    --radio-mark-size: .42em;
+
+    /* Selected state */
+    --radio-checked-bg: CornflowerBlue;
+    --radio-mark-color: White;
+
+    /* Depth and motion */
+    --radio-dot-shadow: inset 0 .06em .12em rgba(0, 0, 0, .12);
+    --radio-dot-shadow-hover: inset 0 .06em .14em rgba(0, 0, 0, .2);
+    --radio-transition: var(--transition-duration-fast) ease;
+
+    /* Focus */
+    --radio-focus-color: RoyalBlue;
+    --radio-focus-width: 2px;
+    --radio-focus-offset: .18em;
+
+    --radio-disabled-opacity: .5;
+}
+
+.radio {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--radio-gap);
+    font-family: var(--sans-font);
+    font-size: var(--radio-font-size);
+    line-height: 1.2;
+    color: var(--radio-label-color);
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* The real control: hidden from sight, not from assistive technology. */
+.radio-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+    opacity: 0;
+}
+
+.radio-dot {
+    position: relative;
+    display: block;
+    flex: none;
+    box-sizing: border-box;
+    width: var(--radio-dot-size);
+    height: var(--radio-dot-size);
+    background-color: var(--radio-dot-bg);
+    border: var(--radio-dot-border-width) solid var(--radio-dot-border-color);
+    border-radius: 50%;
+    box-shadow: var(--radio-dot-shadow);
+    transition: background-color var(--radio-transition),
+        border-color var(--radio-transition),
+        box-shadow var(--radio-transition),
+        transform var(--radio-transition);
+}
+
+/* The centered mark: invisible and collapsed until the input is checked. */
+.radio-dot::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--radio-mark-size);
+    height: var(--radio-mark-size);
+    background-color: var(--radio-mark-color);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+    transition: opacity var(--radio-transition),
+        transform var(--radio-transition);
+}
+
+.radio-input:checked + .radio-dot {
+    background-color: var(--radio-checked-bg);
+    border-color: var(--radio-checked-bg);
+}
+
+.radio-input:checked + .radio-dot::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+@media (hover: hover) {
+    .radio:hover .radio-input:not(:checked) + .radio-dot {
+        border-color: DimGray;
+        box-shadow: var(--radio-dot-shadow-hover);
+    }
+}
+
+.radio:active .radio-dot {
+    transform: scale(.96);
+}
+
+.radio-input:focus-visible + .radio-dot {
+    outline: var(--radio-focus-width) solid var(--radio-focus-color);
+    outline-offset: var(--radio-focus-offset);
+}
+
+.radio-label {
+    min-width: 0;
+}
+
+/* Options written on consecutive lines share one paragraph, so the browser
+   collapses the newline to a single space. Add a little more room between
+   adjacent radios; blank-line-separated options get paragraph spacing
+   instead. */
+.radio + .radio {
+    margin-left: .75em;
+}
+
+.radio-small {
+    --radio-font-size: var(--font-size-small);
+    --radio-dot-size: 1em;
+    --radio-mark-size: .38em;
+}
+
+.radio-large {
+    --radio-font-size: var(--font-size-big);
+    --radio-dot-size: 1.2em;
+    --radio-mark-size: .46em;
+}
+
+.radio-disabled {
+    cursor: not-allowed;
+    opacity: var(--radio-disabled-opacity);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .radio-dot,
+    .radio-dot::after {
+        transition: none;
+    }
+
+    .radio:active .radio-dot {
+        transform: none;
+    }
+}
