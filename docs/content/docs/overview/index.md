@@ -24,13 +24,15 @@ site turn those components on or off.
   links, images, tables, and other everyday Markdown.
 - [Markdown Options and Extensions](../markdown-options-and-extensions/) covers
   the Goldmark settings that change how Markdown renders.
-- [Authoring Shortcodes](../authoring-shortcodes/) covers attachments,
-  admonitions, sidenotes, shell output, math, diagrams, and the other content
-  helpers.
-- [Interactive Shortcodes](../interactive-shortcodes/) covers buttons, form
-  controls, tabs, dropdowns, and the carousel.
-- [Miscellaneous Shortcodes](../miscellaneous-shortcodes/) covers the smaller
-  helpers that do not belong to a component.
+- [Shortcodes](../shortcodes/) covers the component library and content helpers:
+    - [Widgets & Components](../shortcodes/widgets-and-components/) covers icons, labels,
+      buttons, form controls, tabs, dropdowns, admonitions, details, the
+      carousel, and the code editor.
+    - [Authoring Shortcodes](../shortcodes/authoring-shortcodes/) covers
+      attachments, sidenotes, commands, math, diagrams, dropcaps, secrets, and
+      other content helpers.
+    - [Miscellaneous Shortcodes](../shortcodes/miscellaneous-shortcodes/)
+      covers the smaller helpers that do not belong to a component.
 - [Configuration and Customizations](../configuration-and-customizations/)
   covers site parameters, menus, and theme overrides.
 
