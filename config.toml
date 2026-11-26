@@ -31,6 +31,20 @@
         # "hover" (default) or "click"
         mode = "hover"
 
+    # Switch shortcode defaults ({{< switch >}}). Any shortcode argument wins.
+    [params.switch]
+        # Initial state: on (true) or off (false).
+        on = false
+        # Track color while on (any CSS color). Empty uses the theme's
+        # CornflowerBlue.
+        tintColor = ""
+        # Thumb color (any CSS color). Empty uses White.
+        thumbColor = ""
+        # small|s, medium|m, or large|l
+        size = "medium"
+        # Extra classes added to every switch.
+        class = ""
+
     # Breadcrumb bar under the header. Shown on every page by default; set
     # enable = false here, or `breadcrumb: false` in a page's front matter.
     # The Home crumb (text and icon) and section icons reuse menu.main entries.

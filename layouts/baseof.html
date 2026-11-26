@@ -167,6 +167,9 @@
 <body class="{{ block "body-class" . }}{{ end }}">
 	{{- partial "header" . -}}
 	{{- partial "breadcrumb.html" . -}}
+	{{- if .HasShortcode "switch" -}}
+		{{- .Store.Delete "alice-switch-js" -}}
+	{{- end -}}
 	{{- block "main" . -}}{{- end -}}
 	{{- partial "footer" . -}}
 </body>

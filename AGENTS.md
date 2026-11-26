@@ -96,6 +96,10 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
   - Styles: `static/css/dropdown.css`. Script: `static/js/dropdown.js` (linked in `baseof` `<head>` when the page has the shortcode or the header menu has children).
   - Left side optional `title` (markdownified); right side inline caret (solid triangle). Header menu entries still pass left-side HTML into the partial.
   - Mode `hover` (default) or `click` via shortcode arg, `params.dropdown.mode`, or `params.header.dropdown.mode` for the header. Hamburger menus always use `click`.
+- `switch`:
+  - Template: `layouts/_shortcodes/switch.html`. Styles: `static/css/switch.css` (imported by `style.css`).
+  - A native checkbox with `role="switch"` under a styled track and thumb, so it works without JavaScript and keeps keyboard/screen-reader behavior. The look follows Apple's UISwitch: a borderless pill track, a round thumb with a soft drop shadow, and a short iOS-style ease. Args: `on` (initial state), `tintColor` (on-track color), `thumbColor` (thumb fill, default White), `size` (`small`/`s`, `medium`/`m` default, `large`/`l`), `label` (inline Markdown), `id`, and `class`; a switch without a label gets an automatic `Switch` accessible name. Defaults: `params.switch` (`on`, `tintColor`, `thumbColor`, `size`, `class`).
+  - `js` takes a script URL/path (loaded once per page, page-bundle and `assets/` resources included) or inline source attached to the input's `change` event; `jsMode` forces the reading, `jsEvent` picks the event (`load` runs after `DOMContentLoaded`). `baseof.html` clears the page's `alice-switch-js` registry before the main block.
 - `carousel` and `slide`:
   - Image-only carousel; `carousel` wraps one or more `slide` children, and each `slide` is one image.
   - Shared partials: `layouts/_partials/carousel/navigator.html`, `layouts/_partials/carousel/position.html`, and `layouts/_partials/carousel/indicators.html` (holds every indicator style: dots, segments, counter, thumbnails).

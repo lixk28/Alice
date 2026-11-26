@@ -1,0 +1,200 @@
+{{- /*
+  Switch shortcode — a theme-styled on/off toggle built from a native checkbox.
+
+  Usage:
+    {{< switch label="Notifications" on=true >}}
+    {{< switch label="Large toggle" size="large" tintColor="RoyalBlue" >}}
+    {{< switch label="Run a script" js="/js/demo.js" >}}
+    {{< switch label="Inline code" js="console.log(el.id, el.checked)" >}}
+
+  Args (all optional):
+    on        — initial state: true|false (default: params.switch.on or false)
+    tintColor — CSS color of the track while the switch is on
+                (default: the theme's CornflowerBlue)
+    thumbColor — CSS color of the thumb (default: White)
+    size      — small|s, medium|m (default), or large|l
+    label     — visible text, inline Markdown
+    id        — input id (default: switch-<ordinal>)
+    class     — extra classes on the label wrapper
+    js        — a script URL/path, or inline JavaScript source. A URL/path
+                (http(s)://, //, /, ./, ../, a bare *.js path, a page-bundle
+                resource, or an assets/ resource) is loaded once per page
+                with <script src>; anything else is attached to the input
+                event
+    jsMode    — "auto" (default), "src", or "inline"; forces how js is read
+    jsEvent   — event that runs inline js (default: "change");
+                "load" runs it once after the DOM is ready
+
+  Site defaults live under params.switch. Colors, geometry, sizes, and
+  motion are --switch-* variables in static/css/switch.css.
+
+  The control is a native checkbox (role="switch"), so it keeps working
+  without JavaScript. A switch with no visible label gets aria-label="Switch".
+  Inline js runs as an event handler: `this` and `el` are the input element,
+  `event` is the event, and `el.checked` is the new state. With
+  jsEvent="load" the code runs after DOMContentLoaded instead, so `el` is
+  available and `event` is not.
+*/ -}}
+
+{{- /* Site defaults. Hugo lowercases config keys, while shortcode arguments
+       keep the case they were written in, so match the two case-insensitively. */ -}}
+{{- $siteSwitch := site.Params.switch | default dict -}}
+{{- $siteOpts := dict -}}
+{{- $defaultKeys := slice "on" "tintColor" "thumbColor" "size" "class" -}}
+{{- if reflect.IsMap $siteSwitch -}}
+	{{- range $key, $value := $siteSwitch -}}
+		{{- range $defaultKey := $defaultKeys -}}
+			{{- if eq (lower $defaultKey) (lower $key) -}}
+				{{- $siteOpts = merge $siteOpts (dict $defaultKey $value) -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $id := .Get "id" | default (printf "switch-%d" .Ordinal) -}}
+
+{{- $sizes := dict
+	"small" "small" "s" "small"
+	"medium" "medium" "m" "medium"
+	"large" "large" "l" "large"
+-}}
+{{- $sizeArg := lower (printf "%v" (.Get "size" | default (index $siteOpts "size") | default "medium")) -}}
+{{- $size := "medium" -}}
+{{- if isset $sizes $sizeArg -}}
+	{{- $size = index $sizes $sizeArg -}}
+{{- else -}}
+	{{- warnf "switch shortcode %q: unknown size %q; using \"medium\"" $id $sizeArg -}}
+{{- end -}}
+
+{{- /* on: a shortcode argument wins even when it is false; otherwise the
+       site default (also false when unset). .Get returns "" for a missing
+       key on a named-params shortcode, so check the Params map first. */ -}}
+{{- $onRaw := index $siteOpts "on" | default false -}}
+{{- if reflect.IsMap .Params -}}
+	{{- if isset .Params "on" -}}{{- $onRaw = .Get "on" -}}{{- end -}}
+{{- end -}}
+{{- $on := in (slice "true" "yes" "1" "on") (lower (printf "%v" $onRaw)) -}}
+
+{{- /* tintColor and thumbColor are CSS colors. Validate them so they cannot
+       escape the style attribute. An empty value leaves the theme variables
+       in charge. */ -}}
+{{- $colorVars := dict "tintColor" "--switch-on-bg" "thumbColor" "--switch-thumb-bg" -}}
+{{- $styleParts := slice -}}
+{{- range $name, $prop := $colorVars -}}
+	{{- $value := index $siteOpts $name | default "" -}}
+	{{- with $.Get $name -}}{{- $value = . -}}{{- end -}}
+	{{- with $value -}}
+		{{- $css := replaceRE `\s+` " " (printf "%v" .) | strings.TrimSpace -}}
+		{{- if findRE `^[#A-Za-z0-9_(),.%+/ -]+$` $css -}}
+			{{- $styleParts = $styleParts | append (printf "%s: %s" $prop $css) -}}
+		{{- else -}}
+			{{- warnf "switch shortcode %q: invalid %s %q; using the theme default" $id $name $css -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+{{- $style := delimit $styleParts "; " -}}
+
+{{- $label := .Get "label" | default "" -}}
+{{- $labelHTML := "" -}}
+{{- $labelText := "" -}}
+{{- with $label -}}
+	{{- $labelHTML = . | markdownify | strings.TrimSpace -}}
+	{{- $labelHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $labelHTML -}}
+	{{- $labelText = $labelHTML | plainify | strings.TrimSpace -}}
+{{- end -}}
+
+{{- $autoLabel := "" -}}
+{{- if not $labelText -}}{{- $autoLabel = "Switch" -}}{{- end -}}
+
+{{- $class := .Get "class" | default (index $siteOpts "class") | default "" -}}
+{{- $classes := slice "switch" (printf "switch-%s" $size) -}}
+{{- with $class -}}{{- $classes = $classes | append (printf "%v" .) -}}{{- end -}}
+{{- $classAttr := delimit $classes " " -}}
+
+{{- /* js: auto-detect a URL/path, otherwise treat the value as source. */ -}}
+{{- $jsRaw := trim (printf "%v" (.Get "js" | default "")) " \t\r\n" -}}
+{{- $jsMode := lower (printf "%v" (.Get "jsMode" | default "auto")) -}}
+{{- if not (in (slice "auto" "src" "inline") $jsMode) -}}
+	{{- warnf "switch shortcode %q: unknown jsMode %q; using \"auto\"" $id $jsMode -}}
+	{{- $jsMode = "auto" -}}
+{{- end -}}
+{{- $jsIsSrc := false -}}
+{{- if $jsRaw -}}
+	{{- if eq $jsMode "src" -}}
+		{{- $jsIsSrc = true -}}
+	{{- else if eq $jsMode "inline" -}}
+		{{- $jsIsSrc = false -}}
+	{{- else if not (findRE `\s` $jsRaw) -}}
+		{{- if or
+			(hasPrefix $jsRaw "http://")
+			(hasPrefix $jsRaw "https://")
+			(hasPrefix $jsRaw "//")
+			(hasPrefix $jsRaw "/")
+			(hasPrefix $jsRaw "./")
+			(hasPrefix $jsRaw "../")
+			(findRE `^[A-Za-z0-9_@%+~./-]+\.js([?#].*)?$` $jsRaw)
+		-}}
+			{{- $jsIsSrc = true -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $jsEvent := lower (printf "%v" (.Get "jsEvent" | default "change")) -}}
+{{- if not (findRE `^[a-z][a-z0-9_:-]*$` $jsEvent) -}}
+	{{- warnf "switch shortcode %q: invalid jsEvent %q; using \"change\"" $id $jsEvent -}}
+	{{- $jsEvent = "change" -}}
+{{- end -}}
+
+<label class="{{ $classAttr }}"{{ with $style }} style="{{ . | safeCSS }}"{{ end }}>
+	<input class="switch-input" id="{{ $id }}" type="checkbox" role="switch"
+		{{- if $on }} checked{{ end }}
+		{{- with $autoLabel }} aria-label="{{ . }}"{{ end }}>
+	<span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+	{{- with $labelHTML }}
+	<span class="switch-label">{{ . | safeHTML }}</span>
+	{{- end }}
+</label>
+
+{{- if and $jsRaw $jsIsSrc -}}
+	{{- $remote := or (hasPrefix $jsRaw "http://") (hasPrefix $jsRaw "https://") (hasPrefix $jsRaw "//") -}}
+	{{- $jsURL := "" -}}
+	{{- if $remote -}}
+		{{- $jsURL = $jsRaw -}}
+	{{- else -}}
+		{{- /* A page-bundle resource is published and referenced directly;
+		       a global asset is published the same way; anything else is a
+		       site-relative path. */ -}}
+		{{- with .Page.Resources.GetMatch $jsRaw -}}{{- $jsURL = .RelPermalink -}}{{- end -}}
+		{{- if not $jsURL -}}
+			{{- with resources.Get $jsRaw -}}{{- $jsURL = .RelPermalink -}}{{- end -}}
+		{{- end -}}
+		{{- if not $jsURL -}}{{- $jsURL = $jsRaw | relURL -}}{{- end -}}
+	{{- end -}}
+	{{- $registered := .Page.Store.Get "alice-switch-js" | default slice -}}
+	{{- if not (in $registered $jsURL) -}}
+		{{- .Page.Store.Set "alice-switch-js" ($registered | append $jsURL) -}}
+<script src="{{ $jsURL }}" defer></script>
+	{{- end -}}
+{{- else if $jsRaw -}}
+	{{- $jsCode := replaceRE "(?i)</(script)" "<\\/$1" $jsRaw -}}
+	{{- if eq $jsEvent "load" -}}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	{{ $jsCode | safeJS }}
+});
+</script>
+	{{- else -}}
+<script>
+(function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	el.addEventListener({{ $jsEvent }}, function (event) {
+		if (el.disabled) return;
+		{{ $jsCode | safeJS }}
+	});
+})();
+</script>
+	{{- end -}}
+{{- end -}}

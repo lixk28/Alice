@@ -1,0 +1,135 @@
+/*
+ * Switch component — used by the `switch` shortcode.
+ *
+ * Modelled on Apple's UISwitch: a borderless pill track, a round thumb with
+ * a soft drop shadow, and a short iOS-style ease. A native checkbox is
+ * visually hidden underneath, so the switch works before JavaScript loads
+ * and keeps the checkbox's keyboard and screen-reader behavior. Geometry,
+ * colors, and motion are --switch-* variables, so a site stylesheet can
+ * retheme it.
+ */
+
+:root {
+    /* Size and layout */
+    --switch-font-size: var(--font-size-normal);
+    --switch-gap: .5em;
+    --switch-label-color: var(--font-color);
+    --switch-track-width: 2.6em;
+    --switch-track-height: 1.58em;
+    --switch-track-padding: .12em;
+
+    /* Colors */
+    --switch-off-bg: Gainsboro;
+    --switch-on-bg: CornflowerBlue;
+    --switch-thumb-bg: White;
+
+    /* Depth and motion */
+    --switch-thumb-shadow: 0 .12em .3em rgba(0, 0, 0, .18),
+        0 .03em .06em rgba(0, 0, 0, .12);
+    --switch-thumb-shadow-hover: 0 .16em .36em rgba(0, 0, 0, .22),
+        0 .04em .08em rgba(0, 0, 0, .12);
+    --switch-duration: var(--transition-duration-slow);
+    --switch-ease: cubic-bezier(.32, .72, 0, 1);
+    --switch-thumb-duration: var(--transition-duration-fast);
+
+    /* Focus */
+    --switch-focus-color: RoyalBlue;
+    --switch-focus-width: 2px;
+    --switch-focus-offset: .18em;
+}
+
+.switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--switch-gap);
+    font-family: var(--sans-font);
+    font-size: var(--switch-font-size);
+    line-height: 1.2;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* The real control: hidden from sight, not from assistive technology. */
+.switch-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+    opacity: 0;
+}
+
+.switch-track {
+    display: block;
+    flex: none;
+    box-sizing: border-box;
+    width: var(--switch-track-width);
+    height: var(--switch-track-height);
+    padding: var(--switch-track-padding);
+    background-color: var(--switch-off-bg);
+    border-radius: calc(var(--switch-track-height) / 2);
+    transition: background-color var(--switch-duration) var(--switch-ease);
+}
+
+.switch-thumb {
+    display: block;
+    box-sizing: border-box;
+    width: calc(var(--switch-track-height) - var(--switch-track-padding) * 2);
+    height: calc(var(--switch-track-height) - var(--switch-track-padding) * 2);
+    background-color: var(--switch-thumb-bg);
+    border-radius: 50%;
+    box-shadow: var(--switch-thumb-shadow);
+    transform: translateX(0);
+    transition: transform var(--switch-duration) var(--switch-ease),
+        background-color var(--switch-thumb-duration) ease,
+        box-shadow var(--switch-thumb-duration) ease;
+}
+
+.switch-input:checked + .switch-track {
+    background-color: var(--switch-on-bg);
+}
+
+/* With border-box and the same inset on both sides, the thumb travels the
+   difference between the track width and its height, landing evenly inset. */
+.switch-input:checked + .switch-track .switch-thumb {
+    transform: translateX(calc(var(--switch-track-width) - var(--switch-track-height)));
+}
+
+@media (hover: hover) {
+    .switch:hover .switch-thumb {
+        box-shadow: var(--switch-thumb-shadow-hover);
+    }
+}
+
+.switch-input:focus-visible + .switch-track {
+    outline: var(--switch-focus-width) solid var(--switch-focus-color);
+    outline-offset: var(--switch-focus-offset);
+}
+
+.switch-label {
+    min-width: 0;
+    color: var(--switch-label-color);
+}
+
+.switch-small {
+    --switch-font-size: var(--font-size-small);
+}
+
+.switch-large {
+    --switch-font-size: var(--font-size-big);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .switch-track,
+    .switch-thumb {
+        transition: none;
+    }
+}
