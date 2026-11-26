@@ -172,6 +172,89 @@ Site-wide defaults and theming:
 
 `static/css/label.css` exposes `--label-font-size`, `--label-color`, `--label-bgcolor`, `--label-border-*`, `--label-shadow`, `--label-padding-*`, `--label-gap`, and `--label-icon-size`, so a custom stylesheet can retheme every label.
 
+## Tabs
+
+### Single Tab
+
+Single tab:
+{{< tab "An orphan tab" >}}
+So lonely
+{{< /tab >}}
+
+### Tab Panels
+
+Tab panel `{{</* tabpanel */>}}` with tab1 selected `choice=2` by default:
+{{< tabpanel choice=2 >}}
+
+{{< tab >}}
+1
+{{< /tab >}}
+
+{{< tab >}}
+22
+{{< /tab >}}
+
+{{< tab >}}
+333
+{{< /tab >}}
+
+{{< tab >}}
+4444
+{{< /tab >}}
+
+{{< /tabpanel >}}
+
+nested tab panels:
+{{< tabpanel >}}
+
+{{< tab >}}
+{{< loremipsum paragraphs=1 >}}
+{{< /tab >}}
+
+{{< tab "NEST BABY" >}}
+{{< tabpanel >}}
+
+{{< tab >}}
+Yeah, you like that?
+{{< /tab >}}
+
+{{< tab "MORE NEST BABY" >}}
+{{< tab "FREAKING NEST BABY" >}}
+```C
+#include <stdio.h>
+
+int main() {
+    printf("WE NEED NEST!!!");
+    return 0;
+}
+```
+{{< /tab >}}
+{{< /tab >}}
+{{< /tabpanel >}}
+
+{{< /tab >}}
+
+{{< /tabpanel >}}
+
+### Grouping Tabs
+
+You can also group several tab panels by specifying the `group` attribute.
+It's used for synchronizing tab choices across tab panels in the same group, e.g. a doc on different platforms.
+
+{{< tabpanel group="os" >}}
+{{< tab "Linux" >}} Hello {{< /tab >}}
+{{< tab "Windows" >}} o_O {{< /tab >}}
+{{< tab "macOS" >}} O_O {{< /tab >}}
+{{< /tabpanel >}}
+
+{{< tabpanel group="os" >}}
+{{< tab "Linux" >}} World {{< /tab >}}
+{{< tab "Windows" >}} Win {{< /tab >}}
+{{< tab "macOS" >}} Mac {{< /tab >}}
+{{< /tabpanel >}}
+
+Tab choices are persistent, try reloading this page.
+
 ## Dropdown
 
 Floating panel with an optional left-side `title` and a play caret on the right. The same partial also powers nested header menu items (any `menu.main` entry with `parent` children).
