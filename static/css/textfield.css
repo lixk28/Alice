@@ -1,0 +1,222 @@
+/*
+ * TextField component — used by the `textfield` shortcode.
+ *
+ * A multi-line block text field: a thin SlateGray border, a small inset
+ * shadow, and a soft focus ring in RoyalBlue. An optional icon sits at the
+ * top of the block on the left or right, and an optional tip renders as a
+ * small hint below it. The control is a native <textarea>, so it works
+ * before JavaScript loads, keeps the browser's resize handle, and keeps the
+ * keyboard, selection, and screen-reader behavior.
+ *
+ * Geometry, colors, sizes, and motion are --textfield-* variables, so a site
+ * stylesheet can retheme every text field.
+ */
+
+:root {
+    /* Layout and type */
+    --textfield-font-size: var(--font-size-normal);
+    --textfield-gap: .35em;
+    --textfield-label-color: var(--font-color);
+    --textfield-text-color: var(--font-color);
+    --textfield-placeholder-color: DimGray;
+    --textfield-line-height: 1.5;
+
+    /* Field surface */
+    --textfield-field-bg: White;
+    --textfield-border-width: 1px;
+    --textfield-border-color: SlateGray;
+    --textfield-border-radius: .3em;
+    --textfield-padding-y: .55em;
+    --textfield-padding-x: .7em;
+
+    /* Icon inside the block */
+    --textfield-icon-color: SlateGray;
+    --textfield-icon-size: 1.1em;
+    --textfield-icon-gap: .5em;
+
+    /* Tip below the field */
+    --textfield-tip-color: DimGray;
+    --textfield-tip-font-size: var(--font-size-small);
+
+    /* Depth and motion */
+    --textfield-field-shadow: inset 0 .06em .12em rgba(0, 0, 0, .08);
+    --textfield-field-shadow-hover: inset 0 .06em .14em rgba(0, 0, 0, .14);
+    --textfield-transition: var(--transition-duration-fast) ease;
+
+    /* Focus */
+    --textfield-focus-color: RoyalBlue;
+    --textfield-focus-width: 2px;
+    --textfield-focus-offset: .16em;
+
+    --textfield-disabled-opacity: .5;
+
+    /* Sizes */
+    --textfield-sm-font-size: var(--font-size-small);
+    --textfield-sm-padding-y: .45em;
+    --textfield-sm-padding-x: .6em;
+    --textfield-sm-icon-size: 1em;
+    --textfield-sm-tip-font-size: var(--font-size-tiny);
+
+    --textfield-lg-font-size: var(--font-size-big);
+    --textfield-lg-padding-y: .65em;
+    --textfield-lg-padding-x: .85em;
+    --textfield-lg-icon-size: 1.25em;
+    --textfield-lg-tip-font-size: var(--font-size-small);
+}
+
+.textfield {
+    display: flex;
+    flex-direction: column;
+    gap: var(--textfield-gap);
+    width: var(--textfield-width, 100%);
+    max-width: 100%;
+    margin: 1em 0;
+    font-family: var(--sans-font);
+    font-size: var(--textfield-font-size);
+    line-height: 1.2;
+    color: var(--textfield-label-color);
+}
+
+.textfield-label {
+    min-width: 0;
+    cursor: pointer;
+}
+
+/* The visible field. The textarea fills it, so the whole block is a click
+   target and the icon can be laid over the textarea's top padding. */
+.textfield-field {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    background-color: var(--textfield-field-bg);
+    border: var(--textfield-border-width) solid var(--textfield-border-color);
+    border-radius: var(--textfield-border-radius);
+    box-shadow: var(--textfield-field-shadow);
+    transition: border-color var(--textfield-transition),
+        box-shadow var(--textfield-transition);
+}
+
+.textfield-input {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    padding: var(--textfield-padding-y) var(--textfield-padding-x);
+    font: inherit;
+    line-height: var(--textfield-line-height);
+    color: var(--textfield-text-color);
+    background: transparent;
+    border: 0;
+    border-radius: inherit;
+    outline: none;
+    resize: var(--textfield-resize, vertical);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Leave room for the icon on the side that holds it. The icon aligns with
+   the first line rather than centering over the whole block. */
+.textfield-field-icon-start .textfield-input {
+    padding-left: calc(
+        var(--textfield-padding-x) + var(--textfield-icon-size) + var(--textfield-icon-gap)
+    );
+}
+
+.textfield-field-icon-end .textfield-input {
+    padding-right: calc(
+        var(--textfield-padding-x) + var(--textfield-icon-size) + var(--textfield-icon-gap)
+    );
+}
+
+.textfield-input::placeholder {
+    color: var(--textfield-placeholder-color);
+    opacity: 1;
+}
+
+.textfield-icon {
+    position: absolute;
+    top: calc(
+        var(--textfield-padding-y) +
+            (var(--textfield-line-height) * 1em - var(--textfield-icon-size)) / 2
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--textfield-icon-color);
+    pointer-events: none;
+    line-height: 1;
+}
+
+.textfield-icon-start {
+    left: var(--textfield-padding-x);
+}
+
+.textfield-icon-end {
+    right: var(--textfield-padding-x);
+}
+
+.textfield-icon svg {
+    display: block;
+    width: var(--textfield-icon-size);
+    height: var(--textfield-icon-size);
+}
+
+.textfield-tip {
+    font-size: var(--textfield-tip-font-size);
+    line-height: 1.4;
+    color: var(--textfield-tip-color);
+}
+
+@media (hover: hover) {
+    .textfield:not(.textfield-disabled) .textfield-field:hover {
+        border-color: DimGray;
+        box-shadow: var(--textfield-field-shadow-hover);
+    }
+}
+
+/* The textarea has no outline of its own; the field shows the focus ring. The
+   border change works everywhere, and the ring uses :focus-visible so a mouse
+   click does not draw it. */
+.textfield-field:focus-within {
+    border-color: var(--textfield-focus-color);
+}
+
+.textfield-field:has(.textfield-input:focus-visible) {
+    outline: var(--textfield-focus-width) solid var(--textfield-focus-color);
+    outline-offset: var(--textfield-focus-offset);
+}
+
+.textfield-input:disabled {
+    cursor: not-allowed;
+}
+
+.textfield-input:read-only:not(:disabled) {
+    cursor: default;
+}
+
+.textfield-disabled {
+    opacity: var(--textfield-disabled-opacity);
+}
+
+.textfield-small {
+    --textfield-font-size: var(--textfield-sm-font-size);
+    --textfield-padding-y: var(--textfield-sm-padding-y);
+    --textfield-padding-x: var(--textfield-sm-padding-x);
+    --textfield-icon-size: var(--textfield-sm-icon-size);
+    --textfield-tip-font-size: var(--textfield-sm-tip-font-size);
+}
+
+.textfield-large {
+    --textfield-font-size: var(--textfield-lg-font-size);
+    --textfield-padding-y: var(--textfield-lg-padding-y);
+    --textfield-padding-x: var(--textfield-lg-padding-x);
+    --textfield-icon-size: var(--textfield-lg-icon-size);
+    --textfield-tip-font-size: var(--textfield-lg-tip-font-size);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .textfield-field {
+        transition: none;
+    }
+}
