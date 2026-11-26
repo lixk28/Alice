@@ -1,0 +1,93 @@
+/*
+ * Label component — used by the `label` shortcode and the `label.html` partial.
+ *
+ * A label is an inline-flex chip: font size, text color, background, border,
+ * radius, padding, gap, shadow, and font weight are all --label-* variables,
+ * so a shortcode argument or a custom stylesheet can retheme it. Size presets
+ * only re-point those variables; explicit arguments win because they are set
+ * inline.
+ */
+
+:root {
+    --label-font-size: var(--font-size-small);
+    --label-font-weight: 500;
+    --label-line-height: 1.2;
+    --label-padding-block: .15em;
+    --label-padding-inline: .5em;
+    --label-gap: .35em;
+    --label-color: var(--font-color);
+    --label-bgcolor: White;
+    --label-border-width: 1px;
+    --label-border-style: solid;
+    --label-border-color: Silver;
+    --label-border-radius: .3em;
+    --label-shadow: none;
+    --label-icon-size: 1em;
+}
+
+.label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--label-gap);
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: var(--label-padding, var(--label-padding-block) var(--label-padding-inline));
+    font-family: var(--sans-font);
+    font-size: var(--label-font-size);
+    font-weight: var(--label-font-weight);
+    line-height: var(--label-line-height);
+    color: var(--label-color);
+    background: var(--label-bgcolor);
+    border: var(--label-border, var(--label-border-width) var(--label-border-style) var(--label-border-color));
+    border-radius: var(--label-border-radius);
+    box-shadow: var(--label-shadow);
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.label-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.label-icon {
+    flex: none;
+}
+
+.label-2xs {
+    --label-font-size: .7rem;
+    --label-padding-block: .05em;
+    --label-padding-inline: .3em;
+    --label-gap: .2em;
+}
+
+.label-xs {
+    --label-font-size: var(--font-size-tiny);
+    --label-padding-block: .1em;
+    --label-padding-inline: .4em;
+    --label-gap: .25em;
+}
+
+.label-sm {
+    --label-font-size: var(--font-size-small);
+    --label-padding-block: .15em;
+    --label-padding-inline: .5em;
+    --label-gap: .35em;
+}
+
+.label-md {
+    --label-font-size: var(--font-size-normal);
+    --label-padding-block: .2em;
+    --label-padding-inline: .6em;
+    --label-gap: .4em;
+}
+
+.label-lg {
+    --label-font-size: var(--font-size-big);
+    --label-padding-block: .25em;
+    --label-padding-inline: .75em;
+    --label-gap: .45em;
+}

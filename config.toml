@@ -320,6 +320,34 @@
     [params.icons]
         placeholder = "svg/placeholder.svg"
 
+    # Label shortcode defaults ({{< label >}}). Any shortcode argument wins.
+    [params.label]
+        # 2xs|xs|sm|md|lg, or a CSS font-size length.
+        size = "sm"
+        # Text and surface colors (any CSS color). Empty uses the theme defaults.
+        color = ""
+        backgroundColor = ""
+        # Full CSS border shorthand. Empty uses 1px solid Silver (the
+        # borderWidth/borderStyle/borderColor chain).
+        border = ""
+        borderWidth = ""
+        borderStyle = ""
+        borderColor = ""
+        borderRadius = ""
+        # CSS box-shadow. Empty uses none.
+        shadow = ""
+        # CSS padding shorthand. Empty follows the size preset.
+        padding = ""
+        # CSS font-weight. Empty uses 500.
+        fontWeight = ""
+        # Gap between the icon and text. Empty follows the size preset.
+        gap = ""
+        # Icon size and color. Empty uses 1em and the label text color.
+        iconSize = ""
+        iconColor = ""
+        # Extra classes added to every label.
+        class = ""
+
     [params.footer]
         # Should display site generator (Hugo) and theme (Alice) 🥰
         showHugoAlice = true

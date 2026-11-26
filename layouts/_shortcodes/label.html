@@ -1,0 +1,79 @@
+{{- /*
+  Label shortcode — a compact inline label with per-label typography, color,
+  background, border, shadow, and an optional left/right icon.
+
+  Usage:
+    {{< label >}}Default{{< /label >}}
+    {{< label text="New" backgroundColor="AliceBlue" borderColor="RoyalBlue" >}}
+    {{< label icon="check" color="DarkGreen" backgroundColor="Honeydew" >}}Passed{{< /label >}}
+    {{< label icon="chevron-right" iconPos="right" shadow=".1em .1em .2em Silver" >}}Next{{< /label >}}
+
+  Text comes from the inner content (inline Markdown) or, when the shortcode is
+  self-closing, from `text` (`label` is accepted as an alias). Inner content wins.
+
+  Args (all optional):
+    text            — label text, inline Markdown
+    size            — 2xs|xs|sm|md|lg, or a CSS font-size length
+                      (default: params.label.size or "sm")
+    fontSize        — CSS font-size override
+    color           — text color (any CSS color)
+    backgroundColor — surface color (any CSS color)
+    border          — full CSS border shorthand, e.g. "1px solid Silver";
+                      wins over borderWidth/borderStyle/borderColor
+    borderWidth     — CSS border width
+    borderStyle     — CSS border style
+    borderColor     — CSS border color
+    borderRadius    — CSS border radius
+    shadow          — CSS box-shadow
+    padding         — CSS padding shorthand (overrides the size preset)
+    fontWeight      — CSS font-weight
+    gap             — gap between the icon and the text
+    icon            — icon path, or a bare icon name such as "check"
+    iconName        — icon name inside iconSet
+    iconSet         — icon set directory under static/svg
+    iconPos         — left (default) or right; start/end and before/after work
+    iconSize        — CSS icon size (default: 1em)
+    iconColor       — CSS icon color (default: the label text color)
+    id              — span id
+    title           — native tooltip
+    ariaLabel       — accessible name for an icon-only label
+    class           — extra classes on the span
+
+  Rendering lives in layouts/_partials/label.html; the icon is resolved through
+  layouts/_partials/icon.html. Styles are in static/css/label.css and defaults
+  under params.label.
+*/ -}}
+{{- $text := "" -}}
+{{- if .Inner -}}
+	{{- $text = trim .InnerDeindent " \t\r\n" -}}
+{{- end -}}
+{{- if not $text -}}
+	{{- $text = .Get "text" | default (.Get "label") | default "" -}}
+{{- end -}}
+{{- $args := dict
+	"text" $text
+	"size" (.Get "size" | default "")
+	"fontSize" (.Get "fontSize" | default "")
+	"color" (.Get "color" | default "")
+	"backgroundColor" (.Get "backgroundColor" | default "")
+	"border" (.Get "border" | default "")
+	"borderWidth" (.Get "borderWidth" | default "")
+	"borderStyle" (.Get "borderStyle" | default "")
+	"borderColor" (.Get "borderColor" | default "")
+	"borderRadius" (.Get "borderRadius" | default "")
+	"shadow" (.Get "shadow" | default "")
+	"padding" (.Get "padding" | default "")
+	"fontWeight" (.Get "fontWeight" | default "")
+	"gap" (.Get "gap" | default "")
+	"icon" (.Get "icon" | default "")
+	"iconName" (.Get "iconName" | default "")
+	"iconSet" (.Get "iconSet" | default "")
+	"iconPos" (.Get "iconPos" | default "")
+	"iconSize" (.Get "iconSize" | default "")
+	"iconColor" (.Get "iconColor" | default "")
+	"id" (.Get "id" | default "")
+	"title" (.Get "title" | default "")
+	"ariaLabel" (.Get "ariaLabel" | default "")
+	"class" (.Get "class" | default "")
+-}}
+{{- partial "label.html" $args -}}

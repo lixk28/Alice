@@ -1,0 +1,218 @@
+{{- /*
+Label renderer — an inline-flex label with per-label typography, color,
+surface, border, and shadow, plus an optional icon on the left or right.
+
+The `label` shortcode calls this partial; templates can call it directly with
+the same flat dict. Text is inline Markdown.
+
+Parameters (flat dict, all optional):
+  text            — label text (inline Markdown); the shortcode's inner content wins
+  size            — 2xs|xs|sm|md|lg preset, or a CSS font-size length (default: params.label.size or "sm")
+  fontSize        — CSS font-size override
+  color           — text color
+  backgroundColor — surface color
+  border          — full CSS border shorthand (wins over the individual border controls)
+  borderWidth     — CSS border width
+  borderStyle     — CSS border style
+  borderColor     — CSS border color
+  borderRadius    — CSS border radius
+  shadow          — CSS box-shadow
+  padding         — CSS padding shorthand (overrides the size preset's padding)
+  fontWeight      — CSS font-weight
+  gap             — gap between the icon and text
+  icon            — icon path, or a bare icon name
+  iconName        — icon name inside iconSet
+  iconSet         — icon set directory for iconName
+  iconPos         — left|right (start/end and before/after are aliases)
+  iconSize        — CSS icon size (default: 1em via --label-icon-size)
+  iconColor       — CSS icon color (default: the label text color)
+  id              — span id
+  title           — native tooltip
+  ariaLabel       — accessible name for an icon-only label
+  class           — extra class(es) on the span; a list is joined with spaces
+
+Site defaults: params.label. Any shortcode argument overrides them.
+Stylesheet: static/css/label.css, imported by style.css.
+*/ -}}
+{{- $ctx := . -}}
+
+{{- /* Site defaults: Hugo lowercases config keys, so map them back to the
+       camelCase argument names case-insensitively. */ -}}
+{{- $siteOpts := dict -}}
+{{- $siteRaw := site.Params.label | default dict -}}
+{{- $defaultKeys := slice
+	"size" "fontSize" "color" "backgroundColor" "border" "borderWidth" "borderStyle"
+	"borderColor" "borderRadius" "shadow" "padding" "fontWeight" "gap"
+	"iconSize" "iconColor" "class"
+-}}
+{{- if reflect.IsMap $siteRaw -}}
+	{{- range $key, $value := $siteRaw -}}
+		{{- range $defaultKey := $defaultKeys -}}
+			{{- if eq (lower $defaultKey) (lower $key) -}}
+				{{- $siteOpts = merge $siteOpts (dict $defaultKey $value) -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+{{- $opts := $siteOpts -}}
+{{- if reflect.IsMap $ctx -}}
+	{{- range $key, $value := $ctx -}}
+		{{- if $value -}}
+			{{- $opts = merge $opts (dict $key $value) -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Text: inline Markdown; strip the single wrapping paragraph. */ -}}
+{{- $textHTML := "" -}}
+{{- with trim (printf "%v" ($opts.text | default "")) " \t\r\n" -}}
+	{{- $textHTML = . | markdownify | strings.TrimSpace -}}
+	{{- $textHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $textHTML -}}
+{{- end -}}
+
+{{- /* Size presets scale font and padding; a CSS length is treated as a
+       font-size override. */ -}}
+{{- $sizePresets := dict
+	"2xs" "2xs" "xxs" "2xs"
+	"xs" "xs"
+	"s" "sm" "sm" "sm" "small" "sm"
+	"m" "md" "md" "md" "medium" "md" "normal" "md"
+	"l" "lg" "lg" "lg" "large" "lg"
+-}}
+{{- $sizeRaw := trim (printf "%v" ($opts.size | default "sm")) " \t\r\n" -}}
+{{- $sizeKey := lower $sizeRaw -}}
+{{- $size := "sm" -}}
+{{- $customFontSize := "" -}}
+{{- if isset $sizePresets $sizeKey -}}
+	{{- $size = index $sizePresets $sizeKey -}}
+{{- else if $sizeRaw -}}
+	{{- $value := $sizeRaw -}}
+	{{- if findRE `^([0-9]+(\.[0-9]+)?|\.[0-9]+)$` $value -}}
+		{{- $value = printf "%spx" $value -}}
+	{{- end -}}
+	{{- $ok := or
+		(findRE `^([0-9]+(\.[0-9]+)?|\.[0-9]+)(px|em|rem|ex|ch|vw|vh|vmin|vmax|%|pt|pc|cm|mm|in)$` $value)
+		(findRE `^var\(--[A-Za-z0-9_-]+\)$` $value)
+		(findRE `^(calc|clamp|min|max)\([0-9A-Za-z%.,+*/( )-]+\)$` $value)
+	-}}
+	{{- if $ok -}}
+		{{- $customFontSize = $value -}}
+	{{- else -}}
+		{{- warnf "label: invalid size %q; using \"sm\"" $sizeRaw -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* fontSize overrides the size preset or the size-as-length. */ -}}
+{{- with trim (printf "%v" ($opts.fontSize | default "")) " \t\r\n" -}}
+	{{- $value := . -}}
+	{{- if findRE `^([0-9]+(\.[0-9]+)?|\.[0-9]+)$` $value -}}
+		{{- $value = printf "%spx" $value -}}
+	{{- end -}}
+	{{- $ok := or
+		(findRE `^([0-9]+(\.[0-9]+)?|\.[0-9]+)(px|em|rem|ex|ch|vw|vh|vmin|vmax|%|pt|pc|cm|mm|in)$` $value)
+		(findRE `^var\(--[A-Za-z0-9_-]+\)$` $value)
+		(findRE `^(calc|clamp|min|max)\([0-9A-Za-z%.,+*/( )-]+\)$` $value)
+	-}}
+	{{- if $ok -}}
+		{{- $customFontSize = $value -}}
+	{{- else -}}
+		{{- warnf "label: invalid fontSize %q; using the size default" $value -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Every remaining visual control is a CSS value exposed as a custom
+       property in the style attribute. */ -}}
+{{- $styleVars := dict
+	"color" "--label-color"
+	"backgroundColor" "--label-bgcolor"
+	"border" "--label-border"
+	"borderWidth" "--label-border-width"
+	"borderStyle" "--label-border-style"
+	"borderColor" "--label-border-color"
+	"borderRadius" "--label-border-radius"
+	"shadow" "--label-shadow"
+	"padding" "--label-padding"
+	"fontWeight" "--label-font-weight"
+	"gap" "--label-gap"
+-}}
+{{- $styleParts := slice -}}
+{{- range $key, $prop := $styleVars -}}
+	{{- with trim (printf "%v" (index $opts $key | default "")) " \t\r\n" -}}
+		{{- $value := replaceRE `\s+` " " . -}}
+		{{- if findRE `^[#A-Za-z0-9_(),.%+/ *-]+$` $value -}}
+			{{- $styleParts = $styleParts | append (printf "%s: %s" $prop $value) -}}
+		{{- else -}}
+			{{- warnf "label: invalid %s %q; using the default" $key $value -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+{{- with $customFontSize -}}
+	{{- $styleParts = $styleParts | append (printf "--label-font-size: %s" .) -}}
+{{- end -}}
+{{- $style := delimit $styleParts "; " -}}
+
+{{- /* Icon: `icon` may be a path or a bare name; an explicit iconName wins
+       only when `icon` is empty. */ -}}
+{{- $iconPath := "" -}}
+{{- $iconName := trim (printf "%v" ($opts.iconName | default "")) " \t\r\n" -}}
+{{- with trim (printf "%v" ($opts.icon | default "")) " \t\r\n" -}}
+	{{- if strings.Contains . "/" -}}
+		{{- $iconPath = . -}}
+	{{- else -}}
+		{{- $iconName = . -}}
+	{{- end -}}
+{{- end -}}
+{{- $iconPos := lower (printf "%v" ($opts.iconPos | default "left")) -}}
+{{- if in (slice "start" "before" "begin") $iconPos -}}
+	{{- $iconPos = "left" -}}
+{{- else if in (slice "end" "after") $iconPos -}}
+	{{- $iconPos = "right" -}}
+{{- end -}}
+{{- if not (in (slice "left" "right") $iconPos) -}}
+	{{- warnf "label: invalid iconPos %q; using \"left\"" $iconPos -}}
+	{{- $iconPos = "left" -}}
+{{- end -}}
+{{- $iconHTML := "" -}}
+{{- if or $iconPath $iconName -}}
+	{{- $iconHTML = partial "icon.html" (dict
+		"path" $iconPath
+		"name" $iconName
+		"set" ($opts.iconSet | default "")
+		"size" ($opts.iconSize | default "var(--label-icon-size)")
+		"color" ($opts.iconColor | default "currentColor")
+		"class" "label-icon"
+		"styled" true
+	) -}}
+{{- end -}}
+
+{{- $class := $opts.class | default "" -}}
+{{- if reflect.IsSlice $class -}}{{- $class = delimit $class " " -}}{{- end -}}
+{{- $class = trim (printf "%v" $class) " \t\r\n" -}}
+{{- $classes := slice "label" (printf "label-%s" $size) -}}
+{{- with $class -}}{{- $classes = $classes | append . -}}{{- end -}}
+{{- $classAttr := delimit $classes " " -}}
+
+{{- $id := trim (printf "%v" ($opts.id | default "")) " \t\r\n" -}}
+{{- $title := trim (printf "%v" ($opts.title | default "")) " \t\r\n" -}}
+{{- $ariaLabel := trim (printf "%v" ($opts.ariaLabel | default "")) " \t\r\n" -}}
+{{- if and (not $textHTML) (not $ariaLabel) $title -}}{{- $ariaLabel = $title -}}{{- end -}}
+
+{{- $textBlock := "" -}}
+{{- with $textHTML -}}
+	{{- $textBlock = printf `<span class="label-text">%s</span>` . -}}
+{{- end -}}
+{{- $iconLeft := "" -}}
+{{- $iconRight := "" -}}
+{{- if eq $iconPos "left" -}}{{- $iconLeft = $iconHTML -}}{{- else -}}{{- $iconRight = $iconHTML -}}{{- end -}}
+
+{{- $attrParts := slice (printf `class="%s"` (htmlEscape $classAttr)) -}}
+{{- with $id -}}{{- $attrParts = $attrParts | append (printf `id="%s"` (htmlEscape .)) -}}{{- end -}}
+{{- with $title -}}{{- $attrParts = $attrParts | append (printf `title="%s"` (htmlEscape .)) -}}{{- end -}}
+{{- with $ariaLabel -}}
+	{{- $attrParts = $attrParts | append (printf `aria-label="%s"` (htmlEscape .)) -}}
+	{{- if not $textHTML -}}{{- $attrParts = $attrParts | append `role="img"` -}}{{- end -}}
+{{- end -}}
+{{- with $style -}}{{- $attrParts = $attrParts | append (printf `style="%s"` (. | safeCSS)) -}}{{- end -}}
+{{- $attrString := delimit $attrParts " " -}}
+{{- $labelHTML := printf `<span %s>%s%s%s</span>` $attrString $iconLeft $textBlock $iconRight -}}
+{{- $labelHTML | safeHTML -}}
