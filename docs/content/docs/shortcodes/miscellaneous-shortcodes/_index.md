@@ -11,3 +11,6 @@ tags: ["Alice", "Shortcode"]
 toc:
     show: false
 ---
+
+These pages document the smaller helpers that do not belong to a larger
+component.
