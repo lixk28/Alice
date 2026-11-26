@@ -1,0 +1,22 @@
+{{- $keys := .Params -}}
+{{- $sep := "+" -}}
+{{- $class := "" -}}
+{{- if .IsNamedParams -}}
+    {{- $sep = .Get "sep" | default "+" -}}
+    {{- $class = .Get "class" -}}
+    {{- with .Get "keys" -}}
+        {{- $keys = slice -}}
+        {{- range split . "," -}}
+            {{- $key := strings.TrimSpace . -}}
+            {{- if $key -}}{{- $keys = $keys | append $key -}}{{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{- with $keys -}}
+<span class="kbd-combo{{ with $class }} {{ . }}{{ end }}">
+    {{- range $i, $key := . -}}
+        {{- if $i -}}<span class="kbd-sep" aria-hidden="true">{{ $sep }}</span>{{- end -}}
+        <kbd>{{ $key }}</kbd>
+    {{- end -}}
+</span>
+{{- end -}}

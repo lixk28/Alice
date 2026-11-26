@@ -1,0 +1,26 @@
+kbd {
+    font-family: var(--mono-font);
+    font-size: .85em;
+    line-height: 1.2;
+    padding: .08em .35em;
+    border: 1px solid SlateGray;
+    border-bottom-width: 2px;
+    border-radius: .2em;
+    background-color: GhostWhite;
+    box-shadow: 0 .08em 0 Silver;
+    color: Black;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.kbd-combo {
+    display: inline-flex;
+    align-items: center;
+    gap: .2em;
+    vertical-align: baseline;
+}
+
+.kbd-sep {
+    color: SlateGray;
+    font-size: .8em;
+}

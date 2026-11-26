@@ -29,8 +29,8 @@ site turn those components on or off.
       buttons, form controls, tabs, dropdowns, admonitions, details, the
       carousel, and the code editor.
     - [Authoring Shortcodes](../shortcodes/authoring-shortcodes/) covers
-      attachments, sidenotes, commands, math, diagrams, dropcaps, secrets, and
-      other content helpers.
+      attachments, sidenotes, commands, math, diagrams, dropcaps, secrets,
+      keyboard keys, and other content helpers.
     - [Miscellaneous Shortcodes](../shortcodes/miscellaneous-shortcodes/)
       covers the smaller helpers that do not belong to a component.
 - [Configuration and Customizations](../configuration-and-customizations/)
