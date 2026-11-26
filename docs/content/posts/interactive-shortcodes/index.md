@@ -80,7 +80,7 @@ Site-wide defaults and theming:
 
 ## Label
 
-`label` renders a compact inline label for one-line text. The text comes from the inner content (inline Markdown) or the `text` argument. Typography, color, background, border, and shadow are direct CSS controls, so a label can be neutral, colored, bordered, or elevated without adding new variants.
+`label` renders a compact inline label for one-line text. The text comes from the inner content (inline Markdown) or the `text` argument. Typography, color, background, border, and shadow are direct CSS controls, so a label can be neutral, colored, bordered, or elevated without adding new variants. It replaces the old `mark` shortcode: use `color`, `backgroundColor`, `fontSize`, and `fontWeight` for the same highlighting controls.
 
 {{< label >}}Default{{< /label >}}
 {{< label backgroundColor="AliceBlue" borderColor="RoyalBlue" color="Navy" >}}Info{{< /label >}}

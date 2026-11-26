@@ -102,7 +102,7 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
   - `icon.html` is also the single renderer for every theme icon (menu, button, breadcrumb, checkbox, carousel, and so on). Template call sites leave `styled` off, so they keep their own classes/styles and do not inherit `params.icon`; the shortcode passes `styled=true` to add the `icon` class and the component defaults.
 - `label`:
   - Template: `layouts/_shortcodes/label.html`; renderer: `layouts/_partials/label.html`. Styles: `static/css/label.css` (imported by `style.css`).
-  - Renders an inline-flex label from inner content or `text` (inline Markdown), with per-label `size`/`fontSize`, `color`, `backgroundColor`, `border`/`borderWidth`/`borderStyle`/`borderColor`/`borderRadius`, `shadow`, `padding`, `fontWeight`, and `gap`. Optional left/right icon via `icon` (path or bare name), `iconName`/`iconSet`, `iconPos`, `iconSize`, and `iconColor`; the icon is rendered by `icon.html`. Args also include `class`, `id`, `title`, and `ariaLabel`. Defaults: `params.label` (`size`, `color`, `backgroundColor`, border controls, `shadow`, `padding`, `fontWeight`, `gap`, `iconSize`, `iconColor`, `class`).
+  - Renders an inline-flex label from inner content or `text` (inline Markdown), with per-label `size`/`fontSize`, `color`, `backgroundColor`, `border`/`borderWidth`/`borderStyle`/`borderColor`/`borderRadius`, `shadow`, `padding`, `fontWeight`, and `gap`. Optional left/right icon via `icon` (path or bare name), `iconName`/`iconSet`, `iconPos`, `iconSize`, and `iconColor`; the icon is rendered by `icon.html`. Args also include `class`, `id`, `title`, and `ariaLabel`. Defaults: `params.label` (`size`, `color`, `backgroundColor`, border controls, `shadow`, `padding`, `fontWeight`, `gap`, `iconSize`, `iconColor`, `class`). Replaces the removed `mark` shortcode; its `color`, `backgroundColor`, size, and weight controls map to `color`, `backgroundColor`, `fontSize`, and `fontWeight`.
 - `button`:
   - Template: `layouts/_shortcodes/button.html`. Styles: `static/css/button.css` (imported by `style.css`).
   - Four core types (`plain`, `primary`, `secondary`, `link`) plus a `download` action preset. Each type supplies default colors; `borderColor`, `tintColor`, and `textColor` override them per button (`tintColor="transparent"` makes an outline button); `link` defaults to a bordered text link. Also `size` (`sm`/`md`/`lg`), `block`, `active`, `disabled`, and native `<button>` vs. `<a role="button">` (`href`). `icon`/`iconPos` reuse `icon.html`; `label` supports inline Markdown. Inside a `buttongroup`, the group's `size` and `disabled` are inherited and the default id is prefixed with the group id, while a child's own size wins.
@@ -144,7 +144,6 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
 - `shell`, `cmd`, and `cmdout`: `static/css/shell.css`.
 - `secret`: `static/css/secret.css`.
 - `sidenote`: `static/css/sidenote.css`.
-- `mark`: `static/css/mark.css`.
 - `dropcap`: `static/css/dropcap.css`.
 - `attachment`: `static/css/attachment.css`.
 - `friend` and `frienmily`: `static/css/friend.css`.

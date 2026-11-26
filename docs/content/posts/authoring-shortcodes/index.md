@@ -647,38 +647,6 @@ graph TD;
     C-->D;
 ```
 
-## Marks
-
-If this <mark>word</mark> has yellow background color and black font color on your screen,
-that's because {{< sidenote label="most browsers have the following preset css rules for `<mark>`" >}} https://html.spec.whatwg.org/multipage/rendering.html#phrasing-content-3 {{< /sidenote >}}:
-```css
-mark {
-    background: yellow;
-    color: black;
-}
-```
-
-Alice also uses `<mark>` to highlight and mark text,
-but you can also specify
-
-Here are {{< mark >}} some marked text {{< /mark >}}
-
-Here are {{< mark >}} some marked text with `some code` {{< /mark >}}
-
-Here are {{< mark >}} some marked text with [some link](https://github.com/lixk28/Alice) {{< /mark >}}
-
-Here are {{< mark >}} some marked text with some equation \(a^2 + b^2 = c^2\) {{< /mark >}}
-
-Here are {{< mark >}} some marked text with some {{< sidenote label="sidenote" >}} Amazing {{< /sidenote >}} {{< /mark >}}
-
-Here are {{< mark >}} some marked text with some {{< secret >}} secret {{< /secret >}} {{< /mark >}}
-
-You can also customize some attributes of mark:
-- {{< mark color="Red" >}} color {{< /mark >}}
-- {{< mark backgroundColor="Pink" >}} background color {{< /mark >}}
-- {{< mark scale=1.6 >}} font scale {{< /mark >}}
-- {{< mark weight="bold" >}} font weight {{< /mark >}}
-
 ## Lorem Ipsum
 
 https://en.wikipedia.org/wiki/Lorem_ipsum
