@@ -1,0 +1,128 @@
+{{- /*
+  ButtonGroup shortcode — a fieldset wrapper for button-like controls.
+
+  Usage:
+    {{< buttongroup name="Actions" orientation="horizontal" >}}
+      {{< button label="Save" type="primary" >}}
+      {{< button label="Preview" >}}
+      {{< button label="Cancel" >}}
+    {{< /buttongroup >}}
+
+    {{< buttongroup name="Drink" >}}
+      {{< radio label="Coffee" checked=true >}}
+      {{< radio label="Tea" >}}
+      {{< radio label="Water" >}}
+    {{< /buttongroup >}}
+
+  The group renders a native <fieldset> with an optional <legend>, so the
+  controls share one accessible group title. It accepts `button`, `radio`,
+  and `checkbox` children and lays them out in a column or a wrapping row.
+  `name` is the visible group title, not a DOM id or form name: the fieldset
+  id (default buttongroup-<ordinal>) seeds the default child ids, and the
+  default native name of a radio/checkbox, when that child does not set its
+  own.
+
+  Args (all optional):
+    name        — visible group title, inline Markdown; rendered as the legend
+    orientation — vertical|v (default) or horizontal|h
+    size        — default size for the children: small|s, medium|m, or large|l
+    disabled    — disable every child
+    ariaLabel   — accessible name when there is no visible title
+                  (default: "Button group")
+    id          — fieldset id (default buttongroup-<ordinal>); also the default
+                  child-id base and, for radio/checkbox children, their default
+                  native name
+    class       — extra classes on the fieldset
+
+  Site defaults live under params.buttongroup (orientation, class); the
+  child controls keep their site defaults under params.button, params.radio,
+  and params.checkbox. Geometry, colors, and motion are --button-group-*
+  variables in static/css/buttongroup.css.
+
+  Hugo renders nested shortcodes before the parent, so the parent cannot hand
+  computed state down to the children. Each child resolves the same group id
+  from .Parent.Ordinal and reads the raw group arguments directly. A child's
+  own `size` wins; group `disabled=true` disables every child. Group-level
+  colors are not inherited because the three controls color different parts;
+  set `tintColor` / `checkColor` / button type colors per child.
+
+  The group has no group-level `js`: attach `js` to the individual button,
+  radio, or checkbox that needs behavior.
+*/ -}}
+
+{{- /* Site defaults. Hugo lowercases config keys, while shortcode arguments
+       keep the case they were written in, so match the two case-insensitively. */ -}}
+{{- $siteGroup := site.Params.buttongroup | default dict -}}
+{{- $siteOpts := dict -}}
+{{- $defaultKeys := slice "orientation" "class" -}}
+{{- if reflect.IsMap $siteGroup -}}
+	{{- range $key, $value := $siteGroup -}}
+		{{- range $defaultKey := $defaultKeys -}}
+			{{- if eq (lower $defaultKey) (lower $key) -}}
+				{{- $siteOpts = merge $siteOpts (dict $defaultKey $value) -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $id := .Get "id" | default (printf "buttongroup-%d" .Ordinal) -}}
+
+{{- /* name is the visible group title. The native name of a radio/checkbox
+       child defaults to the fieldset id, so the title stays a label only. */ -}}
+{{- $titleRaw := .Get "name" | default "" -}}
+{{- $titleHTML := "" -}}
+{{- $titleText := "" -}}
+{{- with $titleRaw -}}
+	{{- $titleHTML = . | markdownify | strings.TrimSpace -}}
+	{{- $titleHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $titleHTML -}}
+	{{- $titleText = $titleHTML | plainify | strings.TrimSpace -}}
+{{- end -}}
+
+{{- $ariaLabel := .Get "ariaLabel" | default "" -}}
+{{- if not $ariaLabel -}}
+	{{- if not $titleText -}}{{- $ariaLabel = "Button group" -}}{{- end -}}
+{{- end -}}
+
+{{- /* orientation: vertical stacks the controls; horizontal lays them in a
+       wrapping row. */ -}}
+{{- $orientations := dict
+	"vertical" "vertical" "v" "vertical"
+	"horizontal" "horizontal" "h" "horizontal"
+-}}
+{{- $orientationArg := lower (printf "%v" (.Get "orientation" | default (index $siteOpts "orientation") | default "vertical")) -}}
+{{- $orientation := "vertical" -}}
+{{- if isset $orientations $orientationArg -}}
+	{{- $orientation = index $orientations $orientationArg -}}
+{{- else -}}
+	{{- warnf "buttongroup shortcode %q: unknown orientation %q; using \"vertical\"" $id $orientationArg -}}
+{{- end -}}
+
+{{- /* size is a fallback for the children; a child's own size wins. Children
+       read the raw argument, so accept the same long and short names they do. */ -}}
+{{- $sizes := dict
+	"small" "small" "s" "small"
+	"medium" "medium" "m" "medium"
+	"large" "large" "l" "large"
+-}}
+{{- $sizeArg := lower (printf "%v" (.Get "size" | default "")) -}}
+{{- if and $sizeArg (not (isset $sizes $sizeArg)) -}}
+	{{- warnf "buttongroup shortcode %q: unknown size %q; children use their own defaults" $id $sizeArg -}}
+{{- end -}}
+
+{{- $disabled := in (slice "true" "yes" "1" "on") (lower (printf "%v" (.Get "disabled" | default false))) -}}
+
+{{- $class := .Get "class" | default (index $siteOpts "class") | default "" -}}
+{{- $classes := slice "button-group" (printf "button-group-%s" $orientation) -}}
+{{- if $disabled -}}{{- $classes = $classes | append "button-group-disabled" -}}{{- end -}}
+{{- with $class -}}{{- $classes = $classes | append (printf "%v" .) -}}{{- end -}}
+{{- $classAttr := delimit $classes " " -}}
+
+<fieldset id="{{ $id }}" class="{{ $classAttr }}"
+	{{- with $ariaLabel }} aria-label="{{ . }}"{{ end }}>
+	{{- with $titleHTML }}
+	<legend class="button-group-legend">{{ . | safeHTML }}</legend>
+	{{- end }}
+	<div class="button-group-items">
+		{{ .InnerDeindent }}
+	</div>
+</fieldset>

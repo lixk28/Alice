@@ -26,18 +26,21 @@
     borderColor — CSS border color (overrides the type default)
     tintColor  — CSS background/tint color; "transparent" gives an outline button
     textColor  — CSS label/icon color (overrides the type default)
-    size       — sm|md|lg (default: params.button.size)
+    size       — sm|md|lg (default: params.button.size; inside a buttongroup
+                 the group's size is the fallback)
     block      — full-width button: true|false (default: params.button.block)
     active     — pressed appearance + aria-pressed="true"
-    disabled   — disabled state
+    disabled   — disabled state; a disabled buttongroup disables every child
     icon       — icon path under static/, resolved by svg-icon.html
     iconPos    — icon placement: start|end (default: start)
     title      — native tooltip
     ariaLabel  — accessible name when the visible label is empty or differs
-    id         — element id (default: button-<ordinal>)
+    id         — element id (default: button-<ordinal>, or
+                 <group-id>-button-<ordinal> inside a buttongroup)
 
-  Site defaults live under params.button. The stylesheet is
-  static/css/button.css and exposes :root variables for retheming.
+  Site defaults live under params.button. Inside a buttongroup, the group's
+  size argument is a fallback (a child's own size still wins). The stylesheet
+  is static/css/button.css and exposes :root variables for retheming.
 
   Inline js runs as an event handler: `this` is the button, `event` is the
   event, and `el` is the button element. With jsEvent="load" the code runs
@@ -57,7 +60,27 @@
 {{- $labelHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $labelHTML -}}
 {{- $labelText := $labelHTML | plainify | strings.TrimSpace -}}
 
-{{- $id := .Get "id" | default (printf "button-%d" .Ordinal) -}}
+{{- /* A button inside a buttongroup inherits the group's id as its child-id
+       base, plus the group's size and disabled state. Hugo renders the nested
+       shortcode before its parent, so read the raw group arguments from
+       .Parent. */ -}}
+{{- $parent := .Parent -}}
+{{- $inGroup := and $parent (eq $parent.Name "buttongroup") -}}
+{{- $groupID := "" -}}
+{{- $groupSize := "" -}}
+{{- if $inGroup -}}
+	{{- $groupID = $parent.Get "id" | default (printf "buttongroup-%d" $parent.Ordinal) -}}
+	{{- $groupSize = lower (printf "%v" ($parent.Get "size" | default "")) | strings.TrimSpace -}}
+{{- end -}}
+
+{{- $id := .Get "id" | default "" -}}
+{{- if not $id -}}
+	{{- if $inGroup -}}
+		{{- $id = printf "%s-button-%d" $groupID .Ordinal -}}
+	{{- else -}}
+		{{- $id = printf "button-%d" .Ordinal -}}
+	{{- end -}}
+{{- end -}}
 
 {{- $types := slice "plain" "primary" "secondary" "download" "link" -}}
 {{- $type := lower (printf "%v" (.Get "type" | default $site.type | default "plain")) -}}
@@ -67,8 +90,8 @@
 	{{- $type = "plain" -}}
 {{- end -}}
 
-{{- $sizes := dict "small" "sm" "medium" "md" "normal" "md" "large" "lg" -}}
-{{- $size := lower (printf "%v" (.Get "size" | default $site.size | default "md")) -}}
+{{- $sizes := dict "small" "sm" "s" "sm" "medium" "md" "m" "md" "normal" "md" "large" "lg" "l" "lg" -}}
+{{- $size := lower (printf "%v" (.Get "size" | default $groupSize | default $site.size | default "md")) -}}
 {{- if isset $sizes $size -}}{{- $size = index $sizes $size -}}{{- end -}}
 {{- if not (in (slice "sm" "md" "lg") $size) -}}
 	{{- warnf "button shortcode %q: unknown size %q; using \"md\"" $id $size -}}
@@ -82,6 +105,10 @@
 {{- $block := in $truthy (lower (printf "%v" $blockRaw)) -}}
 {{- $active := in $truthy (lower (printf "%v" (.Get "active" | default false))) -}}
 {{- $disabled := in $truthy (lower (printf "%v" (.Get "disabled" | default false))) -}}
+{{- if $inGroup -}}
+	{{- $groupDisabled := in $truthy (lower (printf "%v" ($parent.Get "disabled" | default false))) -}}
+	{{- if $groupDisabled -}}{{- $disabled = true -}}{{- end -}}
+{{- end -}}
 
 {{- $class := .Get "class" | default $site.class | default "" -}}
 

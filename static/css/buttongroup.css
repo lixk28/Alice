@@ -1,0 +1,75 @@
+/*
+ * Button group component — used by the `buttongroup` shortcode.
+ *
+ * A fieldset that groups `button`, `radio`, and `checkbox` controls under one
+ * optional legend. Each control keeps its own component styles; the group
+ * supplies the frame, layout, and spacing. Geometry, colors, and motion are
+ * --button-group-* variables, so a site stylesheet can retheme every group.
+ */
+
+:root {
+    --button-group-width: fit-content;
+    --button-group-margin: 1em 0;
+    --button-group-padding: .55em .8em .7em;
+    --button-group-gap: .45em;
+    --button-group-column-gap: 1.25em;
+    --button-group-border-width: 1px;
+    --button-group-border-color: Silver;
+    --button-group-radius: .3em;
+    --button-group-legend-color: Navy;
+    --button-group-legend-font-size: var(--font-size-normal);
+}
+
+/* The title is a plain bold legend in the theme's navy, without the sidebar
+   chip treatment. */
+.button-group {
+    box-sizing: border-box;
+    width: var(--button-group-width);
+    max-width: 100%;
+    min-width: 0;
+    margin: var(--button-group-margin);
+    padding: var(--button-group-padding);
+    border: var(--button-group-border-width) solid var(--button-group-border-color);
+    border-radius: var(--button-group-radius);
+}
+
+.button-group-legend {
+    padding: 0 .35em;
+    font-family: var(--sans-font);
+    font-size: var(--button-group-legend-font-size);
+    font-weight: bold;
+    line-height: 1.2;
+    color: var(--button-group-legend-color);
+}
+
+.button-group-items {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--button-group-gap);
+    min-width: 0;
+}
+
+.button-group-horizontal .button-group-items {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--button-group-column-gap);
+    row-gap: var(--button-group-gap);
+}
+
+/* Adjacent radio/checkbox controls add their own inline margin for prose;
+   the group's flex gap takes over inside the group. */
+.button-group .radio + .radio,
+.button-group .checkbox + .checkbox {
+    margin-left: 0;
+}
+
+/* A block button follows the group layout instead of the content column. */
+.button-group .button-block {
+    margin: 0;
+}
+
+.button-group-horizontal .button-block {
+    width: auto;
+}
