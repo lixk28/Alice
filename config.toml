@@ -42,6 +42,44 @@
         # Extra classes added to every button.
         class = ""
 
+    # Radio shortcode defaults ({{< radio >}}). Any shortcode argument wins.
+    [params.radio]
+        # small|s, medium|m, or large|l
+        size = "medium"
+        # Selected-ring fill color (any CSS color). Empty uses the theme's
+        # CornflowerBlue.
+        tintColor = ""
+        # Inner dot (mark) color (any CSS color). Empty uses White.
+        dotColor = ""
+        # Unselected ring border color (any CSS color). Empty uses SlateGray.
+        borderColor = ""
+        # Extra classes added to every radio.
+        class = ""
+
+    # ButtonGroup shortcode defaults ({{< buttongroup >}}). Any shortcode
+    # argument wins; children can override the group size, while group
+    # disabled=true disables every child.
+    [params.buttongroup]
+        # vertical|v or horizontal|h
+        orientation = "vertical"
+        # Extra classes added to every group.
+        class = ""
+
+    # Checkbox shortcode defaults ({{< checkbox >}}). Any shortcode argument
+    # wins.
+    [params.checkbox]
+        # small|s, medium|m, or large|l
+        size = "medium"
+        # Checked-box fill color (any CSS color). Empty uses the theme's
+        # CornflowerBlue.
+        tintColor = ""
+        # Check mark color (any CSS color). Empty uses White.
+        checkColor = ""
+        # Unchecked box border color (any CSS color). Empty uses SlateGray.
+        borderColor = ""
+        # Extra classes added to every checkbox.
+        class = ""
+
     # Switch shortcode defaults ({{< switch >}}). Any shortcode argument wins.
     [params.switch]
         # Initial state: on (true) or off (false).
@@ -54,6 +92,32 @@
         # small|s, medium|m, or large|l
         size = "medium"
         # Extra classes added to every switch.
+        class = ""
+
+    # Slider shortcode defaults ({{< slider >}}). Any shortcode argument wins.
+    [params.slider]
+        # Initial value. Clamped to [min, max] and snapped to the nearest step.
+        value = 50
+        # Range endpoints.
+        min = 0
+        max = 100
+        # Increment; must be greater than 0.
+        step = 1
+        # Suffix appended to the value readout, e.g. "%" or " px".
+        unit = ""
+        # Width of the whole control (any CSS length or percentage).
+        # Empty uses 100% for a block slider and auto for an inline one.
+        width = ""
+        # Show the current value beside the label.
+        showValue = true
+        # small|s, medium|m, or large|l
+        size = "medium"
+        # Minimum-track, remaining-track, and thumb colors (any CSS color).
+        # Empty uses the theme's CornflowerBlue, Gainsboro, and White.
+        tintColor = ""
+        trackColor = ""
+        thumbColor = ""
+        # Extra classes added to every slider.
         class = ""
 
     # Breadcrumb bar under the header. Shown on every page by default; set

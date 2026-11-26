@@ -19,7 +19,11 @@
 @import "secret.css";
 @import "mark.css";
 @import "button.css";
+@import "radio.css";
+@import "checkbox.css";
+@import "buttongroup.css";
 @import "switch.css";
+@import "slider.css";
 @import "attachment.css";
 @import "quote.css";
 @import "tikz.css";
