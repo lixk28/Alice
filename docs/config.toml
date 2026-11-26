@@ -1,5 +1,7 @@
 locale = "en-US"
 hasCJKLanguage = true
+# Local preview; CI overrides this with the GitHub Pages base URL.
+baseURL = "http://localhost:1314/"
 title = "Hugo Alice"
 theme = "Alice"
 themesDir = "../.."
@@ -9,7 +11,7 @@ themesDir = "../.."
     title = "Hugo Alice"
     author = "Xuekun Li"
     description = ""
-    mainSections = ["posts", "gallery"]
+    mainSections = ["docs", "gallery"]
 
     keywords = []
     dateFmt = "2006-01-02"
@@ -167,6 +169,16 @@ themesDir = "../.."
         # Separator between crumbs: an icon path, or literal text / HTML.
         # Set it to "" to render no separator.
         separator = "svg/ui-oval/slash-divider.svg"
+
+    # Documentation pages (type: docs) render a left page tree and, when the
+    # page sets toc.show, the snaketoc on the right.
+    [params.docs]
+        # Show the page tree on the left by default. A page can override this
+        # with `docs: { nav: false }` in front matter.
+        nav = true
+        # Title above the page tree and in the mobile <details>. Empty uses
+        # the docs section's own title.
+        title = ""
 
     # Carousel shortcode defaults ({{< carousel >}} + {{< slide >}}).
     # Every key is a fallback; a shortcode argument still wins.
@@ -398,9 +410,9 @@ themesDir = "../.."
 
     [params.home]
         [params.home.pagination]
-            # Only posts in given sections will be paginated
-            sections = ["posts"]
-            # The number of posts per page
+            # Only pages in the given sections are paginated on the home page.
+            sections = ["docs"]
+            # The number of pages per page.
             pagerSize = 3
             # Previous indicator, HTML is allowed
             prev = "&laquo;"
@@ -465,6 +477,9 @@ themesDir = "../.."
                     delimiter = "&emsp;"
                     # Sort by {count | random}, default is count
                     sortBy = "count"
+
+    [params.postcard]
+        showDescription = true
 
     [params.codeblock]
         maxLinesOfCode = 64
@@ -655,12 +670,12 @@ themesDir = "../.."
             path = "svg/ui-oval/home-03.svg"
 
     [[menu.main]]
-        identifier = "posts"
-        name = "Posts"
-        url = "/posts/"
+        identifier = "docs"
+        name = "Docs"
+        url = "/docs/"
         weight = 2
         [menu.main.params.icon]
-            path = "svg/ui-oval/archive.svg"
+            path = "svg/ui-oval/file-05.svg"
 
     [[menu.main]]
         identifier = "categories"

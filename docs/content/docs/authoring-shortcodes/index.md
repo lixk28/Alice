@@ -1,27 +1,28 @@
 ---
-title: "Alice (3): Authoring Shortcodes"
-description: ""
-keywords: []
+title: "Authoring Shortcodes"
+description: "Attachments, admonitions, sidenotes, shell output, math, diagrams, and more."
 date: 2024-10-04T00:09:24+08:00
 lastmod: 2024-10-20T12:28:15+08:00
-location: Guangzhou, China
+type: docs
+weight: 40
+aliases: ["/posts/authoring-shortcodes/"]
 categories: ["Documentation"]
 tags: ["Alice", "Shortcode"]
+toc:
+    show: true
+    snake: true
+codeblock:
+    highlight: true
+    cursed: true
+lightbox: false
 tex:
     engine: mathjax
     math: true
     algorithm: true
     tikz: true
-lightbox: false
 mermaid: true
-toc:
-    show: true
-    cursed: false
-    snake: true
-codeblock:
-    highlight: true
-    cursed: true
 ---
+
 
 ## Attachment
 

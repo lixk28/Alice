@@ -1,0 +1,17 @@
+{{- /*
+Return the docs page tree below a section as nested data:
+
+    [
+      { "page": <Page>, "children": [ { "page": <Page>, "children": [...] }, ... ] },
+      ...
+    ]
+
+The partial recurses through the native `.Pages` collection and returns data
+only; the caller renders the HTML. Call it with a section Page.
+*/ -}}
+{{- $nodes := slice -}}
+{{- range .Pages.ByWeight -}}
+    {{- $children := partial "docs/tree.html" . -}}
+    {{- $nodes = $nodes | append (dict "page" . "children" $children) -}}
+{{- end -}}
+{{- return $nodes -}}

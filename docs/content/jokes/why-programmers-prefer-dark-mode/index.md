@@ -1,6 +1,7 @@
 ---
 title: "Why programmers prefer dark mode"
 date: 2026-11-14T08:26:39+09:00
+aliases: ["/posts/why-programmers-prefer-dark-mode/"]
 jokes: ["Programmer Jokes"]
 prext: false
 related: false

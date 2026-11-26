@@ -168,6 +168,16 @@
         # Set it to "" to render no separator.
         separator = "svg/ui-oval/slash-divider.svg"
 
+    # Documentation pages (type: docs) render a left page tree and, when the
+    # page sets toc.show, the snaketoc on the right.
+    [params.docs]
+        # Show the page tree on the left by default. A page can override this
+        # with `docs: { nav: false }` in front matter.
+        nav = true
+        # Title above the page tree and in the mobile <details>. Empty uses
+        # the docs section's own title.
+        title = ""
+
     # Carousel shortcode defaults ({{< carousel >}} + {{< slide >}}).
     # Every key is a fallback; a shortcode argument still wins.
     [params.carousel]

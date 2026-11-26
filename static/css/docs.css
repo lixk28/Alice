@@ -1,0 +1,350 @@
+:root {
+    --docs-nav-proportion: 20%;
+    --docs-toc-proportion: var(--post-sidetoc-proportion);
+}
+
+/* Three columns: page tree | article | snaketoc. The right column stays
+   reserved for the TOC/sidenote gutter even when a page does not render a TOC. */
+main.docs {
+    display: grid;
+    grid-template-columns: var(--docs-nav-proportion) minmax(0, 1fr) var(--docs-toc-proportion);
+    align-items: start;
+    width: 100%;
+    padding: 0;
+}
+
+main.docs.docs-no-nav {
+    grid-template-columns: minmax(0, 1fr) var(--docs-toc-proportion);
+    padding-left: 1em;
+}
+
+main.docs > article {
+    width: 100%;
+    min-width: 0;
+    padding-bottom: 1em;
+}
+
+/* left docs page tree */
+main.docs aside#docnav {
+    align-self: start;
+    position: sticky;
+    top: var(--header-height);
+    max-height: calc(100vh - var(--header-height));
+    width: 100%;
+    padding: 1em 0 1em 1em;
+    overflow-y: auto;
+    font-family: var(--sans-font);
+    font-size: var(--font-size-small);
+}
+
+a.docs-nav-title {
+    display: block;
+    margin: 0 0 .55em;
+    padding: .1em .2em .45em;
+    color: navy;
+    font-family: var(--sans-font);
+    font-size: var(--font-size-small);
+    font-weight: 600;
+    border-bottom: 1px solid gainsboro;
+    box-shadow: none !important;
+}
+
+a.docs-nav-title:hover,
+a.docs-nav-title.docs-nav-current {
+    color: navy;
+    border-bottom-color: navy;
+    box-shadow: none !important;
+}
+
+nav.docs-nav ul.docs-nav-list {
+    margin: 0;
+    padding: 0;
+    list-style: none !important;
+}
+
+nav.docs-nav ul.docs-nav-list ul.docs-nav-list {
+    margin-left: .45em;
+    padding-left: .55em;
+    border-left: 1px solid gainsboro;
+}
+
+nav.docs-nav li.docs-nav-item {
+    margin: .05em 0;
+}
+
+nav.docs-nav .docs-nav-heading {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    transition: background-color var(--transition-duration-fast) ease;
+}
+
+nav.docs-nav .docs-nav-heading:hover {
+    background-color: lavender;
+}
+
+nav.docs-nav .docs-nav-section-link {
+    flex: 1;
+    min-width: 0;
+    color: slategray;
+    font-weight: 600;
+}
+
+nav.docs-nav .docs-nav-section-link:hover {
+    color: var(--link-active-color);
+}
+
+nav.docs-nav .docs-nav-active > .docs-nav-heading {
+    background-color: lavender;
+    border-radius: 0;
+}
+
+nav.docs-nav .docs-nav-active > .docs-nav-heading > .docs-nav-section-link {
+    color: navy;
+}
+
+/* Keep the checkbox focusable but visually hidden; the label is the button. */
+nav.docs-nav .docs-nav-toggle-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+nav.docs-nav .docs-nav-toggle {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 1.6em;
+    height: 1.6em;
+    margin-left: .1em;
+    border-radius: .2em;
+    color: slategray;
+    cursor: pointer;
+}
+
+nav.docs-nav .docs-nav-toggle:hover {
+    color: navy;
+    background-color: lavender;
+}
+
+nav.docs-nav .docs-nav-toggle-icon {
+    width: 1em;
+    height: 1em;
+    transition: transform var(--transition-duration-normal) ease;
+}
+
+nav.docs-nav .docs-nav-toggle-input:checked ~ .docs-nav-heading .docs-nav-toggle {
+    color: navy;
+}
+
+nav.docs-nav .docs-nav-toggle-input:checked ~ .docs-nav-heading .docs-nav-toggle-icon {
+    transform: rotate(90deg);
+}
+
+nav.docs-nav .docs-nav-children {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--transition-duration-normal) ease;
+}
+
+nav.docs-nav .docs-nav-children > ul {
+    min-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition: visibility 0s linear var(--transition-duration-normal);
+}
+
+nav.docs-nav .docs-nav-toggle-input:checked ~ .docs-nav-children {
+    grid-template-rows: 1fr;
+}
+
+nav.docs-nav .docs-nav-toggle-input:checked ~ .docs-nav-children > ul {
+    visibility: visible;
+    transition: visibility 0s;
+}
+
+nav.docs-nav .docs-nav-toggle-input:focus-visible ~ .docs-nav-heading .docs-nav-toggle {
+    outline: 2px solid var(--link-color);
+    outline-offset: 1px;
+}
+
+nav.docs-nav a {
+    display: block;
+    padding: .12em .35em;
+    border-radius: .2em;
+    color: dimgray;
+    box-shadow: none !important;
+    line-height: 1.35;
+    transition: color var(--transition-duration-fast) ease,
+                background-color var(--transition-duration-fast) ease;
+}
+
+nav.docs-nav a:hover {
+    color: var(--link-active-color);
+    background-color: lavender;
+    border-radius: 0;
+    box-shadow: none !important;
+}
+
+nav.docs-nav .docs-nav-active > a {
+    color: navy;
+    font-weight: 600;
+}
+
+nav.docs-nav a[aria-current="page"] {
+    color: navy;
+    background-color: lavender;
+    border-radius: 0;
+    box-shadow: inset .15em 0 0 navy !important;
+    padding-left: .55em;
+}
+
+/* the same tree, collapsed above the article on smaller screens */
+details.docs-nav-mobile {
+    display: none;
+    margin: .8em 1em 1em;
+    padding: .2em .6em .4em;
+    border: 1px solid gainsboro;
+    border-radius: .3em;
+    background-color: transparent;
+    font-family: var(--sans-font);
+    font-size: var(--font-size-small);
+}
+
+summary.docs-nav-mobile-summary {
+    padding: .15em 0;
+    color: slategray;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+summary.docs-nav-mobile-summary:hover {
+    color: navy;
+}
+
+summary.docs-nav-mobile-summary::marker {
+    color: slategray;
+}
+
+details.docs-nav-mobile nav.docs-nav {
+    margin-top: .3em;
+}
+
+/* right snaketoc: reuse toc.css, but fill the grid column */
+main.docs aside#sidetoc {
+    width: 100%;
+    max-height: calc(100vh - var(--header-height));
+    padding: 1em 1ch 1em 1ch;
+    overflow-y: auto;
+}
+
+/* article header and section page links */
+p.docs-description {
+    margin: .4em 0 0;
+    color: dimgray;
+}
+
+main.docs .post-content {
+    margin-bottom: 1em;
+}
+
+ul.docs-page-list {
+    display: grid;
+    gap: .8em;
+    margin: 1em;
+    padding: 0;
+    list-style: none !important;
+}
+
+ul.docs-page-list > li {
+    padding: .7em .9em;
+    border: 1px solid silver;
+    border-radius: .3em;
+    background-color: white;
+    box-shadow: .1em .1em .3em lightslategray;
+}
+
+ul.docs-page-list > li > a {
+    font-size: var(--font-size-big);
+    font-weight: 600;
+    box-shadow: none;
+}
+
+p.docs-page-description {
+    margin: .3em 0 0;
+    color: dimgray;
+}
+
+/* Docs pages use the right column for the snaketoc, so sidenotes render
+   inline instead of floating into that gutter. */
+main.docs span.sidenote-content {
+    display: block;
+    position: static;
+    width: auto;
+    margin: .6em 0;
+}
+
+@media screen and (min-width: 1081px) {
+    /* line the breadcrumb up with the article card's left edge */
+    body.docs-page nav#breadcrumb {
+        padding-left: var(--docs-nav-proportion);
+    }
+
+    body.docs-page.docs-no-nav nav#breadcrumb {
+        padding-left: 1em;
+    }
+}
+
+@media screen and (max-width: 1080px) {
+    /* the page tree folds into the <details> block inside the article */
+    main.docs {
+        padding-left: 1em;
+    }
+
+    main.docs,
+    main.docs.docs-no-nav {
+        grid-template-columns: minmax(0, 1fr) var(--docs-toc-proportion);
+    }
+
+    main.docs aside#docnav {
+        display: none;
+    }
+
+    details.docs-nav-mobile {
+        display: block;
+    }
+}
+
+@media screen and (max-width: 720px) {
+    main.docs {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0;
+    }
+
+    main.docs > article {
+        margin: 0;
+        padding-bottom: 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    main.docs aside#sidetoc {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    nav.docs-nav .docs-nav-children,
+    nav.docs-nav .docs-nav-children > ul,
+    nav.docs-nav .docs-nav-toggle-icon {
+        transition: none;
+    }
+}

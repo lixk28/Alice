@@ -1,0 +1,52 @@
+{{- define "body-class" -}}
+{{- $docs := site.Params.docs | default dict -}}
+{{- $showNav := true -}}
+{{- if isset $docs "nav" -}}{{- $showNav = $docs.nav -}}{{- end -}}
+{{- with .Params.docs -}}{{- if isset . "nav" -}}{{- $showNav = .nav -}}{{- end -}}{{- end -}}
+docs-page{{ if not $showNav }} docs-no-nav{{ end }}
+{{- end -}}
+{{- define "main" -}}
+{{- $docs := site.Params.docs | default dict -}}
+{{- $showNav := true -}}
+{{- if isset $docs "nav" -}}{{- $showNav = $docs.nav -}}{{- end -}}
+{{- with .Params.docs -}}{{- if isset . "nav" -}}{{- $showNav = .nav -}}{{- end -}}{{- end -}}
+{{- $showToc := false -}}
+{{- with .Params.toc -}}{{- if isset . "show" -}}{{- $showToc = .show -}}{{- end -}}{{- end -}}
+<main class="docs{{ if not $showNav }} docs-no-nav{{ end }}">
+	{{- if $showNav -}}
+		{{ partial "docs/tree-toc.html" (dict "page" . "variant" "desktop") }}
+	{{- end }}
+	<article>
+		<div class="post-preamble docs-preamble">
+			<h1 class="post-title"># {{ .Title | markdownify | safeHTML }}</h1>
+			{{- with .Description -}}
+			<p class="docs-description">{{ . | markdownify }}</p>
+			{{- end -}}
+		</div>
+		{{- if $showNav -}}
+			{{ partial "docs/tree-toc.html" (dict "page" . "variant" "mobile") }}
+		{{- end -}}
+		{{- with .Content -}}
+		<div class="post-content">
+			{{ . }}
+		</div>
+		{{- end -}}
+		{{- with .Pages.ByWeight -}}
+		<ul class="docs-page-list">
+			{{- range . -}}
+			<li>
+				<a href="{{ .RelPermalink }}">{{ .LinkTitle | default .Title }}</a>
+				{{- with .Description -}}
+				<p class="docs-page-description">{{ . | markdownify }}</p>
+				{{- end -}}
+			</li>
+			{{- end -}}
+		</ul>
+		{{- end -}}
+	</article>
+	{{- if $showToc -}}
+		{{ partial "sidetoc.html" . }}
+	{{- end }}
+	{{ partial "jump-buttons.html" . }}
+</main>
+{{- end -}}

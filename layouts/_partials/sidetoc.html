@@ -1,0 +1,22 @@
+{{- /*
+Side table of contents. Shared by post and docs pages so toc.css and
+snakeTOC2.js work with one markup block.
+
+Context: the current Page.
+*/ -}}
+<aside id="sidetoc"{{ if .Params.toc.show }} aria-label="Table of contents"{{ end }}>
+    {{- if .Params.toc.show -}}
+    <h3 id="toc-title">{{ .Title | markdownify | safeHTML }}</h3>
+    <div id="toc-hunting-land">
+        {{ .TableOfContents }}
+        <svg id="toc-snake" xmlns="http://www.w3.org/2000/svg" version="1.1">
+            <path stroke="navy"
+                stroke-width="3"
+                stroke-dasharray="0, 0, 0, 1000"
+                stroke-linecap="round"
+                stroke-linjoin="round"
+                transform="translate(-0.5, -0.5)"/>
+        </svg>
+    </div>
+    {{- end -}}
+</aside>

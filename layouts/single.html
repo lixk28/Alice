@@ -1,25 +1,7 @@
 {{- define "body-class" -}}post-page{{- end -}}
 {{- define "main" -}}
-{{- $post := site.Params.post | default dict -}}
-{{- $jump := $post.jump | default dict -}}
-{{- $jumpIcons := $jump.icons | default dict -}}
 <main class="post">
-	<aside id="sidetoc">
-		{{- if .Params.toc.show -}}
-		<h3 id="toc-title">{{ .Title | markdownify | safeHTML }}</h3>
-		<div id="toc-hunting-land">
-			{{ .TableOfContents }}
-			<svg id="toc-snake" xmlns="http://www.w3.org/2000/svg" version="1.1">
-				<path stroke="navy"
-					stroke-width="3"
-					stroke-dasharray="0, 0, 0, 1000"
-					stroke-linecap="round"
-					stroke-linjoin="round"
-					transform="translate(-0.5, -0.5)"/>
-			</svg>
-		</div>
-		{{- end -}}
-	</aside>
+	{{ partial "sidetoc.html" . }}
 	<article>
 		{{- if .Params.featuredimage -}}
 		<figure class="featured-image">
@@ -96,17 +78,6 @@
 		{{- end -}}
 	</article>
 	
-	<!-- Jump to top/bottom buttons -->
-	<div class="jump-buttons">
-		<button id="jump-top" class="jump-btn jump-top" title="Jump to top">
-			{{ partial "icon.html" (dict "path" ($jumpIcons.up | default "svg/ui-oval/chevron-up.svg") "class" "jump-up-icon") }}
-		</button>
-		<button id="jump-bottom" class="jump-btn jump-bottom" title="Jump to bottom">
-			{{ partial "icon.html" (dict "path" ($jumpIcons.down | default "svg/ui-oval/chevron-down.svg") "class" "jump-bottom-icon") }}
-		</button>
-	</div>
-	
-	<!-- Jump buttons script -->
-	<script src="{{ "js/jumpButtons.js" | relURL }}"></script>
+	{{ partial "jump-buttons.html" . }}
 </main>
 {{- end -}}

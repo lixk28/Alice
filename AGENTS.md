@@ -12,6 +12,7 @@ CI uses Hugo 0.170.0 (single binary; the extended edition was removed upstream i
 - `static/css/` and `static/js/` are served as-is. `static/css/style.css` is linked on every page and `@import`s the shared component sheets. Scripts in `static/js/` are linked with `relURL` only when a page needs them.
 - `assets/` holds files passed through `resources.Get`.
 - Example data lives under `docs/data/`. Friend YAML is in `docs/data/friends/`. Homepage news is in `docs/data/news/`. Change those files when editing the Friends page or the home sidebar; do not add a second copy at the theme root.
+- Example documentation lives under `docs/content/docs/` (`type: docs`); the `/posts/` section has been removed, old `/posts/...` URLs alias to the matching docs page (or to the joke page under `docs/content/jokes/`), and the home feed paginates `docs`. The Docs menu entry and `[params.docs]` live in `docs/config.toml`.
 
 Which template, stylesheet, and script belongs to which page or shortcode is listed under Components.
 
@@ -61,13 +62,17 @@ Pages:
   - Partials: `post-card.html`, `paginator.html`, and `layouts/_partials/sidebar/` (`news`, `recent-updates`, `pinned`, `tag-list`, `category-list`).
   - Styles: `static/css/home.css`, `static/css/paginator.css`.
 - `layouts/single.html` renders one post.
-  - Pieces: table of contents, featured image, title, `post-meta.html`, `post-tldr.html`, content, previous/next (`post-prext.html`), related posts (`post-related.html`), jump buttons. Front matter `prext` / `related` default on; set either to `false` to hide that block.
+  - Pieces: table of contents (`sidetoc.html`, shared with docs), featured image, title, `post-meta.html`, `post-tldr.html`, content, previous/next (`post-prext.html`), related posts (`post-related.html`), jump buttons (`jump-buttons.html`). Front matter `prext` / `related` default on; set either to `false` to hide that block.
   - Sets `body.post-page` through the `body-class` block so the global breadcrumb can align to the article column.
   - Styles: `static/css/post.css` (article layout), `static/css/toc.css`, `static/css/img.css` (featured image and figures), `static/css/prext.css`, `static/css/related.css`, `static/css/jump.css`.
 - `layouts/posts/section.html` renders `/posts/`.
   - Calls `post-list.html` with `groupBy "PublishDate"` so pinned posts come first, then the rest under publish-year headings.
   - `post-list.html` is generic: pass any page collection (`{{ partial "post-list.html" .Pages }}`), or a dict with `pages` plus optional `groupBy` / `groupSort` (Hugo's `GroupBy FIELD [SORT]` semantics; date fields group by year). Posts with `pinned: true` always render first; `params.postlist.pinned` sets that group's heading and icon.
   - `layouts/list.html` is the fallback list (it paginates and does not pin). Post-list and pinned-group rules live in `static/css/style.css`.
+- `layouts/docs/single.html` and `layouts/docs/section.html` render documentation pages (`type: docs`, created from `archetypes/docs.md`).
+  - Left: the docs navigation from `layouts/_partials/docs/tree-toc.html` (desktop aside, or the mobile `<details>` wrapper when called with `variant=mobile`). `tree.html` recursively returns a nested `{page, children}` slice, and `tree-toc.html` renders that data with a recursive named template. A section title links to its page and a small toggle at the far right expands/collapses its children (native checkbox, no JS), with the current branch open by default. Up to 1080px the mobile variant renders above the article.
+  - Right: the shared `layouts/_partials/sidetoc.html` (also used by post pages) keeps `toc.show` / `toc.snake` and `snakeTOC2.js` unchanged. The docs layouts resolve `params.docs.nav` and the page's `docs.nav` / `toc.show` overrides inline.
+  - Styles: `static/css/docs.css`. Docs articles reuse the post card and content rules, and set `body.docs-page` for the breadcrumb offset.
 - Taxonomy pages:
   - `layouts/categories/taxonomy.html` renders `/categories/`. `layouts/tags/taxonomy.html` renders `/tags/`.
   - `layouts/more/section.html` renders `/more/` (section hub via `content/more/`); the link list is `layouts/_partials/morehub.html` (`menu.main` children of `identifier = "more"`).
@@ -151,7 +156,7 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
 - `tab` and `tabpanel`: `static/css/tabs.css`.
 - `shell`, `cmd`, and `cmdout`: `static/css/shell.css`.
 - `secret`: `static/css/secret.css`.
-- `sidenote`: `static/css/sidenote.css`.
+- `sidenote`: `static/css/sidenote.css`. On docs pages the right gutter belongs to the snaketoc, so `static/css/docs.css` renders `span.sidenote-content` inline instead of floating.
 - `dropcap`: `static/css/dropcap.css`.
 - `attachment`: `static/css/attachment.css`.
 - `friend` and `frienmily`: `static/css/friend.css`.
@@ -193,7 +198,7 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
 Scripts in `static/js/` are served as-is and linked with `relURL`. A template loads each one only when that page needs it:
 
 - `static/js/jumpButtons.js`
-  - Loaded by `layouts/single.html` on every post.
+  - Loaded by the `jump-buttons.html` partial on every post and docs page.
   - Jump-to-top and jump-to-bottom buttons. Styles: `static/css/jump.css`.
 - `static/js/copyCodeBlock.js`
   - Loaded by `baseof.html` when the page sets `codeblock.cursed`.

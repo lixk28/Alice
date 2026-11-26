@@ -1,0 +1,12 @@
+{{- /* Jump to top/bottom buttons and their script. */ -}}
+{{- $jump := site.Params.post.jump | default dict -}}
+{{- $jumpIcons := $jump.icons | default dict -}}
+<div class="jump-buttons">
+    <button id="jump-top" class="jump-btn jump-top" title="Jump to top">
+        {{ partial "icon.html" (dict "path" ($jumpIcons.up | default "svg/ui-oval/chevron-up.svg") "class" "jump-up-icon") }}
+    </button>
+    <button id="jump-bottom" class="jump-btn jump-bottom" title="Jump to bottom">
+        {{ partial "icon.html" (dict "path" ($jumpIcons.down | default "svg/ui-oval/chevron-down.svg") "class" "jump-bottom-icon") }}
+    </button>
+</div>
+<script src="{{ "js/jumpButtons.js" | relURL }}"></script>
