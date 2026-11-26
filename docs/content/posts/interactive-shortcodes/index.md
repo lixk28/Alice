@@ -176,7 +176,7 @@ The link form loads a script once per page, even when several buttons share it. 
 | `iconPos` | Icon placement: `start` (default) or `end`; `before`/`after` are aliases. |
 | `title` | Native tooltip, also used as the accessible name for an icon-only button. |
 | `ariaLabel` | Accessible name when the visible label is empty or differs. |
-| `id` | Element id, useful for external scripts. Default: `button-<ordinal>`. |
+| `id` | Element id, useful for external scripts. Default: `button-<ordinal>`, or `<group-id>-button-<ordinal>` inside a `buttongroup`. |
 
 ### Site-wide defaults and theming
 
@@ -274,6 +274,397 @@ Set defaults under `params.switch`; any shortcode argument overrides them. The g
     # Empty uses White.
     thumbColor = ""
     size = "medium"
+    class = ""
+```
+
+## Radio
+
+`radio` renders one radio option in the spirit of Apple's AppKit `NSButton` radio type: a small circular ring that fills with the theme's CornflowerBlue and reveals a centered white dot when selected. It is a native `<input type="radio">` under the styled ring, so it works without JavaScript, is reachable with <kbd>Tab</kbd>, and moves the selection with the arrow keys. The `label` accepts inline Markdown.
+
+Radios are grouped by the native `name` attribute: give several `radio` shortcodes the same `name` and the browser keeps exactly one selected. A radio without a `name` gets a unique one, so it never clears another control by accident. To group options under a visible title, wrap them in a [`buttongroup`](#button-group); its id becomes their default native name.
+
+Usage:
+
+```
+{{</* radio name="drink" label="Coffee" checked=true */>}}
+{{</* radio name="drink" label="Tea" */>}}
+{{</* radio name="drink" label="Water" */>}}
+```
+
+A group (`checked` sets the initial selection):
+
+{{< radio name="drink" label="Coffee" checked=true >}}
+{{< radio name="drink" label="Tea" >}}
+{{< radio name="drink" label="Water" >}}
+
+### Sizes
+
+`size` accepts `small`/`s`, `medium`/`m` (default), or `large`/`l`:
+
+{{< radio name="radio-size" label="Small" size="small" >}}
+{{< radio name="radio-size" label="Medium" size="medium" checked=true >}}
+{{< radio name="radio-size" label="Large" size="large" >}}
+
+### Colors
+
+`tintColor` fills the selected ring, `dotColor` sets the inner dot, and `borderColor` sets the ring border while unselected. Any CSS color works:
+
+{{< radio name="radio-tone" label="RoyalBlue" tintColor="RoyalBlue" checked=true >}}
+{{< radio name="radio-tone" label="SeaGreen dot" tintColor="SeaGreen" dotColor="Cornsilk" >}}
+{{< radio name="radio-tone" label="Navy border" borderColor="Navy" >}}
+
+Without them the control follows the theme: CornflowerBlue, White, and SlateGray. Retheme every radio at once with the `--radio-*` variables (see [Radio defaults and theming](#radio-defaults-and-theming)).
+
+### States and JavaScript
+
+`disabled=true` disables an option; the wrapper dims and the native input stops responding. `id` sets the input's id (default `radio-<ordinal>`), which is what external scripts should look up, and `class` adds classes to the wrapper label. A radio with no visible label gets `aria-label="Radio"` unless `ariaLabel` is passed.
+
+`js` accepts a single-token URL/path; it loads once per page with `<script src>` (page bundle and `assets/` resources are published and loaded directly), while anything else is inline source. Inline source runs on the input's `change` event by default, where `this` and `el` are the input and `el.checked` is the new state. Use `jsEvent="load"` to run it once after `DOMContentLoaded`, or `jsMode="src"` / `jsMode="inline"` to force how `js` is read.
+
+{{< radio name="radio-disabled" label="Disabled" disabled=true >}}
+{{< radio name="radio-disabled" label="Disabled, selected" checked=true disabled=true >}}
+
+{{< radio name="radio-log" label="Log the state" checked=true js="console.log(el.id, el.checked)" >}}
+
+```
+{{</* radio id="my-radio" name="my-group" label="Run" js="/js/demo.js" */>}}
+```
+
+### Parameters
+
+| Name | Description |
+| --- | --- |
+| `label` | Visible text; inline Markdown. |
+| `name` | Group name. Options sharing it are mutually exclusive. Inside a `buttongroup`, a missing name defaults to the group id; an explicit name wins. Default: `radio-<ordinal>`, unique per shortcode. |
+| `value` | Value submitted by the form. Default: the plain-text label, or `on` when there is no label. |
+| `checked` | Initially selected: `true` or `false`. `selected` and `on` are aliases. Default: `false`. |
+| `disabled` | Disabled state; a disabled `buttongroup` disables every child. |
+| `size` | `small`/`s`, `medium`/`m` (default), or `large`/`l`. Default: `params.radio.size` or `medium`; a `buttongroup` size is the fallback. |
+| `tintColor` | Selected-ring fill color. Default: the theme's CornflowerBlue. |
+| `dotColor` | Inner dot (mark) color. Default: White. |
+| `borderColor` | Ring border color while unselected. Default: SlateGray. |
+| `ariaLabel` | Accessible name when there is no visible label. Default: `Radio`. |
+| `id` | Input id. Default: `radio-<ordinal>`, or `<group-id>-radio-<ordinal>` inside a `buttongroup`. |
+| `class` | Extra classes on the wrapper label. |
+| `js` | Script URL/path (loaded once per page, including page bundle and `assets/` resources), or inline JavaScript source. |
+| `jsMode` | `auto` (default), `src`, or `inline`; forces how `js` is read. |
+| `jsEvent` | Event for inline `js`; default `change`. `load` runs it after `DOMContentLoaded`. |
+
+### Radio defaults and theming
+
+Set defaults under `params.radio`; any shortcode argument overrides them. The geometry, colors, and motion are `--radio-*` CSS variables in `static/css/radio.css`, so a custom stylesheet (see `params.customCSS`) can retheme every radio.
+
+```toml
+[params.radio]
+    size = "medium"
+    tintColor = ""
+    dotColor = ""
+    borderColor = ""
+    class = ""
+```
+
+## Checkbox
+
+`checkbox` renders a theme-styled checkbox: a small square box with a thin SlateGray border and an inset shadow that fills with the theme's CornflowerBlue and shows the theme's `svg/ui-oval/check.svg` check mark when selected. It is a native `<input type="checkbox">` under the styled box, so it works without JavaScript, is reachable with <kbd>Tab</kbd>, and toggles with <kbd>Space</kbd>. The `label` accepts inline Markdown.
+
+Usage:
+
+```
+{{</* checkbox label="Subscribe to the newsletter" */>}}
+
+{{</* checkbox label="Remember me" checked=true */>}}
+```
+
+Basic checkboxes (`checked` sets the initial state):
+
+{{< checkbox label="Subscribe to the newsletter" >}}
+{{< checkbox label="Remember me" checked=true >}}
+{{< checkbox label="Send **only** important mail" checked=true >}}
+
+### Sizes
+
+`size` accepts `small`/`s`, `medium`/`m` (default), or `large`/`l`:
+
+{{< checkbox label="Small" size="small" >}}
+{{< checkbox label="Medium" size="medium" checked=true >}}
+{{< checkbox label="Large" size="large" checked=true >}}
+
+### Colors
+
+`tintColor` fills the selected box, `checkColor` sets the check mark, and `borderColor` sets the box border while unchecked. Any CSS color works:
+
+{{< checkbox label="RoyalBlue" tintColor="RoyalBlue" checked=true >}}
+{{< checkbox label="SeaGreen check" tintColor="SeaGreen" checkColor="Cornsilk" checked=true >}}
+{{< checkbox label="Navy border" borderColor="Navy" >}}
+
+Without them the control follows the theme: CornflowerBlue, White, and SlateGray. Retheme every checkbox at once with the `--checkbox-*` variables (see [Checkbox defaults and theming](#checkbox-defaults-and-theming)).
+
+### Groups, states, and JavaScript
+
+Checkboxes are independent. Give several checkboxes the same `name` to submit them as one form field with one value per checked option; without a name each checkbox gets a unique one so it never joins another field by accident. To group them under a visible title, wrap them in a [`buttongroup`](#button-group); the group id becomes their default name, and a child's own `name` still wins. `value` sets the submitted value and defaults to the plain-text label (or `on` when there is no label).
+
+`disabled=true` disables an option; the wrapper dims and the native input stops responding. A disabled `buttongroup` disables every child. `id` sets the input's id (default `checkbox-<ordinal>`), which is what external scripts should look up, and `class` adds classes to the wrapper label. A checkbox with no visible label gets `aria-label="Checkbox"` unless `ariaLabel` is passed.
+
+{{< checkbox name="features" value="alpha" label="Feature A" checked=true >}}
+{{< checkbox name="features" value="beta" label="Feature B" >}}
+
+{{< checkbox name="checkbox-disabled" label="Disabled" disabled=true >}}
+{{< checkbox name="checkbox-disabled" label="Disabled, checked" checked=true disabled=true >}}
+
+`js` accepts a single-token URL/path; it loads once per page with `<script src>` (page bundle and `assets/` resources are published and loaded directly), while anything else is inline source. Inline source runs on the input's `change` event by default, where `this` and `el` are the input and `el.checked` is the new state. Use `jsEvent="load"` to run it once after `DOMContentLoaded`, or `jsMode="src"` / `jsMode="inline"` to force how `js` is read.
+
+{{< checkbox label="Log the state" checked=true js="console.log(el.id, el.checked)" >}}
+
+```
+{{</* checkbox id="my-checkbox" label="Run" js="/js/demo.js" */>}}
+```
+
+### Parameters
+
+| Name | Description |
+| --- | --- |
+| `label` | Visible text; inline Markdown. |
+| `name` | Form field name. Checkboxes that share a name submit as one field. Inside a `buttongroup`, a missing name defaults to the group id; an explicit name wins. Default: `checkbox-<ordinal>`, unique per shortcode. |
+| `value` | Value submitted by the form. Default: the plain-text label, or `on` when there is no label. |
+| `checked` | Initially selected: `true` or `false`. `selected` and `on` are aliases. Default: `false`. |
+| `disabled` | Disabled state; a disabled `buttongroup` disables every child. |
+| `size` | `small`/`s`, `medium`/`m` (default), or `large`/`l`. Default: `params.checkbox.size` or `medium`; a `buttongroup` size is the fallback. |
+| `tintColor` | Checked box fill color. Default: the theme's CornflowerBlue. |
+| `checkColor` | Check mark color. Default: White. |
+| `borderColor` | Box border color while unchecked. Default: SlateGray. |
+| `ariaLabel` | Accessible name when there is no visible label. Default: `Checkbox`. |
+| `id` | Input id. Default: `checkbox-<ordinal>`, or `<group-id>-checkbox-<ordinal>` inside a `buttongroup`. |
+| `class` | Extra classes on the wrapper label. |
+| `js` | Script URL/path (loaded once per page, including page bundle and `assets/` resources), or inline JavaScript source. |
+| `jsMode` | `auto` (default), `src`, or `inline`; forces how `js` is read. |
+| `jsEvent` | Event for inline `js`; default `change`. `load` runs it after `DOMContentLoaded`. |
+
+### Checkbox defaults and theming
+
+Set defaults under `params.checkbox`; any shortcode argument overrides them. The geometry, colors, and motion are `--checkbox-*` CSS variables in `static/css/checkbox.css`, so a custom stylesheet (see `params.customCSS`) can retheme every checkbox.
+
+```toml
+[params.checkbox]
+    size = "medium"
+    tintColor = ""
+    checkColor = ""
+    borderColor = ""
+    class = ""
+```
+
+## Button Group
+
+`buttongroup` wraps one or more `button`, `radio`, or `checkbox` shortcodes in a native `<fieldset>` with an optional `<legend>`. `name` is the visible group title (inline Markdown), rendered as the legend; it is not a DOM id or form name. The fieldset id defaults to `buttongroup-<ordinal>` and seeds the default child ids of button/radio/checkbox children plus the default native name of radio/checkbox children, so a group of radios is mutually exclusive without setting `name` on each one. The group is a thin Silver-bordered panel with a plain bold Navy title. `orientation` chooses a vertical stack (default) or a wrapping horizontal row.
+
+The group passes `size` to its children (a child's own `size` wins) and `disabled=true` disables every child. Colors stay with each component: use a button `type`/`tintColor`, a radio `tintColor`/`dotColor`, or a checkbox `tintColor`/`checkColor`. There is no group-level `js`; attach `js` to the individual control that needs behavior.
+
+Usage:
+
+```
+{{</* buttongroup name="Actions" orientation="horizontal" */>}}
+  {{</* button label="Save" type="primary" */>}}
+  {{</* button label="Preview" */>}}
+  {{</* button label="Cancel" */>}}
+{{</* /buttongroup */>}}
+```
+
+A horizontal group of buttons:
+
+{{< buttongroup name="Actions" orientation="horizontal" >}}
+  {{< button label="Save" type="primary" >}}
+  {{< button label="Preview" >}}
+  {{< button label="Cancel" >}}
+{{< /buttongroup >}}
+
+A group of radios (`name` on each child is optional; the group id is the default native name):
+
+{{< buttongroup name="Drink" >}}
+  {{< radio label="Coffee" checked=true >}}
+  {{< radio label="Tea" >}}
+  {{< radio label="Water" >}}
+{{< /buttongroup >}}
+
+A horizontal group of checkboxes:
+
+{{< buttongroup name="Toppings" orientation="horizontal" >}}
+  {{< checkbox label="Cheese" checked=true >}}
+  {{< checkbox label="Olives" >}}
+  {{< checkbox label="Mushrooms" >}}
+{{< /buttongroup >}}
+
+### Shared size and disabled state
+
+`size` (or `s` / `m` / `l`) is a fallback for every child; a child's own size wins. `disabled=true` disables all buttons, radios, and checkboxes in the group.
+
+{{< buttongroup name="Plan" orientation="horizontal" size="large" >}}
+  {{< radio label="Basic" checked=true >}}
+  {{< radio label="Pro" size="small" >}}
+  {{< button label="Choose" type="primary" >}}
+{{< /buttongroup >}}
+
+A disabled group:
+
+{{< buttongroup name="Unavailable" orientation="horizontal" disabled=true >}}
+  {{< button label="Action" >}}
+  {{< radio name="disabled-radio" label="Option A" checked=true >}}
+  {{< checkbox name="disabled-checkbox" label="Option B" >}}
+{{< /buttongroup >}}
+
+### Parameters
+
+| Name | Description |
+| --- | --- |
+| `name` | Visible group title; inline Markdown. Rendered as the fieldset legend. |
+| `orientation` | `vertical`/`v` (default) or `horizontal`/`h`. |
+| `size` | Fallback size for the children: `small`/`s`, `medium`/`m`, or `large`/`l`. A child's own size wins. |
+| `disabled` | Disable every child button, radio, and checkbox. |
+| `ariaLabel` | Accessible name when there is no visible title. Default: `Button group`. |
+| `id` | Fieldset id. Default: `buttongroup-<ordinal>`. Also the default native name and child-id base for button/radio/checkbox children. |
+| `class` | Extra classes on the fieldset. |
+
+### Button group defaults and theming
+
+Set site defaults under `params.buttongroup` for orientation and extra classes; a shortcode argument still wins. Group geometry and the title are `--button-group-*` CSS variables in `static/css/buttongroup.css`; the children keep their own `--button-*`, `--radio-*`, and `--checkbox-*` variables.
+
+```toml
+[params.buttongroup]
+    orientation = "vertical"
+    class = ""
+```
+
+## Slider
+
+`slider` renders a themed horizontal range control modelled on Apple's UISlider: a thin rounded track with a tinted minimum side, a white circular thumb lifted by a soft shadow, and a short ease. It is a native `<input type="range">` under the styled track, so it works without JavaScript, is reachable with <kbd>Tab</kbd>, and moves with the arrow keys, <kbd>Home</kbd>, and <kbd>End</kbd>. The `label` accepts inline Markdown.
+
+By default the shortcode renders as a full-width block. Use `width` for a narrower block, or `inline=true` to share a line with text — see [Width and inline layout](#width-and-inline-layout).
+
+Usage:
+
+```
+{{</* slider label="Volume" value=60 unit="%" */>}}
+
+{{</* slider label="Text size" min=10 max=24 step=1 value=16 minIcon="svg/ui-oval/align-left-02.svg" maxIcon="svg/ui-oval/align-right-01.svg" */>}}
+```
+
+Basic sliders (`value` sets the initial state, `unit` suffixes the readout):
+
+{{< slider label="Volume" value=60 unit="%" >}}
+
+{{< slider label="Brightness" value=35 unit="%" >}}
+
+{{< slider label="Opacity" min=0 max=1 step=0.05 value=0.65 >}}
+
+### Range and step
+
+`min`, `max`, and `step` define the range. `value` is clamped to `[min, max]` and snapped to the nearest step:
+
+{{< slider label="Zoom" min=0 max=10 step=0.5 value=7.5 unit="×" >}}
+
+{{< slider label="Temperature" min=-10 max=40 step=1 value=22 unit=" °C" >}}
+
+### Colors
+
+`tintColor` paints the minimum side of the track, `trackColor` the remaining side, and `thumbColor` the thumb. Any CSS color works:
+
+{{< slider label="RoyalBlue" value=70 tintColor="RoyalBlue" >}}
+
+{{< slider label="SeaGreen" value=45 tintColor="SeaGreen" trackColor="Gainsboro" >}}
+
+{{< slider label="Gold thumb" value=55 tintColor="RoyalBlue" thumbColor="Gold" >}}
+
+Without them the control follows the theme: CornflowerBlue, Gainsboro, and White. Retheme every slider at once with the `--slider-*` variables (see [Slider defaults and theming](#slider-defaults-and-theming)).
+
+### Sizes
+
+`size` accepts `small`/`s`, `medium`/`m` (default), or `large`/`l`:
+
+{{< slider label="Small" size="small" value=25 >}}
+
+{{< slider label="Medium" size="medium" value=50 >}}
+
+{{< slider label="Large" size="large" value=75 >}}
+
+### End icons
+
+`minIcon` and `maxIcon` draw an icon at the two ends of the track, like UISlider's `minimumValueImage` and `maximumValueImage`. They take an icon path under `static/` and resolve through `svg-icon.html`:
+
+{{< slider label="Text size" min=10 max=24 step=1 value=16 minIcon="svg/ui-oval/align-left-02.svg" maxIcon="svg/ui-oval/align-right-01.svg" >}}
+
+### Layout and states
+
+`showValue=false` hides the readout; `id` sets the input's id (default `slider-<ordinal>`), which is what external scripts should look up; `class` adds classes to the wrapper. A slider with no visible label gets `aria-label="Slider"` unless `ariaLabel` is passed. `disabled=true` disables the control, and `name` adds a form field name.
+
+{{< slider label="No readout" value=40 showValue=false >}}
+
+{{< slider label="Disabled" value=65 disabled=true >}}
+
+### Width and inline layout
+
+By default the slider is a block-level box that fills its container (`width: 100%`). Set `width` to any CSS length or percentage to constrain it; it still occupies its own line:
+
+{{< slider label="Narrow" value=45 width="20em" >}}
+
+{{< slider label="Percentage" value=30 width="60%" >}}
+
+`inline=true` switches the wrapper to `inline-flex`, so the control can share a line with text. The shortcode renders a `<span>`, which keeps it valid inside a paragraph. Without `width` an inline slider shrinks to a 12em track; pass `width` to fix the size:
+
+Inline sliders side by side: {{< slider label="Left" value=30 size="small" inline=true >}} {{< slider label="Right" value=70 size="small" inline=true >}}
+
+### JavaScript
+
+`js` accepts a single-token URL/path; it loads once per page with `<script src>` (page bundle and `assets/` resources are published and loaded directly), while anything else is inline source. Inline source runs on the input's `input` event by default, where `this` and `el` are the input and `el.value` is the new value. Use `jsEvent="load"` to run it once after `DOMContentLoaded`, or `jsMode="src"` / `jsMode="inline"` to force how `js` is read.
+
+{{< slider label="Log the value" js="console.log(el.id, el.value)" >}}
+
+```
+{{</* slider id="my-slider" label="Run" js="/js/demo.js" */>}}
+```
+
+### Parameters
+
+| Name | Description |
+| --- | --- |
+| `value` | Initial value; clamped to `[min, max]` and snapped to `step`. Default: `params.slider.value` or `50`. |
+| `min`, `max` | Range endpoints. Defaults: `0` and `100`. |
+| `step` | Increment; must be greater than `0`. Default: `params.slider.step` or `1`. |
+| `label` | Visible text; inline Markdown. |
+| `unit` | Suffix appended to the value readout, e.g. `%` or `" °C"`. |
+| `showValue` | Show the current value beside the label. Default: `params.slider.showValue` or `true`. |
+| `size` | `small`/`s`, `medium`/`m` (default), or `large`/`l`. Default: `params.slider.size` or `medium`. |
+| `tintColor` | Minimum-track color. Default: the theme's CornflowerBlue. |
+| `trackColor` | Remaining-track color. Default: Gainsboro. |
+| `thumbColor` | Thumb color. Default: White. |
+| `minIcon`, `maxIcon` | Icon paths under `static/` drawn at the track ends, e.g. `svg/ui-oval/align-left-02.svg`; resolved by `svg-icon.html`. |
+| `disabled` | Disabled state. |
+| `name` | Form field name. |
+| `ariaLabel` | Accessible name when there is no visible label. |
+| `id` | Input id. Default: `slider-<ordinal>`. |
+| `class` | Extra classes on the wrapper. |
+| `width` | CSS width of the whole control, e.g. `20em`, `60%`, or a `calc()` expression. Default: `params.slider.width`, or `100%` for a block slider and `auto` for an inline one. |
+| `inline` | Render as an inline-flex box that can share a line with text; default `false`. |
+| `js` | Script URL/path (loaded once per page, including page bundle and `assets/` resources), or inline JavaScript source. |
+| `jsMode` | `auto` (default), `src`, or `inline`; forces how `js` is read. |
+| `jsEvent` | Event for inline `js`; default `input`. `load` runs it after `DOMContentLoaded`. |
+
+`static/js/slider.js` keeps the tinted minimum track and the readout in sync as the thumb moves. The initial fill and readout are computed at build time, so the control looks right before that script runs.
+
+### Slider defaults and theming
+
+Set defaults under `params.slider`; any shortcode argument overrides them. The geometry, colors, and motion are `--slider-*` CSS variables in `static/css/slider.css`, so a custom stylesheet (see `params.customCSS`) can retheme every slider.
+
+```toml
+[params.slider]
+    value = 50
+    min = 0
+    max = 100
+    step = 1
+    unit = ""
+    width = ""
+    showValue = true
+    size = "medium"
+    tintColor = ""
+    trackColor = ""
+    thumbColor = ""
     class = ""
 ```
 
