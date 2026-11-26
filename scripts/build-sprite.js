@@ -230,7 +230,7 @@ async function main() {
   if (!enabled) {
     // Disabled: still (re)write the config so the committed sprites.json reflects this state —
     // Disabled: still (re)write the config so the committed sprites.json reflects this state —
-    // an empty map makes svg-icon.html fall back to the loose icon path (or the placeholder when path is unset).
+    // an empty map makes icon.html fall back to the loose icon path (or the placeholder when path is unset).
     fs.mkdirSync(path.dirname(resolved.map), { recursive: true });
     fs.writeFileSync(resolved.map, JSON.stringify({ enabled, map: {} }, null, 2) + '\n');
     console.log(C.dim(`Sprite build disabled — wrote ${resolved.map} with an empty map (site uses loose icon paths).`));

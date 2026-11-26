@@ -236,7 +236,7 @@
 		{{- if $disabled }} disabled{{ end }}
 		{{- with $ariaLabel }} aria-label="{{ . }}"{{ end }}>
 	<span class="checkbox-box" aria-hidden="true">
-		{{- partial "svg-icon.html" (dict "path" "svg/ui-oval/check.svg" "class" "checkbox-mark") -}}
+		{{- partial "icon.html" (dict "path" "svg/ui-oval/check.svg" "class" "checkbox-mark") -}}
 	</span>
 	{{- with $labelHTML }}
 	<span class="checkbox-label">{{ . | safeHTML }}</span>

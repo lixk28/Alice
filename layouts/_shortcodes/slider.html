@@ -24,7 +24,7 @@
     trackColor — remaining-track color (default: Gainsboro)
     thumbColor — thumb color (default: White)
     minIcon    — icon path under static/ drawn before the track
-                 (UISlider's minimumValueImage); resolved by svg-icon.html
+                 (UISlider's minimumValueImage); resolved by icon.html
     maxIcon    — icon path under static/ drawn after the track
                  (UISlider's maximumValueImage)
     disabled   — disabled state
@@ -236,9 +236,9 @@
 {{- end -}}
 
 {{- $minIconHTML := "" -}}
-{{- with .Get "minIcon" -}}{{- $minIconHTML = partial "svg-icon.html" (dict "path" . "class" "slider-endcap-icon") -}}{{- end -}}
+{{- with .Get "minIcon" -}}{{- $minIconHTML = partial "icon.html" (dict "path" . "class" "slider-endcap-icon") -}}{{- end -}}
 {{- $maxIconHTML := "" -}}
-{{- with .Get "maxIcon" -}}{{- $maxIconHTML = partial "svg-icon.html" (dict "path" . "class" "slider-endcap-icon") -}}{{- end -}}
+{{- with .Get "maxIcon" -}}{{- $maxIconHTML = partial "icon.html" (dict "path" . "class" "slider-endcap-icon") -}}{{- end -}}
 
 {{- $class := "" -}}
 {{- if isset $opts "class" -}}{{- $class = printf "%v" (index $opts "class") -}}{{- end -}}

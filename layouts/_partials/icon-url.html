@@ -1,0 +1,32 @@
+{{- /*
+Resolve an icon path to a `<sprite>#<id>` URL (or a loose SVG URL).
+
+This is the shared lookup behind `layouts/_partials/icon.html` and every template that renders an icon.
+The sprite map (`static/svg/sprite/sprites.json`, `{ "enabled", "map" }`) is read ONCE and cached in
+hugo.Store.
+
+Parameters (flat dict):
+  path (string)    : the icon's key relative to the sprite `rootDir`, e.g. "svg/ui-oval/check.svg".
+  mapPath (string) : path to the generated sprites.json. Defaults to "static/svg/sprite/sprites.json".
+
+Returns the icon URL as a string:
+  1. `enabled` + `path` present in the map → "<sprite>#<id>" (both relURL'd).
+  2. otherwise → the loose `path` file (relURL'd).
+  3. when `path` is empty → `params.icons.placeholder` (default "svg/placeholder.svg").
+*/ -}}
+{{- $configPath := .mapPath | default "static/svg/sprite/sprites.json" -}}
+{{- $configKey := printf "alice-sprite-config:%s" $configPath -}}
+{{- $config := hugo.Store.Get $configKey -}}
+{{- if not $config -}}
+	{{- $config = $configPath | os.ReadFile | transform.Unmarshal -}}
+	{{- hugo.Store.Set $configKey $config -}}
+{{- end -}}
+{{- $icons := site.Params.icons | default dict -}}
+{{- $placeholder := $icons.placeholder | default "svg/placeholder.svg" -}}
+{{- $resolvedPath := .path | default $placeholder -}}
+{{- $iconURL := $resolvedPath | relURL -}}
+{{- if and $config.enabled (index $config.map $resolvedPath) -}}
+	{{- $entry := index $config.map $resolvedPath -}}
+	{{- $iconURL = printf "%s#%s" ((index $entry "sprite") | relURL) (index $entry "id") -}}
+{{- end -}}
+{{- return $iconURL -}}

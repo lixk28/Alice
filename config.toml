@@ -304,7 +304,19 @@
         up = "svg/ui-oval/chevron-up.svg"
         down = "svg/ui-oval/chevron-down.svg"
 
-    # Only the universal fallback lives here; component icons live under their own params.
+    # Icon shortcode defaults ({{< icon >}}). Any shortcode argument wins.
+    [params.icon]
+        # Icon set directory under static/svg for a bare `name`.
+        set = "ui-oval"
+        # Default size (any CSS length; a bare number means px). Empty uses
+        # 1em from static/css/icon.css.
+        size = ""
+        # Default color (any CSS color). Empty inherits the surrounding text color.
+        color = ""
+        # Extra classes added to every icon.
+        class = ""
+
+    # Universal fallback path; the icon component's defaults live in params.icon above.
     [params.icons]
         placeholder = "svg/placeholder.svg"
 

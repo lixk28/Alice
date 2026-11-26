@@ -325,12 +325,12 @@
 	"pause" "svg/ui-oval/pause.svg"
 -}}
 {{- $icons := merge $iconDefaults (site.Params.carousel.icons | default dict) -}}
-{{- $prevIcon := partial "svg-icon.html" (dict "path" ($icons.prev | default "svg/ui-oval/chevron-left.svg") "class" "carousel-control-icon") -}}
-{{- $nextIcon := partial "svg-icon.html" (dict "path" ($icons.next | default "svg/ui-oval/chevron-right.svg") "class" "carousel-control-icon") -}}
-{{- $playIcon := partial "svg-icon.html" (dict "path" ($icons.play | default "svg/ui-oval/play.svg") "class" "carousel-control-icon") -}}
+{{- $prevIcon := partial "icon.html" (dict "path" ($icons.prev | default "svg/ui-oval/chevron-left.svg") "class" "carousel-control-icon") -}}
+{{- $nextIcon := partial "icon.html" (dict "path" ($icons.next | default "svg/ui-oval/chevron-right.svg") "class" "carousel-control-icon") -}}
+{{- $playIcon := partial "icon.html" (dict "path" ($icons.play | default "svg/ui-oval/play.svg") "class" "carousel-control-icon") -}}
 {{- $pauseIcon := "" -}}
 {{- with $icons.pause -}}
-	{{- $pauseIcon = partial "svg-icon.html" (dict "path" . "class" "carousel-control-icon") -}}
+	{{- $pauseIcon = partial "icon.html" (dict "path" . "class" "carousel-control-icon") -}}
 {{- else -}}
 	{{- $pauseIcon = `<svg class="carousel-control-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5v14M15 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>` -}}
 {{- end -}}

@@ -1,0 +1,143 @@
+{{- /*
+Icon renderer — draw an SVG icon from the theme's sprite.
+
+The URL is resolved by `icon-url.html`, so built-in icons use the bundled sprite and custom icons under
+`static/` fall back to a loose SVG file. The `icon` shortcode calls this partial in `styled` mode; template
+call sites that need their own classes (menu icons, button icons, and so on) leave `styled` off.
+
+Parameters (flat dict, all optional):
+  path      — icon path relative to static/ (the sprite rootDir), e.g. "svg/ui-oval/check.svg"; wins over name.
+  name      — icon name inside `set` (e.g. "check"), or an icon path when it contains "/" or ends in ".svg".
+  set       — icon set directory under static/svg for `name`. Default: params.icon.set or "ui-oval".
+  size      — CSS length applied to both dimensions; a bare number means px.
+  width     — CSS width override (a bare number means px).
+  height    — CSS height override (a bare number means px).
+  color     — any CSS color; the icons stroke/fill with currentColor. Empty inherits the text color.
+  class     — extra class(es) on the `<svg>`; a list is joined with spaces.
+  id        — id attribute.
+  title     — tooltip and accessible name (renders a `<title>`).
+  ariaLabel — accessible name; defaults to `title`, otherwise the icon is aria-hidden.
+  style     — extra inline CSS appended after the component variables.
+  attrs     — raw extra attributes appended to the `<svg>` tag.
+  mapPath   — custom sprites.json path, forwarded to `icon-url.html`.
+  styled    — true adds the component's `icon` class and applies the params.icon size/color/class defaults.
+              The `icon` shortcode sets it; template call sites that style the icon themselves leave it off.
+
+Site defaults (styled mode): params.icon (set, size, color, class).
+Stylesheet: static/css/icon.css, imported by style.css.
+*/ -}}
+{{- $ctx := . -}}
+{{- $styled := in (slice "true" "yes" "1" "on") (lower (printf "%v" ($ctx.styled | default false))) -}}
+{{- $site := site.Params.icon | default dict -}}
+
+{{- /* Resolve the icon path. `path` wins; `name` is a convenience that maps
+       "check" to "svg/<set>/check.svg" and keeps path-shaped names working. */ -}}
+{{- $path := trim (printf "%v" ($ctx.path | default "")) " \t\r\n" -}}
+{{- $name := trim (printf "%v" ($ctx.name | default "")) " \t\r\n" -}}
+{{- $setDefault := "ui-oval" -}}
+{{- if $styled -}}{{- $setDefault = index $site "set" | default "ui-oval" -}}{{- end -}}
+{{- $set := trim (printf "%v" ($ctx.set | default $setDefault)) " \t\r\n/" -}}
+{{- if not $set -}}{{- $set = "ui-oval" -}}{{- end -}}
+{{- if not (findRE `^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*$` $set) -}}
+	{{- warnf "icon: invalid set %q; using \"ui-oval\"" $set -}}
+	{{- $set = "ui-oval" -}}
+{{- end -}}
+{{- if and (not $path) $name -}}
+	{{- if hasSuffix (lower $name) ".svg" -}}
+		{{- $name = substr $name 0 (sub (len $name) 4) -}}
+	{{- end -}}
+	{{- if strings.Contains $name "/" -}}
+		{{- $path = printf "%s.svg" $name -}}
+	{{- else -}}
+		{{- $path = printf "svg/%s/%s.svg" $set $name -}}
+	{{- end -}}
+{{- end -}}
+{{- $path = strings.Trim $path "/" -}}
+{{- if $path -}}
+	{{- if or (not (findRE `^[A-Za-z0-9_@%+~./-]+$` $path)) (strings.Contains $path "..") -}}
+		{{- warnf "icon: invalid path %q; using the placeholder" $path -}}
+		{{- $path = "" -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* size / width / height: a bare number means px; other values must be a
+       plain CSS length, var(--token), or calc()/clamp()/min()/max(). */ -}}
+{{- $lengths := dict -}}
+{{- range $key := slice "size" "width" "height" -}}
+	{{- $default := "" -}}
+	{{- if $styled -}}{{- $default = index $site $key | default "" -}}{{- end -}}
+	{{- $raw := index $ctx $key | default $default | default "" -}}
+	{{- $value := trim (printf "%v" $raw) " \t\r\n" -}}
+	{{- with $value -}}
+		{{- $value = replaceRE `\s+` " " . -}}
+		{{- if findRE `^([0-9]+(\.[0-9]+)?|\.[0-9]+)$` $value -}}
+			{{- $value = printf "%spx" $value -}}
+		{{- end -}}
+		{{- $ok := or
+			(findRE `^([0-9]+(\.[0-9]+)?|\.[0-9]+)(px|em|rem|ex|ch|vw|vh|vmin|vmax|%|pt|pc|cm|mm|in)$` $value)
+			(findRE `^var\(--[A-Za-z0-9_-]+\)$` $value)
+			(findRE `^(calc|clamp|min|max)\([0-9A-Za-z%.,+*/( )-]+\)$` $value)
+		-}}
+		{{- if $ok -}}
+			{{- $lengths = merge $lengths (dict $key $value) -}}
+		{{- else -}}
+			{{- warnf "icon: invalid %s %q; using the default" $key $value -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* color: reject anything that could escape the style declaration. */ -}}
+{{- $colorDefault := "" -}}
+{{- if $styled -}}{{- $colorDefault = index $site "color" | default "" -}}{{- end -}}
+{{- $color := "" -}}
+{{- with trim (printf "%v" ($ctx.color | default $colorDefault | default "")) " \t\r\n" -}}
+	{{- $value := replaceRE `\s+` " " . -}}
+	{{- if findRE `^[#A-Za-z0-9_(),.%+/ -]+$` $value -}}
+		{{- $color = $value -}}
+	{{- else -}}
+		{{- warnf "icon: invalid color %q; using the default" $value -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $classDefault := "" -}}
+{{- if $styled -}}{{- $classDefault = index $site "class" | default "" -}}{{- end -}}
+{{- $class := $ctx.class | default $classDefault | default "" -}}
+{{- if reflect.IsSlice $class -}}{{- $class = delimit $class " " -}}{{- end -}}
+{{- $class = trim (printf "%v" $class) " \t\r\n" -}}
+{{- $classes := slice -}}
+{{- if $styled -}}{{- $classes = $classes | append "icon" -}}{{- end -}}
+{{- with $class -}}{{- $classes = $classes | append . -}}{{- end -}}
+{{- $classAttr := delimit $classes " " -}}
+
+{{- $id := trim (printf "%v" ($ctx.id | default "")) " \t\r\n" -}}
+{{- $title := trim (printf "%v" ($ctx.title | default "")) " \t\r\n" -}}
+{{- $ariaLabel := trim (printf "%v" ($ctx.ariaLabel | default "")) " \t\r\n" -}}
+{{- if and $title (not $ariaLabel) -}}{{- $ariaLabel = $title -}}{{- end -}}
+
+{{- $styleParts := slice -}}
+{{- with index $lengths "size" -}}{{- $styleParts = $styleParts | append (printf "--icon-size: %s" .) -}}{{- end -}}
+{{- with index $lengths "width" -}}{{- $styleParts = $styleParts | append (printf "--icon-width: %s" .) -}}{{- end -}}
+{{- with index $lengths "height" -}}{{- $styleParts = $styleParts | append (printf "--icon-height: %s" .) -}}{{- end -}}
+{{- with $color -}}{{- $styleParts = $styleParts | append (printf "--icon-color: %s" .) -}}{{- end -}}
+{{- with trim (printf "%v" ($ctx.style | default "")) " \t\r\n" -}}{{- $styleParts = $styleParts | append . -}}{{- end -}}
+{{- $style := delimit $styleParts "; " -}}
+
+{{- $iconURL := partial "icon-url.html" (dict "path" $path "mapPath" $ctx.mapPath) -}}
+{{- $titleEl := "" -}}
+{{- with $title -}}{{- $titleEl = printf "<title>%s</title>" (htmlEscape .) -}}{{- end -}}
+
+{{- $attrParts := slice -}}
+{{- with $classAttr -}}{{- $attrParts = $attrParts | append (printf `class="%s"` (htmlEscape .)) -}}{{- end -}}
+{{- with $id -}}{{- $attrParts = $attrParts | append (printf `id="%s"` (htmlEscape .)) -}}{{- end -}}
+{{- if $ariaLabel -}}
+	{{- $attrParts = $attrParts | append (printf `role="img" aria-label="%s"` (htmlEscape $ariaLabel)) -}}
+{{- else -}}
+	{{- $attrParts = $attrParts | append `aria-hidden="true"` -}}
+{{- end -}}
+{{- with $style -}}{{- $attrParts = $attrParts | append (printf `style="%s"` (. | safeCSS)) -}}{{- end -}}
+{{- $attrString := delimit $attrParts " " -}}
+{{- with trim (printf "%v" ($ctx.attrs | default "")) " \t\r\n" -}}
+	{{- $attrString = printf "%s %s" $attrString . -}}
+{{- end -}}
+{{- $svgHTML := printf `<svg %s>%s<use href="%s"/></svg>` $attrString $titleEl (htmlEscape $iconURL) -}}
+{{- $svgHTML | safeHTML -}}

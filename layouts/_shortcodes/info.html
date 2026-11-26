@@ -7,8 +7,8 @@
     "summary" (.Get "title" | default (.Get 0) | default ($cfg.info.title | default ""))
     "collapsible" (.Get "collapsible" | default ($cfg.info.collapsible | default ($cfg.collapsible | default "no")))
     "open" (.Get "open" | default ($cfg.info.open | default ($cfg.open | default "")))
-    "icon" (partial "svg-icon.html" (dict "path" ($cfg.info.icon | default ($icons.placeholder | default "svg/placeholder.svg")) "class" "admonition-icon indicator info"))
-    "marker" (partial "svg-icon.html" (dict "path" ($cfg.info.marker | default ($icons.placeholder | default "svg/placeholder.svg")) "class" "admonition-icon marker info"))
+    "icon" (partial "icon.html" (dict "path" ($cfg.info.icon | default ($icons.placeholder | default "svg/placeholder.svg")) "class" "admonition-icon indicator info"))
+    "marker" (partial "icon.html" (dict "path" ($cfg.info.marker | default ($icons.placeholder | default "svg/placeholder.svg")) "class" "admonition-icon marker info"))
     "markerPosition" ($cfg.info.markerPosition | default ($cfg.markerPosition | default "end"))
     "markerRotation" ($cfg.info.markerRotation | default ($cfg.markerRotation | default "counterclockwise"))
 -}}

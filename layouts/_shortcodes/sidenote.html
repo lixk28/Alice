@@ -8,7 +8,7 @@
     <label class="sidenote-label" for="sidenote-{{ $index }}-checkbox">{{ $label | chomp | markdownify }}</label>
     <input class="sidenote-checkbox" type="checkbox" id="sidenote-{{ $index }}-checkbox"></input>
     <span class="sidenote-content" id="sidenote-{{ $index }}-content">
-        {{ partial "svg-icon.html" (dict
+        {{ partial "icon.html" (dict
             "path" (site.Params.sidenote.icon | default ($icons.placeholder | default "svg/placeholder.svg"))
             "class" "sidenote-pin-icon"
         ) }}

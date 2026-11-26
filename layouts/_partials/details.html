@@ -15,10 +15,10 @@
 {{- $detailsIcons := $details.icons | default dict -}}
 {{- $icon := .icon -}}
 {{- if not $icon -}}
-    {{- $icon = partial "svg-icon.html" (dict "path" ($detailsIcons.icon | default "svg/ui-oval/info-square.svg")) -}}
+    {{- $icon = partial "icon.html" (dict "path" ($detailsIcons.icon | default "svg/ui-oval/info-square.svg")) -}}
 {{- end -}}
 
-{{- $marker := .marker | default (partial "svg-icon.html" (dict "path" ($detailsIcons.marker | default "svg/ui-oval/play.svg"))) -}}
+{{- $marker := .marker | default (partial "icon.html" (dict "path" ($detailsIcons.marker | default "svg/ui-oval/play.svg"))) -}}
 <!-- {{ print $marker }} -->
 
 {{- $markerPosition := .markerPosition | lower | default "end" -}}

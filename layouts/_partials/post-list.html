@@ -75,7 +75,7 @@ configures the pinned group's heading and icon.
 	{{- if $group.hasTitle }}
 	<h3{{ with $group.titleClass }} class="{{ . }}"{{ end }}>
 		{{- with $group.icon -}}
-		{{- partial "svg-icon.html" (dict "path" . "class" "pinned-post-icon") -}}
+		{{- partial "icon.html" (dict "path" . "class" "pinned-post-icon") -}}
 		{{- end -}}
 		{{- $group.title -}}
 	</h3>

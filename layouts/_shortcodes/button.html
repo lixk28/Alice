@@ -31,7 +31,7 @@
     block      — full-width button: true|false (default: params.button.block)
     active     — pressed appearance + aria-pressed="true"
     disabled   — disabled state; a disabled buttongroup disables every child
-    icon       — icon path under static/, resolved by svg-icon.html
+    icon       — icon path under static/, resolved by icon.html
     iconPos    — icon placement: start|end (default: start)
     title      — native tooltip
     ariaLabel  — accessible name when the visible label is empty or differs
@@ -177,7 +177,7 @@
 {{- end -}}
 {{- $iconHTML := "" -}}
 {{- with .Get "icon" -}}
-	{{- $iconHTML = partial "svg-icon.html" (dict "path" . "class" "button-icon") -}}
+	{{- $iconHTML = partial "icon.html" (dict "path" . "class" "button-icon") -}}
 {{- else -}}
 	{{- if eq $type "download" -}}
 		{{- $iconHTML = `<svg class="button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` -}}

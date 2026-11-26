@@ -56,7 +56,7 @@
     {{- $icons := site.Params.icons | default dict -}}
     {{- $iconMap := $cfg.iconmap | default dict -}}
     {{- $iconPath := index $iconMap $type | default ($iconMap.default | default ($icons.placeholder | default "svg/placeholder.svg")) -}}
-    {{- $icon = partial "svg-icon.html" (dict
+    {{- $icon = partial "icon.html" (dict
         "path" $iconPath
         "class" "attachment-icon") -}}
 {{- end -}}

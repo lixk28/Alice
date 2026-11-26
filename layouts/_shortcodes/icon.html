@@ -1,0 +1,55 @@
+{{- /*
+  Icon shortcode — render an SVG icon from the theme's sprite, with per-icon
+  color and size.
+
+  Usage:
+    {{< icon name="check" >}}
+    {{< icon name="check" size="24" color="Navy" >}}
+    {{< icon name="lightbulb-05" size="2em" color="RoyalBlue" >}}
+    {{< icon path="svg/custom/logo.svg" size="1.5em" >}}
+    {{< icon name="info-square" title="Note" >}}
+
+  Args (all optional):
+    name      — icon name in `set`, e.g. "check"; a name containing "/" or
+                ending in ".svg" is treated as a path
+    path      — icon path relative to static/, e.g.
+                "svg/ui-oval/check.svg"; wins over name
+    set       — icon set directory under static/svg for name
+                (default: params.icon.set or "ui-oval")
+    size      — CSS length (a bare number means px), applied to width and
+                height (default: params.icon.size or 1em from icon.css)
+    width     — CSS width override (a bare number means px)
+    height    — CSS height override (a bare number means px)
+    color     — any CSS color; empty inherits the surrounding text color
+                (default: params.icon.color)
+    class     — extra classes on the <svg>
+    id        — id attribute
+    title     — tooltip and accessible name; renders a <title>
+    ariaLabel — accessible name (defaults to title); without either, the icon
+                is aria-hidden, i.e. decorative
+    style     — extra inline CSS
+    attrs     — raw extra attributes on the <svg>
+    mapPath   — custom sprites.json path (advanced)
+
+  The rendering lives in layouts/_partials/icon.html; URL resolution is shared
+  with the other icon call sites through layouts/_partials/icon-url.html.
+  Styles are in static/css/icon.css and defaults under params.icon.
+*/ -}}
+{{- $args := dict
+	"path" (.Get "path" | default "")
+	"name" (.Get "name" | default "")
+	"set" (.Get "set" | default "")
+	"size" (.Get "size" | default "")
+	"width" (.Get "width" | default "")
+	"height" (.Get "height" | default "")
+	"color" (.Get "color" | default "")
+	"class" (.Get "class" | default "")
+	"id" (.Get "id" | default "")
+	"title" (.Get "title" | default "")
+	"ariaLabel" (.Get "ariaLabel" | default "")
+	"style" (.Get "style" | default "")
+	"attrs" (.Get "attrs" | default "")
+	"mapPath" (.Get "mapPath" | default "")
+	"styled" true
+-}}
+{{- partial "icon.html" $args -}}

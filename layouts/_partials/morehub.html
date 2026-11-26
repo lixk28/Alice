@@ -22,7 +22,7 @@
 	{{- $path := .Params.icon.path -}}
 	<li>
 		{{- with $path }}
-			{{ partial "svg-icon.html" (dict "path" . "class" (printf "menu-icon menu-%s-icon" $id)) }}
+			{{ partial "icon.html" (dict "path" . "class" (printf "menu-icon menu-%s-icon" $id)) }}
 		{{- end }}
 		<a href="{{ .URL | relURL }}">{{ .Name }}</a>
 		<span>({{ $kind }})</span>

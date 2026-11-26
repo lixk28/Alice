@@ -10,7 +10,7 @@
 {{- with $item.Params.icon.class -}}
 	{{- if reflect.IsSlice . -}}{{- range . -}}{{- $iconClass = $iconClass | append . -}}{{- end -}}{{- else -}}{{- $iconClass = $iconClass | append . -}}{{- end -}}
 {{- end -}}
-{{- $icon := partial "svg-icon.html" (dict "path" $item.Params.icon.path "class" $iconClass "id" $item.Params.icon.id "attrs" $item.Params.icon.attrs) -}}
+{{- $icon := partial "icon.html" (dict "path" $item.Params.icon.path "class" $iconClass "id" $item.Params.icon.id "attrs" $item.Params.icon.attrs) -}}
 
 {{- if not $item.HasChildren -}}
 	{{- if eq $variant "hamburger" -}}
@@ -32,7 +32,7 @@
 		{{- with .Params.icon.class -}}
 			{{- if reflect.IsSlice . -}}{{- range . -}}{{- $childClass = $childClass | append . -}}{{- end -}}{{- else -}}{{- $childClass = $childClass | append . -}}{{- end -}}
 		{{- end -}}
-		{{- $childIcon := partial "svg-icon.html" (dict "path" .Params.icon.path "class" $childClass "id" .Params.icon.id "attrs" .Params.icon.attrs) -}}
+		{{- $childIcon := partial "icon.html" (dict "path" .Params.icon.path "class" $childClass "id" .Params.icon.id "attrs" .Params.icon.attrs) -}}
 		{{- $lis = printf `%s<li class="dropdown-menu-item">%s<b><a href="%s">%s</a></b></li>` $lis $childIcon (.URL | relURL) .Name -}}
 	{{- end -}}
 	{{- $panel := printf `<ul class="dropdown-menu">%s</ul>` $lis | safeHTML -}}

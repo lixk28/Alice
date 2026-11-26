@@ -2,7 +2,7 @@
 {{- $isExternal := $url.IsAbs -}}
 {{- $link := site.Params.link | default dict -}}
 {{- $linkIcons := $link.icons | default dict -}}
-{{- $externalIcon := partial "svg-icon.html" (dict "path" ($linkIcons.external | default "svg/ui-oval/link-external-02.svg") "class" "external-anchor-icon") -}}
+{{- $externalIcon := partial "icon.html" (dict "path" ($linkIcons.external | default "svg/ui-oval/link-external-02.svg") "class" "external-anchor-icon") -}}
 
 <a href="{{ .Destination | safeURL }}"
     {{- with .Title }} title="{{ . }}"{{ end -}}

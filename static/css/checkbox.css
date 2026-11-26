@@ -87,7 +87,7 @@
 }
 
 /* The check mark is the theme's ui-oval check icon, resolved through
-   svg-icon.html and laid over the box. It is revealed when the input is
+   icon.html and laid over the box. It is revealed when the input is
    checked; the icon's currentColor follows --checkbox-check-color. */
 .checkbox-mark {
     position: absolute;

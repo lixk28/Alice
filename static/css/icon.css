@@ -1,0 +1,26 @@
+/*
+ * Icon component — styles for the `icon` shortcode and the styled mode of the
+ * `icon.html` partial. Template call sites that render an icon with their own
+ * component class (menu, button, breadcrumb, …) are styled by their own sheet.
+ *
+ * An icon is an inline `<svg>` whose sprite symbol paints with currentColor,
+ * so `--icon-color` (or the surrounding text color) themes it. Size is
+ * controlled by `--icon-size`, with `--icon-width` / `--icon-height` as
+ * per-dimension overrides. Every token can be re-pointed from a custom
+ * stylesheet without touching the template.
+ */
+
+:root {
+    --icon-size: var(--svg-size-normal);
+    --icon-color: currentColor;
+    --icon-vertical-align: -0.15em;
+}
+
+svg.icon {
+    display: inline-block;
+    flex: none;
+    width: var(--icon-width, var(--icon-size));
+    height: var(--icon-height, var(--icon-size));
+    color: var(--icon-color, currentColor);
+    vertical-align: var(--icon-vertical-align);
+}

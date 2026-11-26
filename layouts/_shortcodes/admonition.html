@@ -9,11 +9,11 @@
 {{- $collapsible := .Get "collapsible" | default ($typeCfg.collapsible | default ($cfg.collapsible | default "no")) -}}
 {{- $open := .Get "open" | default ($typeCfg.open | default ($cfg.open | default "")) -}}
 
-{{- $icon := partial "svg-icon.html" (dict
+{{- $icon := partial "icon.html" (dict
     "path" ($typeCfg.icon | default ($icons.placeholder | default "svg/placeholder.svg"))
     "class" (printf "admonition-icon indicator %s" $type)
 ) -}}
-{{- $marker := partial "svg-icon.html" (dict
+{{- $marker := partial "icon.html" (dict
     "path" ($typeCfg.marker | default ($icons.placeholder | default "svg/placeholder.svg"))
     "class" (printf "admonition-icon marker %s" $type)
 ) -}}

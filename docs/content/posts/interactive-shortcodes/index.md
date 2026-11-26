@@ -27,6 +27,57 @@ tex:
 mermaid: false
 ---
 
+## Icon
+
+`icon` renders an inline SVG from the theme's icon sprite. The icon inherits the surrounding text color by default; `color` and `size` override it per use. `size` accepts any CSS length, and a bare number means pixels.
+
+{{< icon name="lightbulb-05" >}} default size (1em)<br>
+{{< icon name="lightbulb-05" size="16" >}} 16px<br>
+{{< icon name="lightbulb-05" size="24" color="Navy" >}} 24px, Navy<br>
+{{< icon name="lightbulb-05" size="2em" color="RoyalBlue" >}} 2em, RoyalBlue
+
+Icons flow with text too: a {{< icon name="check" color="Green" >}} check, a {{< icon name="x-close" color="Crimson" >}} cross, and a {{< icon name="info-square" color="RoyalBlue" >}} note.
+
+An icon with `title` is announced as an image rather than hidden: {{< icon name="help-circle" title="Help" >}}
+
+Usage:
+
+```
+{{</* icon name="check" size="24" color="Navy" */>}}
+
+{{</* icon path="svg/ui-oval/check.svg" size="1.5em" */>}}
+```
+
+A bare `name` is looked up in `params.icon.set` (default `ui-oval`), so `name="check"` renders `svg/ui-oval/check.svg`. Use `path` for a custom icon under `static/`, or a path-shaped `name` such as `name="svg/my-set/logo.svg"`.
+
+Parameters:
+
+| Name | Description |
+| --- | --- |
+| `name` | Icon name in `set`, e.g. `check`; a name containing `/` or ending in `.svg` is treated as a path. |
+| `path` | Icon path relative to `static/`, e.g. `svg/ui-oval/check.svg`; wins over `name`. |
+| `set` | Icon set directory under `static/svg` for `name`. Default: `params.icon.set` or `ui-oval`. |
+| `size` | CSS length applied to width and height; a bare number means px. Default: `params.icon.size`, then `1em`. |
+| `width`, `height` | Per-dimension CSS length overrides; a bare number means px. |
+| `color` | Any CSS color (named, hex, `rgb()`, `hsl()`, or `var(--token)`). Empty inherits the text color. |
+| `class`, `id` | Extra class(es) and id on the `<svg>`. |
+| `title` | Tooltip and accessible name; renders a `<title>`. |
+| `ariaLabel` | Accessible name; defaults to `title`. Without either, the icon is `aria-hidden` and decorative. |
+| `style`, `attrs` | Extra inline CSS and raw attributes on the `<svg>`. |
+| `mapPath` | Custom `sprites.json` path, for an advanced sprite setup. |
+
+Site-wide defaults and theming:
+
+```toml
+[params.icon]
+    set = "ui-oval"
+    size = ""
+    color = ""
+    class = ""
+```
+
+`static/css/icon.css` exposes `--icon-size`, `--icon-color`, `--icon-vertical-align`, `--icon-width`, and `--icon-height`, so a custom stylesheet can retheme every icon.
+
 ## Dropdown
 
 Floating panel with an optional left-side `title` and a play caret on the right. The same partial also powers nested header menu items (any `menu.main` entry with `parent` children).
@@ -131,7 +182,7 @@ Custom colors (`borderColor`, `tintColor`, `textColor`):
 
 ### Icons
 
-`icon` takes a sprite path under `static/` and resolves it through the theme's `svg-icon.html` partial. `iconPos` is `start` (default) or `end`. An icon-only button needs `label=""` plus `ariaLabel` or `title`.
+`icon` takes a sprite path under `static/` and resolves it through the theme's `icon.html` partial. `iconPos` is `start` (default) or `end`. An icon-only button needs `label=""` plus `ariaLabel` or `title`.
 
 {{< button label="Read the posts" href="/posts/" icon="svg/ui-oval/chevron-right.svg" iconPos="end" >}}
 {{< button label="" icon="svg/ui-oval/copy-01.svg" title="Copy something" >}}
@@ -172,7 +223,7 @@ The link form loads a script once per page, even when several buttons share it. 
 | `block` | Full-width button. Default: `params.button.block` or `false`. |
 | `active` | Pressed appearance; also sets `aria-pressed="true"`. |
 | `disabled` | Disabled state. |
-| `icon` | Icon path under `static/`, e.g. `svg/ui-oval/chevron-right.svg`; resolved by `svg-icon.html`. |
+| `icon` | Icon path under `static/`, e.g. `svg/ui-oval/chevron-right.svg`; resolved by `icon.html`. |
 | `iconPos` | Icon placement: `start` (default) or `end`; `before`/`after` are aliases. |
 | `title` | Native tooltip, also used as the accessible name for an icon-only button. |
 | `ariaLabel` | Accessible name when the visible label is empty or differs. |
@@ -586,7 +637,7 @@ Without them the control follows the theme: CornflowerBlue, Gainsboro, and White
 
 ### End icons
 
-`minIcon` and `maxIcon` draw an icon at the two ends of the track, like UISlider's `minimumValueImage` and `maximumValueImage`. They take an icon path under `static/` and resolve through `svg-icon.html`:
+`minIcon` and `maxIcon` draw an icon at the two ends of the track, like UISlider's `minimumValueImage` and `maximumValueImage`. They take an icon path under `static/` and resolve through `icon.html`:
 
 {{< slider label="Text size" min=10 max=24 step=1 value=16 minIcon="svg/ui-oval/align-left-02.svg" maxIcon="svg/ui-oval/align-right-01.svg" >}}
 
@@ -634,7 +685,7 @@ Inline sliders side by side: {{< slider label="Left" value=30 size="small" inlin
 | `tintColor` | Minimum-track color. Default: the theme's CornflowerBlue. |
 | `trackColor` | Remaining-track color. Default: Gainsboro. |
 | `thumbColor` | Thumb color. Default: White. |
-| `minIcon`, `maxIcon` | Icon paths under `static/` drawn at the track ends, e.g. `svg/ui-oval/align-left-02.svg`; resolved by `svg-icon.html`. |
+| `minIcon`, `maxIcon` | Icon paths under `static/` drawn at the track ends, e.g. `svg/ui-oval/align-left-02.svg`; resolved by `icon.html`. |
 | `disabled` | Disabled state. |
 | `name` | Form field name. |
 | `ariaLabel` | Accessible name when there is no visible label. |
@@ -1092,7 +1143,7 @@ Carousel ids are generated from the shortcode's ordinal on the page and are not 
 
 ### Site-wide defaults
 
-Set defaults under `params.carousel` in the site configuration. Autoplay, navigator, and indicator settings are grouped under their own tables; shortcode arguments stay flat (`autoplay`, `navigatorOverlay`, `indicatorStyle`, etc.). Any shortcode argument overrides them. The `icons` table maps each control to an icon path under `static/`, resolved by `svg-icon.html`.
+Set defaults under `params.carousel` in the site configuration. Autoplay, navigator, and indicator settings are grouped under their own tables; shortcode arguments stay flat (`autoplay`, `navigatorOverlay`, `indicatorStyle`, etc.). Any shortcode argument overrides them. The `icons` table maps each control to an icon path under `static/`, resolved by `icon.html`.
 
 ```toml
 [params.carousel]
