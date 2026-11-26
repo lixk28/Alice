@@ -1,0 +1,228 @@
+/*
+ * TextLine component — used by the `textline` shortcode.
+ *
+ * A single-line text field: a thin SlateGray border, a small inset shadow,
+ * and a soft focus ring in RoyalBlue. An optional icon sits inside the field
+ * on the left or right, and an optional tip renders as a small hint below it.
+ * The control is a native <input type="text">, so it works before JavaScript
+ * loads and keeps the browser's keyboard, selection, and screen-reader
+ * behavior.
+ *
+ * Geometry, colors, sizes, and motion are --textline-* variables, so a site
+ * stylesheet can retheme every text line.
+ */
+
+:root {
+    /* Layout and type */
+    --textline-font-size: var(--font-size-normal);
+    --textline-gap: .35em;
+    --textline-label-color: var(--font-color);
+    --textline-text-color: var(--font-color);
+    --textline-placeholder-color: DimGray;
+
+    /* Field surface */
+    --textline-field-bg: White;
+    --textline-border-width: 1px;
+    --textline-border-color: SlateGray;
+    --textline-border-radius: .3em;
+    --textline-padding-y: .45em;
+    --textline-padding-x: .7em;
+
+    /* Icon inside the field */
+    --textline-icon-color: SlateGray;
+    --textline-icon-size: 1.1em;
+    --textline-icon-gap: .5em;
+
+    /* Tip below the field */
+    --textline-tip-color: DimGray;
+    --textline-tip-font-size: var(--font-size-small);
+
+    /* Depth and motion */
+    --textline-field-shadow: inset 0 .06em .12em rgba(0, 0, 0, .08);
+    --textline-field-shadow-hover: inset 0 .06em .14em rgba(0, 0, 0, .14);
+    --textline-transition: var(--transition-duration-fast) ease;
+
+    /* Focus */
+    --textline-focus-color: RoyalBlue;
+    --textline-focus-width: 2px;
+    --textline-focus-offset: .16em;
+
+    --textline-disabled-opacity: .5;
+
+    /* Sizes */
+    --textline-sm-font-size: var(--font-size-small);
+    --textline-sm-padding-y: .35em;
+    --textline-sm-padding-x: .55em;
+    --textline-sm-icon-size: 1em;
+    --textline-sm-tip-font-size: var(--font-size-tiny);
+
+    --textline-lg-font-size: var(--font-size-big);
+    --textline-lg-padding-y: .55em;
+    --textline-lg-padding-x: .85em;
+    --textline-lg-icon-size: 1.25em;
+    --textline-lg-tip-font-size: var(--font-size-small);
+}
+
+.textline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--textline-gap);
+    width: var(--textline-width, 100%);
+    margin: 1em 0;
+    font-family: var(--sans-font);
+    font-size: var(--textline-font-size);
+    line-height: 1.2;
+    color: var(--textline-label-color);
+}
+
+.textline-label {
+    min-width: 0;
+    cursor: pointer;
+}
+
+/* The visible field. The native input fills it, so the whole box is a click
+   target and the icon can be laid over the input's padding. */
+.textline-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    background-color: var(--textline-field-bg);
+    border: var(--textline-border-width) solid var(--textline-border-color);
+    border-radius: var(--textline-border-radius);
+    box-shadow: var(--textline-field-shadow);
+    transition: border-color var(--textline-transition),
+        box-shadow var(--textline-transition);
+}
+
+.textline-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    margin: 0;
+    padding: var(--textline-padding-y) var(--textline-padding-x);
+    font: inherit;
+    line-height: 1.4;
+    color: var(--textline-text-color);
+    background: transparent;
+    border: 0;
+    border-radius: inherit;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Leave room for the icon on the side that holds it. */
+.textline-field-icon-start .textline-input {
+    padding-left: calc(
+        var(--textline-padding-x) + var(--textline-icon-size) + var(--textline-icon-gap)
+    );
+}
+
+.textline-field-icon-end .textline-input {
+    padding-right: calc(
+        var(--textline-padding-x) + var(--textline-icon-size) + var(--textline-icon-gap)
+    );
+}
+
+.textline-input::placeholder {
+    color: var(--textline-placeholder-color);
+    opacity: 1;
+}
+
+.textline-icon {
+    position: absolute;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--textline-icon-color);
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.textline-icon-start {
+    left: var(--textline-padding-x);
+}
+
+.textline-icon-end {
+    right: var(--textline-padding-x);
+}
+
+.textline-icon svg {
+    display: block;
+    width: var(--textline-icon-size);
+    height: var(--textline-icon-size);
+}
+
+.textline-tip {
+    font-size: var(--textline-tip-font-size);
+    line-height: 1.4;
+    color: var(--textline-tip-color);
+}
+
+@media (hover: hover) {
+    .textline:not(.textline-disabled) .textline-field:hover {
+        border-color: DimGray;
+        box-shadow: var(--textline-field-shadow-hover);
+    }
+}
+
+/* The input has no outline of its own; the field shows the focus ring. The
+   border change works everywhere, and the ring uses :focus-visible so a mouse
+   click does not draw it. */
+.textline-field:focus-within {
+    border-color: var(--textline-focus-color);
+}
+
+.textline-field:has(.textline-input:focus-visible) {
+    outline: var(--textline-focus-width) solid var(--textline-focus-color);
+    outline-offset: var(--textline-focus-offset);
+}
+
+.textline-input:disabled {
+    cursor: not-allowed;
+}
+
+.textline-input:read-only:not(:disabled) {
+    cursor: default;
+}
+
+.textline-disabled {
+    opacity: var(--textline-disabled-opacity);
+}
+
+/* Inline mode: the wrapper is a <span>, so this also stays valid inside a
+   paragraph. Without an explicit width it shrinks to a 12em field; an
+   explicit width still lets the field fill the box. */
+.textline-inline {
+    display: inline-flex;
+    width: var(--textline-width, 12em);
+    margin: 0 .3em;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.textline-small {
+    --textline-font-size: var(--textline-sm-font-size);
+    --textline-padding-y: var(--textline-sm-padding-y);
+    --textline-padding-x: var(--textline-sm-padding-x);
+    --textline-icon-size: var(--textline-sm-icon-size);
+    --textline-tip-font-size: var(--textline-sm-tip-font-size);
+}
+
+.textline-large {
+    --textline-font-size: var(--textline-lg-font-size);
+    --textline-padding-y: var(--textline-lg-padding-y);
+    --textline-padding-x: var(--textline-lg-padding-x);
+    --textline-icon-size: var(--textline-lg-icon-size);
+    --textline-tip-font-size: var(--textline-lg-tip-font-size);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .textline-field {
+        transition: none;
+    }
+}

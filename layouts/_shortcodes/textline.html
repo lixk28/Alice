@@ -1,0 +1,346 @@
+{{- /*
+  TextLine shortcode — a theme-styled single-line text field.
+
+  Usage:
+    {{< textline label="Display name" placeholder="Alice" tip="Shown on your profile." >}}
+    {{< textline icon="user-01" placeholder="Username" ariaLabel="Username" >}}
+    {{< textline icon="svg/ui-oval/help-circle.svg" iconPos="right" placeholder="Ask a question" >}}
+    {{< textline label="Search" icon="search" js="console.log(el.id, el.value)" >}}
+
+  Args (all optional):
+    value       — initial text (default: params.textline.value or "")
+    placeholder — hint shown while the field is empty
+                  (default: params.textline.placeholder or "")
+    label       — visible text above the field, inline Markdown
+    tip         — short hint below the field, inline Markdown
+    icon        — icon path under static/, or a bare icon name such as
+                  "user-01" (looked up in iconSet)
+    iconSet     — icon set directory under static/svg for a bare icon name
+                  (default: ui-oval)
+    iconPos     — icon placement: start/left (default) or end/right
+    type        — native input type: text (default), search, email, url,
+                  tel, or password
+    size        — small|s, medium|m (default), or large|l
+    width       — CSS width of the whole control, e.g. "20em" or "60%"
+                  (default: params.textline.width, or 100% for a block
+                  field and 12em for an inline one)
+    inline      — render as an inline-flex box that can share a line with
+                  text instead of a full-width block: true|false
+    disabled    — disabled state
+    readonly    — read-only state (focusable, but not editable)
+    required    — mark the field as required by a form
+    maxlength   — maximum number of characters
+    autocomplete — native autocomplete token, e.g. "email" or "off"
+    name        — form field name
+    ariaLabel   — accessible name when there is no visible label
+                  (default: "Text input" for an unlabelled field)
+    title       — native tooltip
+    id          — input id (default: textline-<ordinal>)
+    class       — extra classes on the wrapper
+    js          — a script URL/path, or inline JavaScript source. A URL/path
+                  (http(s)://, //, /, ./, ../, a bare *.js path, a page-bundle
+                  resource, or an assets/ resource) is loaded once per page
+                  with <script src>; anything else is attached to the input
+                  event
+    jsMode      — "auto" (default), "src", or "inline"; forces how js is read
+    jsEvent     — event that runs inline js (default: "input");
+                  "load" runs it once after the DOM is ready
+
+  Site defaults live under params.textline. Colors, geometry, sizes, and
+  motion are --textline-* variables in static/css/textline.css.
+
+  The control is a native <input type="text">, so it works without
+  JavaScript and keeps the browser's keyboard, selection, and screen-reader
+  behavior. The label is tied to the input with `for`, and a tip is tied with
+  `aria-describedby`. Inline js runs as an event handler: `this` and `el` are
+  the input, `event` is the event, and `el.value` is the current text. With
+  jsEvent="load" the code runs after DOMContentLoaded instead, so `el` is
+  available and `event` is not.
+*/ -}}
+
+{{- /* Site defaults. Hugo lowercases config keys, while shortcode arguments
+       keep the case they were written in, so match the two case-insensitively. */ -}}
+{{- $siteTextline := site.Params.textline | default dict -}}
+{{- $siteOpts := dict -}}
+{{- $defaultKeys := slice "value" "placeholder" "size" "iconPos" "width" "class" -}}
+{{- if reflect.IsMap $siteTextline -}}
+	{{- range $key, $value := $siteTextline -}}
+		{{- range $defaultKey := $defaultKeys -}}
+			{{- if eq (lower $defaultKey) (lower $key) -}}
+				{{- $siteOpts = merge $siteOpts (dict $defaultKey $value) -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Resolve every default, letting a shortcode argument win even when it
+       is an empty string. */ -}}
+{{- $opts := $siteOpts -}}
+{{- if reflect.IsMap .Params -}}
+	{{- range $key := $defaultKeys -}}
+		{{- if isset $.Params $key -}}
+			{{- $opts = merge $opts (dict $key ($.Get $key)) -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $id := .Get "id" | default (printf "textline-%d" .Ordinal) -}}
+
+{{- $value := "" -}}
+{{- if isset $opts "value" -}}{{- $value = printf "%v" (index $opts "value") -}}{{- end -}}
+{{- $placeholder := "" -}}
+{{- if isset $opts "placeholder" -}}{{- $placeholder = printf "%v" (index $opts "placeholder") -}}{{- end -}}
+
+{{- /* Sizes; accept the same aliases as the other controls. */ -}}
+{{- $sizes := dict
+	"small" "small" "s" "small"
+	"medium" "medium" "m" "medium"
+	"large" "large" "l" "large"
+-}}
+{{- $sizeArg := "medium" -}}
+{{- if isset $opts "size" -}}{{- $sizeArg = lower (printf "%v" (index $opts "size")) -}}{{- end -}}
+{{- if not $sizeArg -}}{{- $sizeArg = "medium" -}}{{- end -}}
+{{- $size := "medium" -}}
+{{- if isset $sizes $sizeArg -}}
+	{{- $size = index $sizes $sizeArg -}}
+{{- else -}}
+	{{- warnf "textline shortcode %q: unknown size %q; using \"medium\"" $id $sizeArg -}}
+{{- end -}}
+
+{{- /* The icon may be a path under static/ or a bare name. */ -}}
+{{- $iconPath := "" -}}
+{{- $iconName := "" -}}
+{{- with trim (printf "%v" (.Get "icon" | default "")) " \t\r\n" -}}
+	{{- if strings.Contains . "/" -}}
+		{{- $iconPath = . -}}
+	{{- else -}}
+		{{- $iconName = . -}}
+	{{- end -}}
+{{- end -}}
+{{- $iconSet := trim (printf "%v" (.Get "iconSet" | default "")) " \t\r\n" -}}
+{{- $iconHTML := "" -}}
+{{- if or $iconPath $iconName -}}
+	{{- $iconHTML = partial "icon.html" (dict
+		"path" $iconPath
+		"name" $iconName
+		"set" $iconSet
+		"size" "var(--textline-icon-size)"
+		"color" "currentColor"
+	) -}}
+{{- end -}}
+{{- $hasIcon := or $iconPath $iconName -}}
+
+{{- $iconPos := lower (printf "%v" (index $opts "iconPos" | default "start")) -}}
+{{- if in (slice "left" "before" "begin") $iconPos -}}
+	{{- $iconPos = "start" -}}
+{{- else if in (slice "right" "after") $iconPos -}}
+	{{- $iconPos = "end" -}}
+{{- end -}}
+{{- if not (in (slice "start" "end") $iconPos) -}}
+	{{- warnf "textline shortcode %q: unknown iconPos %q; using \"start\"" $id $iconPos -}}
+	{{- $iconPos = "start" -}}
+{{- end -}}
+
+{{- /* type: keep the field single-line and avoid surprising browser
+       widgets such as a date picker. */ -}}
+{{- $types := slice "text" "search" "email" "url" "tel" "password" -}}
+{{- $type := lower (printf "%v" (.Get "type" | default "text")) -}}
+{{- if not (in $types $type) -}}
+	{{- warnf "textline shortcode %q: unknown type %q; using \"text\"" $id $type -}}
+	{{- $type = "text" -}}
+{{- end -}}
+
+{{- $truthy := slice "true" "yes" "1" "on" -}}
+{{- $disabled := in $truthy (lower (printf "%v" (.Get "disabled" | default false))) -}}
+{{- $readonly := in $truthy (lower (printf "%v" (.Get "readonly" | default false))) -}}
+{{- $required := in $truthy (lower (printf "%v" (.Get "required" | default false))) -}}
+{{- $inline := in $truthy (lower (printf "%v" (.Get "inline" | default false))) -}}
+
+{{- /* maxlength: a positive integer. */ -}}
+{{- $maxlength := "" -}}
+{{- with .Get "maxlength" -}}
+	{{- $raw := trim (printf "%v" .) " \t\r\n" -}}
+	{{- if findRE `^[1-9][0-9]*$` $raw -}}
+		{{- $maxlength = $raw -}}
+	{{- else -}}
+		{{- warnf "textline shortcode %q: invalid maxlength %q; ignoring it" $id $raw -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* autocomplete: a native token; reject anything that could break the
+       attribute with quotes or spaces outside the token grammar. */ -}}
+{{- $autocomplete := "" -}}
+{{- with .Get "autocomplete" -}}
+	{{- $raw := trim (printf "%v" .) " \t\r\n" -}}
+	{{- if findRE `^[A-Za-z0-9 _-]+$` $raw -}}
+		{{- $autocomplete = $raw -}}
+	{{- else -}}
+		{{- warnf "textline shortcode %q: invalid autocomplete %q; ignoring it" $id $raw -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* width is any CSS length/percentage. It is validated so it cannot
+       escape the style attribute; empty leaves the layout defaults alone. */ -}}
+{{- $width := "" -}}
+{{- if isset $opts "width" -}}
+	{{- $w := replaceRE `\s+` " " (printf "%v" (index $opts "width")) | strings.TrimSpace -}}
+	{{- with $w -}}
+		{{- if findRE `^[#A-Za-z0-9_(),.%+/ -]+$` . -}}
+			{{- $width = . -}}
+		{{- else -}}
+			{{- warnf "textline shortcode %q: invalid width %q; using the default" $id . -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $label := .Get "label" | default "" -}}
+{{- $labelHTML := "" -}}
+{{- $labelText := "" -}}
+{{- with $label -}}
+	{{- $labelHTML = . | markdownify | strings.TrimSpace -}}
+	{{- $labelHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $labelHTML -}}
+	{{- $labelText = $labelHTML | plainify | strings.TrimSpace -}}
+{{- end -}}
+
+{{- $tipHTML := "" -}}
+{{- with .Get "tip" -}}
+	{{- $tipHTML = . | markdownify | strings.TrimSpace -}}
+	{{- $tipHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $tipHTML -}}
+{{- end -}}
+{{- $tipID := printf "%s-tip" $id -}}
+{{- $describedBy := "" -}}
+{{- if $tipHTML -}}{{- $describedBy = $tipID -}}{{- end -}}
+
+{{- $ariaLabel := trim (printf "%v" (.Get "ariaLabel" | default "")) " \t\r\n" -}}
+{{- if and (not $ariaLabel) (not $labelText) -}}
+	{{- $ariaLabel = "Text input" -}}
+{{- end -}}
+{{- $title := trim (printf "%v" (.Get "title" | default "")) " \t\r\n" -}}
+{{- $name := trim (printf "%v" (.Get "name" | default "")) " \t\r\n" -}}
+
+{{- $class := "" -}}
+{{- if isset $opts "class" -}}{{- $class = printf "%v" (index $opts "class") -}}{{- end -}}
+{{- $classes := slice "textline" (printf "textline-%s" $size) -}}
+{{- if $inline -}}{{- $classes = $classes | append "textline-inline" -}}{{- end -}}
+{{- if $disabled -}}{{- $classes = $classes | append "textline-disabled" -}}{{- end -}}
+{{- with $class -}}{{- $classes = $classes | append (printf "%v" .) -}}{{- end -}}
+{{- $classAttr := delimit $classes " " -}}
+
+{{- $fieldClasses := slice "textline-field" -}}
+{{- if $hasIcon -}}
+	{{- if eq $iconPos "start" -}}
+		{{- $fieldClasses = $fieldClasses | append "textline-field-icon-start" -}}
+	{{- else -}}
+		{{- $fieldClasses = $fieldClasses | append "textline-field-icon-end" -}}
+	{{- end -}}
+{{- end -}}
+{{- $fieldClassAttr := delimit $fieldClasses " " -}}
+
+{{- $style := "" -}}
+{{- with $width -}}{{- $style = printf "--textline-width: %s" . -}}{{- end -}}
+
+{{- /* js: auto-detect a URL/path, otherwise treat the value as source. */ -}}
+{{- $jsRaw := trim (printf "%v" (.Get "js" | default "")) " \t\r\n" -}}
+{{- $jsMode := lower (printf "%v" (.Get "jsMode" | default "auto")) -}}
+{{- if not (in (slice "auto" "src" "inline") $jsMode) -}}
+	{{- warnf "textline shortcode %q: unknown jsMode %q; using \"auto\"" $id $jsMode -}}
+	{{- $jsMode = "auto" -}}
+{{- end -}}
+{{- $jsIsSrc := false -}}
+{{- if $jsRaw -}}
+	{{- if eq $jsMode "src" -}}
+		{{- $jsIsSrc = true -}}
+	{{- else if eq $jsMode "inline" -}}
+		{{- $jsIsSrc = false -}}
+	{{- else if not (findRE `\s` $jsRaw) -}}
+		{{- if or
+			(hasPrefix $jsRaw "http://")
+			(hasPrefix $jsRaw "https://")
+			(hasPrefix $jsRaw "//")
+			(hasPrefix $jsRaw "/")
+			(hasPrefix $jsRaw "./")
+			(hasPrefix $jsRaw "../")
+			(findRE `^[A-Za-z0-9_@%+~./-]+\.js([?#].*)?$` $jsRaw)
+		-}}
+			{{- $jsIsSrc = true -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- $jsEvent := lower (printf "%v" (.Get "jsEvent" | default "input")) -}}
+{{- if not (findRE `^[a-z][a-z0-9_:-]*$` $jsEvent) -}}
+	{{- warnf "textline shortcode %q: invalid jsEvent %q; using \"input\"" $id $jsEvent -}}
+	{{- $jsEvent = "input" -}}
+{{- end -}}
+
+<span class="{{ $classAttr }}" data-textline{{ with $style }} style="{{ . | safeCSS }}"{{ end }}>
+	{{- with $labelHTML }}
+	<label class="textline-label" for="{{ $id }}">{{ . | safeHTML }}</label>
+	{{- end }}
+	<span class="{{ $fieldClassAttr }}">
+		{{- if and $hasIcon (eq $iconPos "start") }}
+		<span class="textline-icon textline-icon-start" aria-hidden="true">{{ $iconHTML | safeHTML }}</span>
+		{{- end }}
+		<input class="textline-input" id="{{ $id }}" type="{{ $type }}" value="{{ $value }}"
+			{{- with $placeholder }} placeholder="{{ . }}"{{ end }}
+			{{- with $name }} name="{{ . }}"{{ end }}
+			{{- with $maxlength }} maxlength="{{ . }}"{{ end }}
+			{{- with $autocomplete }} autocomplete="{{ . }}"{{ end }}
+			{{- if $disabled }} disabled{{ end }}
+			{{- if $readonly }} readonly{{ end }}
+			{{- if $required }} required{{ end }}
+			{{- with $ariaLabel }} aria-label="{{ . }}"{{ end }}
+			{{- with $describedBy }} aria-describedby="{{ . }}"{{ end }}
+			{{- with $title }} title="{{ . }}"{{ end }}>
+		{{- if and $hasIcon (eq $iconPos "end") }}
+		<span class="textline-icon textline-icon-end" aria-hidden="true">{{ $iconHTML | safeHTML }}</span>
+		{{- end }}
+	</span>
+	{{- with $tipHTML }}
+	<span class="textline-tip" id="{{ $tipID }}">{{ . | safeHTML }}</span>
+	{{- end }}
+</span>
+
+{{- if and $jsRaw $jsIsSrc -}}
+	{{- $remote := or (hasPrefix $jsRaw "http://") (hasPrefix $jsRaw "https://") (hasPrefix $jsRaw "//") -}}
+	{{- $jsURL := "" -}}
+	{{- if $remote -}}
+		{{- $jsURL = $jsRaw -}}
+	{{- else -}}
+		{{- /* A page-bundle resource is published and referenced directly;
+		       a global asset is published the same way; anything else is a
+		       site-relative path. */ -}}
+		{{- with .Page.Resources.GetMatch $jsRaw -}}{{- $jsURL = .RelPermalink -}}{{- end -}}
+		{{- if not $jsURL -}}
+			{{- with resources.Get $jsRaw -}}{{- $jsURL = .RelPermalink -}}{{- end -}}
+		{{- end -}}
+		{{- if not $jsURL -}}{{- $jsURL = $jsRaw | relURL -}}{{- end -}}
+	{{- end -}}
+	{{- $registered := .Page.Store.Get "alice-textline-js" | default slice -}}
+	{{- if not (in $registered $jsURL) -}}
+		{{- .Page.Store.Set "alice-textline-js" ($registered | append $jsURL) -}}
+<script src="{{ $jsURL }}" defer></script>
+	{{- end -}}
+{{- else if $jsRaw -}}
+	{{- $jsCode := replaceRE "(?i)</(script)" "<\\/$1" $jsRaw -}}
+	{{- if eq $jsEvent "load" -}}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	{{ $jsCode | safeJS }}
+});
+</script>
+	{{- else -}}
+<script>
+(function () {
+	var el = document.getElementById({{ $id }});
+	if (!el) return;
+	el.addEventListener({{ $jsEvent }}, function (event) {
+		if (el.disabled) return;
+		{{ $jsCode | safeJS }}
+	});
+})();
+</script>
+	{{- end -}}
+{{- end -}}
