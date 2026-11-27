@@ -79,7 +79,7 @@ Pages:
   - Term-size bins: `static/css/taxo.css`. Tag and category link tilt: `style.css`.
   - `layouts/categories/term.html` and `layouts/tags/term.html` render one category or one tag with `post-list.html` (pinned posts first, like `/posts/`).
 - `layouts/friends.html` renders `/friends/`.
-  - Cards come from the `friend` and `frienmily` shortcodes.
+  - Cards come from the `friend` and `frienmily` shortcodes; `friend` renders through `card.html` with `variant="friend"`.
   - Styles: `static/css/friend.css`.
 - `layouts/about.html` renders `/about/`. Spacing for `.about-content` is in `style.css`.
 - `layouts/404.html` renders the 404 page through `baseof.html` and has no separate stylesheet.
@@ -108,6 +108,10 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
 - `label`:
   - Template: `layouts/_shortcodes/label.html`; renderer: `layouts/_partials/label.html`. Styles: `static/css/label.css` (imported by `style.css`).
   - Renders an inline-flex label from inner content or `text` (inline Markdown), with per-label `size`/`fontSize`, `color`, `backgroundColor`, `border`/`borderWidth`/`borderStyle`/`borderColor`/`borderRadius`, `shadow`, `padding`, `fontWeight`, and `gap`. Optional left/right icon via `icon` (path or bare name), `iconName`/`iconSet`, `iconPos`, `iconSize`, and `iconColor`; the icon is rendered by `icon.html`. Args also include `class`, `id`, `title`, and `ariaLabel`. Defaults: `params.label` (`size`, `color`, `backgroundColor`, border controls, `shadow`, `padding`, `fontWeight`, `gap`, `iconSize`, `iconColor`, `class`). Replaces the removed `mark` shortcode; its `color`, `backgroundColor`, size, and weight controls map to `color`, `backgroundColor`, `fontSize`, and `fontWeight`.
+- `card`:
+  - Template: `layouts/_shortcodes/card.html`; renderer: `layouts/_partials/card.html`. Styles: `static/css/friend.css` (shared card skin) plus `static/css/card.css` (cover, layouts, tags, focus), imported by `style.css`.
+  - A cover + title + description + link + tags card for books, films, repositories, and friend links. Every field is a static argument; no metadata is fetched from the network. The cover is resolved through `image-url.html` (page resource → static → asset → URL), and the overlay link, avatar column, and body reuse the friend card classes. Args: `title`, `description` (inner content wins), `cover`/`image`/`src`, `coverAlt`/`alt`, `coverWidth`, `coverRatio`, `link`/`href`/`url`, `target`, `rel`, `tags`, `layout` (`row`/`column`), `coverPos`, `loading`, `ariaLabel`, `id`, and `class`. Defaults: `params.card` (`layout`, `coverWidth`, `coverRatio`, `coverPos`, `target`, `rel`, `loading`, `class`).
+  - The renderer also takes the internal `variant` (`card` default, or `friend` for the original friend markup/classes without the card skin or params defaults) and `coverHTML` (trusted inline cover markup that wins over `cover`). The `friend` shortcode maps one `data/friends` entry onto it with `variant="friend"` and a `coverHTML` avatar, so that shortcode reuses the renderer while keeping `static/css/friend.css` unchanged.
 - `button`:
   - Template: `layouts/_shortcodes/button.html`. Styles: `static/css/button.css` (imported by `style.css`).
   - Four core types (`plain`, `primary`, `secondary`, `link`) plus a `download` action preset. Each type supplies default colors; `borderColor`, `tintColor`, and `textColor` override them per button (`tintColor="transparent"` makes an outline button); `link` defaults to a bordered text link. Also `size` (`sm`/`md`/`lg`), `block`, `active`, `disabled`, and native `<button>` vs. `<a role="button">` (`href`). `icon`/`iconPos` reuse `icon.html`; `label` supports inline Markdown. Inside a `buttongroup`, the group's `size` and `disabled` are inherited and the default id is prefixed with the group id, while a child's own size wins.
@@ -161,7 +165,7 @@ Shortcodes in `layouts/_shortcodes/` are used inside post content, and on the fr
 - `sidenote`: `static/css/sidenote.css`. On docs pages the right gutter belongs to the snaketoc, so `static/css/docs.css` renders `span.sidenote-content` inline instead of floating.
 - `dropcap`: `static/css/dropcap.css`.
 - `attachment`: `static/css/attachment.css`.
-- `friend` and `frienmily`: `static/css/friend.css`.
+- `friend` and `frienmily`: `friend` maps one data entry onto `card.html` (`variant="friend"`); `frienmily` keeps the original grid markup. Styles: `static/css/friend.css` (the generic `card` reuses this skin; `card.css` adds its cover and tags).
 - Fenced code blocks and the `highlight` shortcode:
   - Template: `layouts/_markup/render-codeblock.html`.
   - Layout styles: `static/css/code.css`.

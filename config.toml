@@ -394,6 +394,25 @@
         # Extra classes added to every label.
         class = ""
 
+    # Card shortcode defaults ({{< card >}}). Any shortcode argument wins.
+    [params.card]
+        # row|column. Empty follows the card's own default ("row").
+        layout = "row"
+        # Cover width (any CSS length). Empty uses the stylesheet's 8em.
+        coverWidth = ""
+        # CSS aspect-ratio for the cover, e.g. "2/3". Empty keeps the natural ratio.
+        coverRatio = ""
+        # Cover position in the row layout: left|right.
+        coverPos = "left"
+        # Link target. Empty opens external http(s) links in a new tab.
+        target = ""
+        # Link rel. Empty uses noopener noreferrer when target is _blank.
+        rel = ""
+        # Cover loading attribute: lazy or eager.
+        loading = "lazy"
+        # Extra classes added to every card.
+        class = ""
+
     [params.footer]
         # Should display site generator (Hugo) and theme (Alice) 🥰
         showHugoAlice = true

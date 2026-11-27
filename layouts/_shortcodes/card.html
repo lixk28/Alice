@@ -1,0 +1,75 @@
+{{- /*
+  Card shortcode — a cover, title, description, link, and tag card for books,
+  films, repositories, friend links, and other hand-written entries.
+
+  Usage:
+    {{< card title="The Classic Web" description="A short note on the theme."
+        cover="img/cover.webp" link="https://example.com" tags="Book, Design" />}}
+
+    {{< card title="Hugo" cover="img/HugoAliceLogo.webp"
+        link="https://gohugo.io" tags="Repository, Static site" />}}
+
+    {{< card title="A film" layout="column" coverRatio="2/3"
+        cover="img/poster.webp" >}}A one-line description.{{< /card >}}
+
+  Everything is static: the card renders the arguments you pass and never
+  fetches metadata or a preview from the network. A cover is resolved through
+  layouts/_partials/image-url.html, so a page resource, a file under static/,
+  an asset, or an absolute URL all work.
+
+  Args (all optional):
+    title       — card title (inline Markdown); also the fallback cover alt
+                  and link label
+    description — card body (Markdown); the inner content wins (alias: desc)
+    cover       — cover image: page resource, static path, asset, or URL
+                  (aliases: image, src)
+    coverAlt    — cover alt text; defaults to the plain-text title (alias: alt)
+    coverWidth  — CSS length for the cover, e.g. 8em; in the row layout it
+                  sizes the cover column (default: params.card.coverWidth or 8em)
+    coverRatio  — CSS aspect-ratio for the cover, e.g. 2/3 or 16/9; empty keeps
+                  the image's natural ratio
+    link        — URL the whole card links to (aliases: href, url)
+    target      — link target; empty opens external http(s) links in a new tab
+                  and keeps internal links in the current tab
+    rel         — link rel; target="_blank" gets noopener, plus noreferrer by default
+    tags        — comma-separated tags, rendered as plain chips (alias: tag)
+    layout      — row (default) or column; horizontal/h and vertical/v work
+    coverPos    — left (default) or right in the row layout
+    loading     — lazy (default) or eager
+    ariaLabel   — accessible name for the overlay card link
+    id          — element id
+    class       — extra classes on the card
+
+  Rendering lives in layouts/_partials/card.html. The visual skin is reused
+  from static/css/friend.css; static/css/card.css adds the cover sizing,
+  layout variants, tag chips, and focus style. Site defaults: params.card.
+*/ -}}
+
+{{- $description := "" -}}
+{{- if .Inner -}}
+	{{- $description = trim .InnerDeindent " \t\r\n" -}}
+{{- end -}}
+{{- if not $description -}}
+	{{- $description = .Get "description" | default (.Get "desc") | default "" -}}
+{{- end -}}
+
+{{- $args := dict
+	"page" .Page
+	"title" (.Get "title" | default "")
+	"description" $description
+	"cover" (.Get "cover" | default (.Get "image") | default (.Get "src") | default "")
+	"coverAlt" (.Get "coverAlt" | default (.Get "alt") | default "")
+	"coverWidth" (.Get "coverWidth" | default "")
+	"coverRatio" (.Get "coverRatio" | default "")
+	"link" (.Get "link" | default (.Get "href") | default (.Get "url") | default "")
+	"target" (.Get "target" | default "")
+	"rel" (.Get "rel" | default "")
+	"tags" (.Get "tags" | default (.Get "tag") | default "")
+	"layout" (.Get "layout" | default "")
+	"coverPos" (.Get "coverPos" | default "")
+	"loading" (.Get "loading" | default "")
+	"ariaLabel" (.Get "ariaLabel" | default "")
+	"id" (.Get "id" | default "")
+	"class" (.Get "class" | default "")
+-}}
+{{- partial "card.html" $args -}}

@@ -1,0 +1,349 @@
+{{- /*
+  Card renderer — a cover, title, description, link, and tag card for books,
+  films, repositories, friend links, and any other hand-written entry.
+
+  The `card` shortcode calls this partial; templates can call it directly with
+  the same flat dict. Everything is rendered from the arguments: no page,
+  data, or network lookup happens during the build. A cover is resolved
+  through layouts/_partials/image-url.html (page resource → static file →
+  asset → URL), and the card never fetches remote metadata.
+
+  Parameters (flat dict, all optional):
+    title       — card title (inline Markdown); also the cover alt and link
+                  label when those are not set
+    description — card body (Markdown); the shortcode's inner content wins
+    cover       — cover image: page resource, static path, asset, or URL
+    coverAlt    — cover alt text; defaults to the plain-text title
+    coverHTML   — trusted inline cover markup (inline SVG, text avatar, …);
+                  wins over cover and skips image resolution
+    coverWidth  — CSS length for the cover; in the row layout it sizes the
+                  cover column (default: params.card.coverWidth or 8em)
+    coverRatio  — CSS aspect-ratio for the cover, e.g. 2/3 or 16/9; empty keeps
+                  the image's natural ratio
+    link        — URL the whole card links to
+    target      — link target; empty makes external http(s) links open in a new
+                  tab and leaves internal links in the same tab
+    rel         — link rel; target="_blank" gets noopener, plus noreferrer by default
+    tags        — comma-separated string, or a slice when called directly
+    layout      — row (default) or column; horizontal/h and vertical/v work
+    coverPos    — left (default) or right in the row layout
+    loading     — lazy (default) or eager
+    ariaLabel   — accessible name for the card link
+    id          — element id
+    class       — extra class(es) on the card; a list is joined with spaces
+    page        — current Page, used for page-resource cover lookup
+    variant     — card (default) or friend; friend keeps the original friend
+                  card classes and skips the card.css skin
+
+  Visuals come from static/css/friend.css (the card reuses .friend-card-anchor,
+  .friend-avatar, .friend-bio, and .friend-card-link) plus static/css/card.css,
+  which adds the cover sizing, layout variants, tag chips, and focus style.
+  Site defaults: params.card. The friend variant ignores those defaults, so
+  friend cards keep their original look.
+
+  The `friend` shortcode calls this with variant="friend" and coverHTML for
+  one data/friends entry; `frienmily` keeps its original grid markup.
+*/ -}}
+
+{{- $ctx := . -}}
+
+{{- /* Renderer variant. The generic card adds the card.css skin; the friend
+       variant keeps the original friend card markup and classes. */ -}}
+{{- $variantRaw := "card" -}}
+{{- if reflect.IsMap $ctx -}}
+	{{- with $ctx.variant -}}
+		{{- $variantRaw = lower (trim (printf "%v" .) " \t\r\n") -}}
+	{{- end -}}
+{{- end -}}
+{{- $variantAliases := dict
+	"card" "card" "default" "card" "generic" "card"
+	"friend" "friend" "friend-card" "friend"
+-}}
+{{- $variant := "card" -}}
+{{- if isset $variantAliases $variantRaw -}}
+	{{- $variant = index $variantAliases $variantRaw -}}
+{{- else -}}
+	{{- warnf "card: unknown variant %q; using \"card\"" $variantRaw -}}
+{{- end -}}
+
+{{- /* Site defaults apply to the generic card only; the friend variant keeps
+       the friend card's original behavior. Hugo lowercases config keys, so map
+       them back to the camelCase argument names case-insensitively. */ -}}
+{{- $siteOpts := dict -}}
+{{- if eq $variant "card" -}}
+	{{- $siteRaw := site.Params.card | default dict -}}
+	{{- $defaultKeys := slice
+		"layout" "coverWidth" "coverRatio" "coverPos" "target" "rel" "loading" "class"
+	-}}
+	{{- if reflect.IsMap $siteRaw -}}
+		{{- range $key, $value := $siteRaw -}}
+			{{- range $defaultKey := $defaultKeys -}}
+				{{- if eq (lower $defaultKey) (lower $key) -}}
+					{{- $siteOpts = merge $siteOpts (dict $defaultKey $value) -}}
+				{{- end -}}
+			{{- end -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+{{- $opts := $siteOpts -}}
+{{- if reflect.IsMap $ctx -}}
+	{{- range $key, $value := $ctx -}}
+		{{- if $value -}}
+			{{- $opts = merge $opts (dict $key $value) -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Cover: trusted inline markup wins, otherwise resolve a page resource,
+       static file, asset, or absolute URL. */ -}}
+{{- $coverHTML := trim (printf "%v" ($opts.coverHTML | default "")) " \t\r\n" -}}
+{{- $cover := trim (printf "%v" ($opts.cover | default "")) " \t\r\n" -}}
+{{- $coverSrc := "" -}}
+{{- if not $coverHTML -}}
+	{{- with $cover -}}
+		{{- $coverSrc = partial "image-url.html" (dict "url" . "page" ($opts.page | default nil)) -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Title: inline Markdown with the single wrapping paragraph removed. */ -}}
+{{- $titleHTML := "" -}}
+{{- with trim (printf "%v" ($opts.title | default "")) " \t\r\n" -}}
+	{{- $titleHTML = . | markdownify | strings.TrimSpace -}}
+	{{- $titleHTML = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $titleHTML -}}
+{{- end -}}
+{{- $titleText := $titleHTML | plainify | strings.TrimSpace -}}
+
+{{- /* Cover alt: explicit text, or the plain-text title. */ -}}
+{{- $coverAlt := trim (printf "%v" ($opts.coverAlt | default ($opts.alt | default ""))) " \t\r\n" -}}
+{{- if not $coverAlt -}}{{- $coverAlt = $titleText -}}{{- end -}}
+
+{{- /* Description: full Markdown so paragraphs, lists, and links all work. */ -}}
+{{- $description := trim (printf "%v" ($opts.description | default "")) " \t\r\n" -}}
+{{- $descHTML := "" -}}
+{{- with $description -}}
+	{{- $descHTML = . | markdownify | strings.TrimSpace -}}
+{{- end -}}
+{{- $descText := $descHTML | plainify | strings.TrimSpace -}}
+
+{{- /* Tags: a comma-separated string from the shortcode, or a slice from a
+       direct partial call. Trim, drop empties, and de-duplicate. */ -}}
+{{- $tags := slice -}}
+{{- $rawTags := $opts.tags -}}
+{{- if reflect.IsSlice $rawTags -}}
+	{{- range $rawTags -}}
+		{{- with trim (printf "%v" .) " \t\r\n" -}}
+			{{- $tags = $tags | append . -}}
+		{{- end -}}
+	{{- end -}}
+{{- else -}}
+	{{- range strings.Split (printf "%v" ($rawTags | default "")) "," -}}
+		{{- with trim . " \t\r\n" -}}
+			{{- $tags = $tags | append . -}}
+		{{- end -}}
+	{{- end -}}
+{{- end -}}
+{{- $tags = $tags | uniq -}}
+
+{{- /* Layout: row by default, with an optional column variant. */ -}}
+{{- $layoutRaw := lower (trim (printf "%v" ($opts.layout | default "row")) " \t\r\n") -}}
+{{- $layoutAliases := dict
+	"row" "row" "horizontal" "row" "h" "row"
+	"column" "column" "col" "column" "vertical" "column" "v" "column"
+-}}
+{{- $layout := "row" -}}
+{{- if isset $layoutAliases $layoutRaw -}}
+	{{- $layout = index $layoutAliases $layoutRaw -}}
+{{- else -}}
+	{{- warnf "card: unknown layout %q; using \"row\"" $layoutRaw -}}
+{{- end -}}
+
+{{- /* Cover position: only meaningful in the row layout. */ -}}
+{{- $coverPosRaw := lower (trim (printf "%v" ($opts.coverPos | default "left")) " \t\r\n") -}}
+{{- if in (slice "start" "before" "begin") $coverPosRaw -}}
+	{{- $coverPosRaw = "left" -}}
+{{- else if in (slice "end" "after") $coverPosRaw -}}
+	{{- $coverPosRaw = "right" -}}
+{{- end -}}
+{{- if not (in (slice "left" "right") $coverPosRaw) -}}
+	{{- warnf "card: unknown coverPos %q; using \"left\"" $coverPosRaw -}}
+	{{- $coverPosRaw = "left" -}}
+{{- end -}}
+
+{{- /* Cover width: a CSS length, a bare number in px, or a CSS function. */ -}}
+{{- $coverWidth := trim (printf "%v" ($opts.coverWidth | default "")) " \t\r\n" -}}
+{{- with $coverWidth -}}
+	{{- $value := . -}}
+	{{- if findRE `^([0-9]+(\.[0-9]+)?|\.[0-9]+)$` $value -}}
+		{{- $value = printf "%spx" $value -}}
+	{{- end -}}
+	{{- $ok := or
+		(findRE `^([0-9]+(\.[0-9]+)?|\.[0-9]+)(px|em|rem|ex|ch|vw|vh|vmin|vmax|%|pt|pc|cm|mm|in)$` $value)
+		(findRE `^var\(--[A-Za-z0-9_-]+\)$` $value)
+		(findRE `^(calc|clamp|min|max)\([0-9A-Za-z%.,+*/( )-]+\)$` $value)
+	-}}
+	{{- if $ok -}}
+		{{- $coverWidth = $value -}}
+	{{- else -}}
+		{{- warnf "card: invalid coverWidth %q; using the default" . -}}
+		{{- $coverWidth = "" -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Cover ratio: a CSS aspect-ratio such as 2/3, or empty for the image's
+       natural ratio. */ -}}
+{{- $coverRatio := trim (printf "%v" ($opts.coverRatio | default "")) " \t\r\n" -}}
+{{- if eq (lower $coverRatio) "auto" -}}
+	{{- $coverRatio = "" -}}
+{{- end -}}
+{{- with $coverRatio -}}
+	{{- if not (findRE `^([0-9]+(\.[0-9]+)?|\.[0-9]+)([[:space:]]*/[[:space:]]*([0-9]+(\.[0-9]+)?|\.[0-9]+))?$` .) -}}
+		{{- warnf "card: invalid coverRatio %q; using the natural ratio" . -}}
+		{{- $coverRatio = "" -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Loading policy: keep it simple and valid. */ -}}
+{{- $loading := lower (trim (printf "%v" ($opts.loading | default "lazy")) " \t\r\n") -}}
+{{- if not (in (slice "lazy" "eager") $loading) -}}
+	{{- warnf "card: invalid loading %q; using \"lazy\"" $loading -}}
+	{{- $loading = "lazy" -}}
+{{- end -}}
+
+{{- /* Link: make root-relative site links baseURL-aware, leave absolute URLs,
+       fragments, query-only links, and relative paths alone. */ -}}
+{{- $href := trim (printf "%v" ($opts.link | default "")) " \t\r\n" -}}
+{{- $urlObj := urls.Parse $href -}}
+{{- if and $href (not $urlObj.IsAbs) (not $urlObj.Host) (hasPrefix $urlObj.Path "/") -}}
+	{{- $suffix := "" -}}
+	{{- with $urlObj.RawQuery -}}{{- $suffix = printf "?%s" . -}}{{- end -}}
+	{{- with $urlObj.Fragment -}}{{- $suffix = printf "%s#%s" $suffix . -}}{{- end -}}
+	{{- if eq $urlObj.Path "/" -}}
+		{{- $href = printf "%s%s" site.Home.RelPermalink $suffix -}}
+	{{- else -}}
+		{{- $path := strings.TrimPrefix "/" $urlObj.Path -}}
+		{{- $href = printf "%s%s" ($path | relURL) $suffix -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Target: an empty target sends external http(s) links to a new tab and
+       keeps internal links in the current one. */ -}}
+{{- $target := trim (printf "%v" ($opts.target | default "")) " \t\r\n" -}}
+{{- $rel := trim (printf "%v" ($opts.rel | default "")) " \t\r\n" -}}
+{{- if and $href (not $target) -}}
+	{{- $scheme := lower $urlObj.Scheme -}}
+	{{- if or (in (slice "http" "https") $scheme) $urlObj.Host -}}
+		{{- $target = "_blank" -}}
+	{{- end -}}
+{{- end -}}
+{{- if eq $target "_blank" -}}
+	{{- if not $rel -}}
+		{{- $rel = "noopener noreferrer" -}}
+	{{- else -}}
+		{{- $relParts := slice -}}
+		{{- range strings.Split $rel " " -}}
+			{{- with trim . " \t\r\n" -}}{{- $relParts = $relParts | append . -}}{{- end -}}
+		{{- end -}}
+		{{- if not (in $relParts "noopener") -}}
+			{{- $relParts = $relParts | append "noopener" -}}
+		{{- end -}}
+		{{- $rel = delimit $relParts " " -}}
+	{{- end -}}
+{{- end -}}
+
+{{- /* Accessible name for the overlay link. */ -}}
+{{- $ariaLabel := trim (printf "%v" ($opts.ariaLabel | default "")) " \t\r\n" -}}
+{{- $ariaName := $ariaLabel -}}
+{{- if and $href (not $ariaName) -}}
+	{{- $ariaName = $titleText -}}
+{{- end -}}
+{{- if and $href (not $ariaName) -}}
+	{{- $ariaName = $descText -}}
+{{- end -}}
+{{- if and $href (not $ariaName) -}}
+	{{- $ariaName = "Card" -}}
+	{{- warnf "card: the card link has no title or ariaLabel; using \"Card\" as its accessible name" -}}
+{{- end -}}
+
+{{- /* Tags become one <li> per tag. The friend variant has no tag row. */ -}}
+{{- $tagHTML := "" -}}
+{{- if and $tags (eq $variant "card") -}}
+	{{- $tagItems := slice -}}
+	{{- range $tags -}}
+		{{- $tagItems = $tagItems | append (printf `<li class="card-tag">%s</li>` (htmlEscape .)) -}}
+	{{- end -}}
+	{{- $tagHTML = printf `<ul class="card-tags">%s</ul>` (delimit $tagItems "") -}}
+{{- end -}}
+
+{{- $class := $opts.class | default "" -}}
+{{- if reflect.IsSlice $class -}}{{- $class = delimit $class " " -}}{{- end -}}
+{{- $class = trim (printf "%v" $class) " \t\r\n" -}}
+
+{{- /* Classes: the card variant adds the card skin; the friend variant keeps
+       the classes the friend cards have always used. */ -}}
+{{- $classes := slice "friend-card-anchor" -}}
+{{- $coverClasses := slice "friend-avatar" -}}
+{{- $bioClass := "friend-bio" -}}
+{{- $titleClass := "friend-name" -}}
+{{- $descClass := "friend-tagline" -}}
+{{- if eq $variant "card" -}}
+	{{- $classes = $classes | append "card" (printf "card-%s" $layout) -}}
+	{{- if and (eq $layout "row") (eq $coverPosRaw "right") -}}
+		{{- $classes = $classes | append "card-cover-right" -}}
+	{{- end -}}
+	{{- $coverClasses = $coverClasses | append "card-cover" -}}
+	{{- if $coverRatio -}}
+		{{- $coverClasses = $coverClasses | append "card-cover-ratio" -}}
+	{{- end -}}
+	{{- $bioClass = "friend-bio card-body" -}}
+	{{- $titleClass = "friend-name card-title" -}}
+	{{- $descClass = "friend-tagline card-description" -}}
+	{{- if $href -}}{{- $classes = $classes | append "card-linked" -}}{{- end -}}
+{{- end -}}
+{{- with $class -}}{{- $classes = $classes | append . -}}{{- end -}}
+{{- $classAttr := delimit $classes " " -}}
+{{- $coverClassAttr := delimit $coverClasses " " -}}
+
+{{- $id := trim (printf "%v" ($opts.id | default "")) " \t\r\n" -}}
+{{- $styleParts := slice -}}
+{{- if eq $variant "card" -}}
+	{{- with $coverWidth -}}
+		{{- $styleParts = $styleParts | append (printf "--card-cover-width: %s" .) -}}
+	{{- end -}}
+{{- end -}}
+{{- $style := delimit $styleParts "; " -}}
+{{- $coverStyle := "" -}}
+{{- if and (eq $variant "card") $coverRatio -}}
+	{{- $coverStyle = printf "--card-cover-ratio: %s" $coverRatio -}}
+{{- end -}}
+
+<div class="{{ $classAttr }}"
+	{{- with $id }} id="{{ . }}"{{ end }}
+	{{- with $style }} style="{{ . | safeCSS }}"{{ end }}>
+	{{- with $href }}
+	<a class="friend-card-link" href="{{ . }}"
+		{{- with $target }} target="{{ . }}"{{ end }}
+		{{- with $rel }} rel="{{ . }}"{{ end }}
+		aria-label="{{ $ariaName }}"></a>
+	{{- end }}
+	{{- if or $coverHTML $coverSrc }}
+	<div class="{{ $coverClassAttr }}"
+		{{- with $coverStyle }} style="{{ . | safeCSS }}"{{ end }}>
+		{{- if $coverHTML -}}
+			{{ $coverHTML | safeHTML }}
+		{{- else -}}
+			<img src="{{ $coverSrc }}" alt="{{ $coverAlt }}" loading="{{ $loading }}">
+		{{- end -}}
+	</div>
+	{{- end }}
+	{{- if or $titleHTML $descHTML $tagHTML }}
+	<div class="{{ $bioClass }}">
+		{{- with $titleHTML }}
+		<h4 class="{{ $titleClass }}">{{ . | safeHTML }}</h4>
+		{{- end }}
+		{{- with $descHTML }}
+		<div class="{{ $descClass }}">{{ . | safeHTML }}</div>
+		{{- end }}
+		{{- with $tagHTML }}{{ . | safeHTML }}{{ end }}
+	</div>
+	{{- end }}
+</div>

@@ -25,9 +25,9 @@ site turn those components on or off.
 - [Markdown Options and Extensions](../markdown-options-and-extensions/) covers
   the Goldmark settings that change how Markdown renders.
 - [Shortcodes](../shortcodes/) covers the component library and content helpers:
-    - [Widgets & Components](../shortcodes/widgets-and-components/) covers icons, labels,
-      buttons, form controls, tabs, dropdowns, admonitions, details, the
-      carousel, and the code editor.
+    - [Widgets & Components](../shortcodes/widgets-and-components/) covers icons,
+      labels, cards, buttons, form controls, tabs, dropdowns, admonitions,
+      details, the carousel, and the code editor.
     - [Authoring Shortcodes](../shortcodes/authoring-shortcodes/) covers
       attachments, sidenotes, commands, math, diagrams, dropcaps, secrets,
       keyboard keys, ruby annotations, and other content helpers.

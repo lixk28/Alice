@@ -1,0 +1,154 @@
+:root {
+    --card-cover-width: 8em;
+}
+
+/*
+ * The card reuses the friend card skin from friend.css: .friend-card-anchor
+ * supplies the border, offset shadow, hover lift, and overlay link;
+ * .friend-avatar and .friend-bio supply the two columns. These rules only add
+ * the cover treatment, the row/column variants, the tag chips, and the states
+ * a card needs when it has no link.
+ */
+
+.friend-card-anchor.card {
+    align-items: center;
+}
+
+.friend-card-anchor.card > .friend-avatar {
+    flex: 0 0 auto;
+    width: var(--card-cover-width);
+    max-width: var(--card-cover-width);
+    height: auto;
+    overflow: hidden;
+}
+
+.friend-card-anchor.card > .friend-avatar > img {
+    width: 100%;
+    height: auto;
+}
+
+/* A fixed ratio crops the cover instead of letting tall and wide images give
+   the cards different heights. */
+.friend-card-anchor.card > .friend-avatar.card-cover-ratio {
+    aspect-ratio: var(--card-cover-ratio);
+}
+
+.friend-card-anchor.card > .friend-avatar.card-cover-ratio > img {
+    height: 100%;
+    object-fit: cover;
+}
+
+.friend-card-anchor.card > .friend-bio {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: .5em .8em;
+}
+
+.friend-card-anchor.card .card-title {
+    margin: .1em 0 .25em;
+}
+
+/* Card titles are not page headings, so skip the anchor spacer that
+   style.css puts before article headings. */
+.friend-card-anchor.card .card-title::before {
+    display: none;
+    content: none;
+}
+
+/* A card without a link keeps body text instead of link blue. */
+.friend-card-anchor.card:not(.card-linked) .card-title {
+    color: var(--font-color);
+}
+
+.friend-card-anchor.card .card-description {
+    color: DimGray;
+    font-size: var(--font-size-small);
+    line-height: 1.5;
+}
+
+.friend-card-anchor.card .card-description p {
+    margin: .15em 0;
+}
+
+.friend-card-anchor.card .card-description > :first-child {
+    margin-top: 0;
+}
+
+.friend-card-anchor.card .card-description > :last-child {
+    margin-bottom: 0;
+}
+
+.friend-card-anchor.card .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35em;
+    margin: .5em 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.friend-card-anchor.card .card-tag {
+    display: inline-block;
+    padding: 0 .45em;
+    color: Navy;
+    background: GhostWhite;
+    border: .1em solid Silver;
+    border-radius: .2em;
+    font-size: var(--font-size-tiny);
+    line-height: 1.7;
+    white-space: nowrap;
+}
+
+/* Variants */
+.friend-card-anchor.card.card-cover-right {
+    flex-direction: row-reverse;
+}
+
+.friend-card-anchor.card.card-column {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.friend-card-anchor.card.card-column > .friend-avatar {
+    align-self: center;
+    width: var(--card-cover-width);
+    max-width: 100%;
+}
+
+.friend-card-anchor.card.card-column > .friend-bio {
+    padding: .6em .8em;
+}
+
+/* A card without a link should not lift, and its text should stay selectable
+   because there is no overlay link to receive the click. */
+.friend-card-anchor.card:not(.card-linked):hover {
+    box-shadow: .1em .1em .1em silver !important;
+    bottom: 0 !important;
+}
+
+.friend-card-anchor.card:not(.card-linked) > .friend-avatar,
+.friend-card-anchor.card:not(.card-linked) > .friend-bio {
+    pointer-events: auto;
+}
+
+/* The overlay link covers the whole card; give keyboard users a visible ring. */
+.friend-card-anchor.card .friend-card-link:focus-visible {
+    outline: .15em solid var(--link-color);
+    outline-offset: .1em;
+    border-radius: .3em;
+}
+
+/* On narrow screens a fixed cover column leaves too little room for the text,
+   so a row card stacks while a column card already stacks. */
+@media screen and (max-width: 480px) {
+    .friend-card-anchor.card.card-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .friend-card-anchor.card.card-row > .friend-avatar {
+        align-self: center;
+        width: var(--card-cover-width);
+        max-width: 100%;
+    }
+}

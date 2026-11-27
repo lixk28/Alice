@@ -132,3 +132,6 @@ The other fields are self-explanatory.
 3. Use `{{</* frienmily */>}}` to show every friend, or `friend` to show one.
 
 The Friends page is the demo; this page is the reference.
+
+For a single hand-written link card that is not part of `data/friends`, use the
+[card](../../widgets-and-components/card/) shortcode.

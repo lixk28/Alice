@@ -1,21 +1,45 @@
-{{ $friendId := .Get "id" | default "" }}
-{{ $friendMap := index hugo.Data.friends $friendId }}
-<div class="friend-card-anchor {{ with $friendMap.dead }}dead{{ end }}" id="{{ $friendMap.id }}">
-<a class="friend-card-link" href="{{ $friendMap.website }}" target="_blank" aria-label="{{ $friendMap.name | plainify }}"></a>
-    {{ with $friendMap.avatar }}
-    <div class="friend-avatar">
-        {{ $avatarKind := lower .kind }}
-        {{ if eq $avatarKind "url" }}
-            <img src="{{ .content }}" title="" alt="">
-        {{ else if eq $avatarKind "svg" }}
-            {{ .content | safeHTML }}
-        {{ else if eq $avatarKind "text" }}
-            {{ .content | markdownify }}
-        {{ end }}
-    </div>
-    {{ end }}
-    <div class="friend-bio">
-        <h4 class="friend-name">{{ $friendMap.name | markdownify }}</h4>
-        <div class="friend-tagline">{{ $friendMap.tagline | markdownify }}</div>
-    </div>
-</div>
+{{- /*
+  Friend shortcode — render one entry from data/friends.
+
+  Usage:
+    {{< friend id="alice" >}}
+
+  The `id` must match an `id` in a data file under data/friends. The friend
+  fields are mapped onto card.html with variant="friend", so the friend card
+  skin and markup stay the same while the renderer is shared.
+*/ -}}
+
+{{- $friendId := .Get "id" | default "" -}}
+{{- with index hugo.Data.friends $friendId -}}
+	{{- $friend := . -}}
+
+	{{- /* Avatar: url → <img>, svg → raw inline SVG, text → Markdown. The
+	       image stays decorative because the card title names the friend. */ -}}
+	{{- $avatarHTML := "" -}}
+	{{- with $friend.avatar -}}
+		{{- $kind := lower (printf "%v" (.kind | default "url")) -}}
+		{{- if eq $kind "url" -}}
+			{{- with .content -}}
+				{{- $avatarHTML = printf `<img src="%s" title="" alt="">` (htmlEscape (printf "%v" .)) -}}
+			{{- end -}}
+		{{- else if eq $kind "svg" -}}
+			{{- $avatarHTML = printf "%v" (.content | default "") -}}
+		{{- else if eq $kind "text" -}}
+			{{- $avatarHTML = .content | default "" | markdownify -}}
+		{{- end -}}
+	{{- end -}}
+
+	{{- $class := "" -}}
+	{{- if $friend.dead -}}{{- $class = "dead" -}}{{- end -}}
+
+	{{- partial "card.html" (dict
+		"variant" "friend"
+		"title" ($friend.name | default "")
+		"description" ($friend.tagline | default "")
+		"coverHTML" $avatarHTML
+		"link" ($friend.website | default "")
+		"target" "_blank"
+		"id" ($friend.id | default "")
+		"class" $class
+	) -}}
+{{- end -}}
