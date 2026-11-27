@@ -174,9 +174,11 @@ themesDir = "../.."
     # overrides these site params (page params win); `autoCollapse` is
     # site-only. The docs section always renders the left page tree; when a
     # page sets toc.show, the snaketoc appears on the right. The Shortcodes
-    # section sets `treenav.collapse: true` in its front matter.
+    # section sets `treenav.collapse: false` in its front matter.
     [params.treenav]
-        # Hide a section's children by default; set false to expand it.
+        # Collapse sections outside the active path; the current page's
+        # section and its ancestors always open. Set false to keep a section
+        # expanded when it is not active.
         collapse = true
         # Collapse sibling categories when one is expanded, like Docusaurus's
         # autoCollapseCategories. Set false to keep every opened branch open.

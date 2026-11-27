@@ -14,8 +14,8 @@ The named template recurses over the nested data; it does not read .Pages.
         {{- $isAncestor := $page.IsAncestor $current -}}
         {{- $collapse := $collapseSite -}}
         {{- with $page.Params.treenav -}}{{- if isset . "collapse" -}}{{- $collapse = .collapse -}}{{- end -}}{{- end -}}
-        {{- $defaultCollapsed := and $collapse (not $isAncestor) -}}
-        {{- $defaultExpanded := and (not $collapse) (not $isAncestor) -}}
+        {{- $defaultCollapsed := and $collapse (not $isCurrent) (not $isAncestor) -}}
+        {{- $defaultExpanded := and (not $collapse) (not $isCurrent) (not $isAncestor) -}}
         {{- $id := printf "tree-nav-%s-%s" $idPrefix (md5 $page.RelPermalink) -}}
     <li class="tree-nav-item{{ if or $isCurrent $isAncestor }} tree-nav-active{{ end }}">
         {{- if $children -}}
@@ -25,7 +25,7 @@ The named template recurses over the nested data; it does not read .Pages.
             aria-label="Toggle {{ $page.LinkTitle | default $page.Title }} section"
             aria-controls="{{ $id }}-children"
             {{ if or $isCurrent $isAncestor }}data-tree-nav-active{{ end }}
-            {{ if or $isAncestor (not $collapse) }}checked{{ end }}
+            {{ if or $isCurrent $isAncestor (not $collapse) }}checked{{ end }}
             {{ if $defaultCollapsed }}data-tree-nav-default-collapsed{{ end }}
             {{ if $defaultExpanded }}data-tree-nav-default-expanded{{ end }}>
         <div class="tree-nav-heading{{ if $isCurrent }} tree-nav-current{{ end }}">
@@ -50,9 +50,10 @@ Page tree navigation. Renders the sticky desktop aside or the mobile <details>
 wrapper around the same data tree.
 
 A page's `treenav.collapse` (site default `params.treenav.collapse`, true)
-overrides the site setting: true hides the section's children, false expands
-it; page params win. It still opens when it is an ancestor of the current
-page.
+overrides the site setting: true collapses the section outside the active
+path, false keeps it expanded; page params win. The current page's section
+and its ancestors always open, so clicking a node page reveals its leaf
+pages.
 
 Context: dict with "page" (the current Page) and "variant" ("desktop" or
 "mobile").

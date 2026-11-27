@@ -177,8 +177,8 @@
 		const value = Object.prototype.hasOwnProperty.call(saved, input.id) ? saved[input.id] === true : input.checked;
 		nextStates.set(input, value);
 	});
-	// The page's collapse default wins, except for ancestors of the active
-	// page: those are not flagged so the active path still opens.
+	// Collapse defaults apply to nodes outside the active path; the current
+	// section and its ancestors are not flagged and always open.
 	toggles.forEach((input) => {
 		if (input.hasAttribute("data-tree-nav-default-expanded")) {
 			nextStates.set(input, true);

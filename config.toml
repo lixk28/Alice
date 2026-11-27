@@ -173,7 +173,9 @@
     # site-only. The docs section always renders the left page tree; when a
     # page sets toc.show, the snaketoc appears on the right.
     [params.treenav]
-        # Hide a section's children by default; set false to expand it.
+        # Collapse sections outside the active path; the current page's
+        # section and its ancestors always open. Set false to keep a section
+        # expanded when it is not active.
         collapse = true
         # Collapse sibling categories when one is expanded, like Docusaurus's
         # autoCollapseCategories. Set false to keep every opened branch open.

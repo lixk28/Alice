@@ -5,8 +5,9 @@ type: docs
 weight: 40
 toc:
     show: false
-# Expand this section in the page tree; its child directory nodes keep the
-# site default (collapsed). Child pages still open the branch they are on.
+# Keep this section expanded when it is not the active page; its child
+# directory nodes keep the site default (collapsed). The active section and
+# its ancestors always open.
 treenav:
     collapse: false
 ---

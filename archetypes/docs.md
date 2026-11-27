@@ -14,8 +14,9 @@ weight: 10
 linkTitle: ""
 
 # Page tree navigation. Page params override `params.treenav` (page params
-# win); `autoCollapse` is site-only. `collapse = true` hides this section's
-# children; set `collapse: false` to expand it:
+# win); `autoCollapse` is site-only. `collapse = true` collapses this section
+# outside the active path; set `collapse: false` to keep it expanded. The
+# active section and its ancestors always open.
 #   treenav:
 #       collapse: false
 
