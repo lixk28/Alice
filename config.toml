@@ -168,18 +168,15 @@
         # Set it to "" to render no separator.
         separator = "svg/ui-oval/slash-divider.svg"
 
-    # Documentation pages (type: docs) render a left page tree and, when the
-    # page sets toc.show, the snaketoc on the right.
-    [params.docs]
-        # Show the page tree on the left by default. A page can override this
-        # with `docs: { nav: false }` in front matter.
-        nav = true
-        # Title above the page tree and in the mobile <details>. Empty uses
-        # the docs section's own title.
-        title = ""
-        # Collapse the sibling categories when one of them is expanded, like
-        # Docusaurus's autoCollapseCategories. Set false to keep every opened
-        # branch open.
+    # Page tree navigation on docs pages. Page front matter under `treenav`
+    # overrides these site params (page params win); `autoCollapse` is
+    # site-only. The docs section always renders the left page tree; when a
+    # page sets toc.show, the snaketoc appears on the right.
+    [params.treenav]
+        # Collapse a section's children on its own page.
+        collapse = false
+        # Collapse sibling categories when one is expanded, like Docusaurus's
+        # autoCollapseCategories. Set false to keep every opened branch open.
         autoCollapse = true
 
     # Carousel shortcode defaults ({{< carousel >}} + {{< slide >}}).

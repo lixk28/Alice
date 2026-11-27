@@ -5,12 +5,14 @@ The named template recurses over the nested data; it does not read .Pages.
 {{- define "alice-tree-nav" -}}
 {{- $current := .current -}}
 {{- $idPrefix := .idPrefix -}}
+{{- $collapse := .collapse | default false -}}
 <ul class="tree-nav-list">
     {{- range .nodes -}}
         {{- $page := .page -}}
         {{- $children := .children -}}
         {{- $isCurrent := eq $page.RelPermalink $current.RelPermalink -}}
         {{- $isAncestor := $page.IsAncestor $current -}}
+        {{- $defaultCollapsed := and $isCurrent $collapse -}}
         {{- $id := printf "tree-nav-%s-%s" $idPrefix (md5 $page.RelPermalink) -}}
     <li class="tree-nav-item{{ if or $isCurrent $isAncestor }} tree-nav-active{{ end }}">
         {{- if $children -}}
@@ -19,7 +21,9 @@ The named template recurses over the nested data; it does not read .Pages.
             id="{{ $id }}"
             aria-label="Toggle {{ $page.LinkTitle | default $page.Title }} section"
             aria-controls="{{ $id }}-children"
-            {{ if or $isCurrent $isAncestor }}checked data-tree-nav-active{{ end }}>
+            {{ if or $isCurrent $isAncestor }}data-tree-nav-active{{ end }}
+            {{ if and (or $isCurrent $isAncestor) (not $defaultCollapsed) }}checked{{ end }}
+            {{ if $defaultCollapsed }}data-tree-nav-default-collapsed{{ end }}>
         <div class="tree-nav-heading{{ if $isCurrent }} tree-nav-current{{ end }}">
             <a class="tree-nav-section-link" href="{{ $page.RelPermalink }}"{{ if $isCurrent }} aria-current="page"{{ end }}>{{ $page.LinkTitle | default $page.Title }}</a>
             <label class="tree-nav-toggle" for="{{ $id }}">
@@ -27,7 +31,7 @@ The named template recurses over the nested data; it does not read .Pages.
             </label>
         </div>
         <div class="tree-nav-children" id="{{ $id }}-children">
-            {{ template "alice-tree-nav" (dict "nodes" $children "current" $current "idPrefix" $idPrefix) }}
+            {{ template "alice-tree-nav" (dict "nodes" $children "current" $current "idPrefix" $idPrefix "collapse" $collapse) }}
         </div>
         {{- else -}}
         <a href="{{ $page.RelPermalink }}"{{ if $isCurrent }} aria-current="page"{{ end }}>{{ $page.LinkTitle | default $page.Title }}</a>
@@ -41,24 +45,29 @@ The named template recurses over the nested data; it does not read .Pages.
 Page tree navigation. Renders the sticky desktop aside or the mobile <details>
 wrapper around the same data tree.
 
+A page's `treenav.collapse` (site default `params.treenav.collapse`, false)
+overrides the site setting and starts its section closed when that page is
+current; page params win. Child pages still open the ancestor path.
+
 Context: dict with "page" (the current Page) and "variant" ("desktop" or
 "mobile").
 */ -}}
 {{- $page := .page -}}
 {{- $variant := .variant | default "desktop" -}}
 {{- $root := $page.FirstSection -}}
-{{- $docs := site.Params.docs | default dict -}}
+{{- $treenav := site.Params.treenav | default dict -}}
 {{- $autoCollapse := true -}}
-{{- if ne $docs.autoCollapse nil -}}{{- $autoCollapse = $docs.autoCollapse -}}{{- end -}}
-{{- $title := "" -}}
-{{- with $docs.title -}}{{- $title = . -}}{{- end -}}
-{{- if not $title -}}{{- $title = $root.LinkTitle | default $root.Title | default "Documentation" -}}{{- end -}}
+{{- if isset $treenav "autoCollapse" -}}{{- $autoCollapse = $treenav.autoCollapse -}}{{- end -}}
+{{- $collapse := false -}}
+{{- if isset $treenav "collapse" -}}{{- $collapse = $treenav.collapse -}}{{- end -}}
+{{- with $page.Params.treenav -}}{{- if isset . "collapse" -}}{{- $collapse = .collapse -}}{{- end -}}{{- end -}}
+{{- $title := $root.LinkTitle | default $root.Title | default "Documentation" -}}
 {{- $tree := partial "tree.html" $root -}}
 {{- if eq $variant "mobile" -}}
 <details class="tree-nav-mobile">
     <summary class="tree-nav-mobile-summary">{{ $title }}</summary>
     <nav class="tree-nav" aria-label="{{ $title }}" data-tree-nav-auto-collapse="{{ $autoCollapse }}">
-        {{ template "alice-tree-nav" (dict "nodes" $tree "current" $page "idPrefix" "mobile") }}
+        {{ template "alice-tree-nav" (dict "nodes" $tree "current" $page "idPrefix" "mobile" "collapse" $collapse) }}
     </nav>
 </details>
 {{- else -}}
@@ -66,7 +75,7 @@ Context: dict with "page" (the current Page) and "variant" ("desktop" or
 <aside id="tree-nav" aria-label="{{ $title }}">
     <a class="tree-nav-title{{ if $isRoot }} tree-nav-current{{ end }}" href="{{ $root.RelPermalink }}"{{ if $isRoot }} aria-current="page"{{ end }}>{{ $title }}</a>
     <nav class="tree-nav" aria-label="{{ $title }}" data-tree-nav-auto-collapse="{{ $autoCollapse }}">
-        {{ template "alice-tree-nav" (dict "nodes" $tree "current" $page "idPrefix" "desktop") }}
+        {{ template "alice-tree-nav" (dict "nodes" $tree "current" $page "idPrefix" "desktop" "collapse" $collapse) }}
     </nav>
 </aside>
 {{- end -}}

@@ -13,10 +13,11 @@ weight: 10
 # Short label for the docs tree and breadcrumbs. Empty uses the title.
 linkTitle: ""
 
-# Docs pages render a left page tree and, when this is on, the snaketoc on
-# the right. Set `nav: false` in this map to drop the left tree on one page.
-docs:
-    nav: true
+# Page tree navigation. Page params override `params.treenav` (page params
+# win); `autoCollapse` is site-only. To close this section's children on this
+# page, add:
+#   treenav:
+#       collapse: true
 
 toc:
     show: true

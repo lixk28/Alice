@@ -13,10 +13,6 @@ main.docs {
     padding: 0;
 }
 
-main.docs.docs-no-nav {
-    grid-template-columns: minmax(0, 1fr) var(--docs-toc-proportion);
-    padding-left: 1em;
-}
 
 main.docs > article {
     width: 100%;
@@ -98,20 +94,13 @@ main.docs span.sidenote-content {
         padding-left: var(--tree-nav-proportion);
     }
 
-    body.docs-page.docs-no-nav nav#breadcrumb {
-        padding-left: 1em;
-    }
 }
 
 @media screen and (max-width: 1080px) {
     /* the page tree folds into the <details> block inside the article */
     main.docs {
-        padding-left: 1em;
-    }
-
-    main.docs,
-    main.docs.docs-no-nav {
         grid-template-columns: minmax(0, 1fr) var(--docs-toc-proportion);
+        padding-left: 1em;
     }
 
     main.docs aside#tree-nav {

@@ -2,7 +2,8 @@
 // category changes with a measured height (Docusaurus-style dynamic duration),
 // and, when a sidebar link is followed, animate from the previous page's tree
 // state to the new one so the old branch collapses while the new one expands.
-// Set params.docs.autoCollapse = false to keep every opened branch open.
+// Set params.treenav.autoCollapse = false to keep every opened branch open.
+// Set treenav.collapse in a page's front matter to close its section there.
 (() => {
 	const STORAGE_KEY = "alice-tree-nav-state";
 	const TRANSITION_KEY = "alice-tree-nav-transition";
@@ -176,8 +177,14 @@
 		const value = Object.prototype.hasOwnProperty.call(saved, input.id) ? saved[input.id] === true : input.checked;
 		nextStates.set(input, value);
 	});
+	// A section configured to default-collapse wins over the active path;
+	// every other active branch is reopened.
 	toggles.forEach((input) => {
-		if (input.hasAttribute("data-tree-nav-active")) nextStates.set(input, true);
+		if (input.hasAttribute("data-tree-nav-default-collapsed")) {
+			nextStates.set(input, false);
+		} else if (input.hasAttribute("data-tree-nav-active")) {
+			nextStates.set(input, true);
+		}
 	});
 	// Expanding an active category closes its siblings, like Docusaurus.
 	if (autoCollapse) {

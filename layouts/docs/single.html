@@ -1,21 +1,9 @@
-{{- define "body-class" -}}
-{{- $docs := site.Params.docs | default dict -}}
-{{- $showNav := true -}}
-{{- if isset $docs "nav" -}}{{- $showNav = $docs.nav -}}{{- end -}}
-{{- with .Params.docs -}}{{- if isset . "nav" -}}{{- $showNav = .nav -}}{{- end -}}{{- end -}}
-docs-page{{ if not $showNav }} docs-no-nav{{ end }}
-{{- end -}}
+{{- define "body-class" -}}docs-page{{- end -}}
 {{- define "main" -}}
-{{- $docs := site.Params.docs | default dict -}}
-{{- $showNav := true -}}
-{{- if isset $docs "nav" -}}{{- $showNav = $docs.nav -}}{{- end -}}
-{{- with .Params.docs -}}{{- if isset . "nav" -}}{{- $showNav = .nav -}}{{- end -}}{{- end -}}
 {{- $showToc := false -}}
 {{- with .Params.toc -}}{{- if isset . "show" -}}{{- $showToc = .show -}}{{- end -}}{{- end -}}
-<main class="docs{{ if not $showNav }} docs-no-nav{{ end }}">
-	{{- if $showNav -}}
-		{{ partial "tree-nav.html" (dict "page" . "variant" "desktop") }}
-	{{- end }}
+<main class="docs">
+	{{ partial "tree-nav.html" (dict "page" . "variant" "desktop") }}
 	<article>
 		<div class="post-preamble docs-preamble">
 			<h1 class="post-title"># {{ .Title | markdownify | safeHTML }}</h1>
@@ -23,10 +11,8 @@ docs-page{{ if not $showNav }} docs-no-nav{{ end }}
 			<p class="docs-description">{{ . | markdownify }}</p>
 			{{- end -}}
 		</div>
-		{{- if $showNav -}}
-			{{ partial "tree-nav.html" (dict "page" . "variant" "mobile") }}
-			<script src="{{ "js/treeNav.js" | relURL }}"></script>
-		{{- end -}}
+		{{ partial "tree-nav.html" (dict "page" . "variant" "mobile") }}
+		<script src="{{ "js/treeNav.js" | relURL }}"></script>
 		<div class="post-content">
 			{{ .Content }}
 		</div>
