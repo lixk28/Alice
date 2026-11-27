@@ -177,10 +177,12 @@
 		const value = Object.prototype.hasOwnProperty.call(saved, input.id) ? saved[input.id] === true : input.checked;
 		nextStates.set(input, value);
 	});
-	// A section configured to default-collapse wins over the active path;
-	// every other active branch is reopened.
+	// The page's collapse default wins, except for ancestors of the active
+	// page: those are not flagged so the active path still opens.
 	toggles.forEach((input) => {
-		if (input.hasAttribute("data-tree-nav-default-collapsed")) {
+		if (input.hasAttribute("data-tree-nav-default-expanded")) {
+			nextStates.set(input, true);
+		} else if (input.hasAttribute("data-tree-nav-default-collapsed")) {
 			nextStates.set(input, false);
 		} else if (input.hasAttribute("data-tree-nav-active")) {
 			nextStates.set(input, true);

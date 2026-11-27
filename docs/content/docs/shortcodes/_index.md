@@ -5,9 +5,10 @@ type: docs
 weight: 40
 toc:
     show: false
-# Start collapsed on this section's own page; child pages still open it.
+# Expand this section in the page tree; its child directory nodes keep the
+# site default (collapsed). Child pages still open the branch they are on.
 treenav:
-    collapse: true
+    collapse: false
 ---
 
 These pages document the theme's shortcodes. **Widgets & Components** covers the

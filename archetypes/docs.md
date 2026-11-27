@@ -14,10 +14,10 @@ weight: 10
 linkTitle: ""
 
 # Page tree navigation. Page params override `params.treenav` (page params
-# win); `autoCollapse` is site-only. To close this section's children on this
-# page, add:
+# win); `autoCollapse` is site-only. `collapse = true` hides this section's
+# children; set `collapse: false` to expand it:
 #   treenav:
-#       collapse: true
+#       collapse: false
 
 toc:
     show: true

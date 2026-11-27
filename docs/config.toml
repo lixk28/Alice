@@ -176,8 +176,8 @@ themesDir = "../.."
     # page sets toc.show, the snaketoc appears on the right. The Shortcodes
     # section sets `treenav.collapse: true` in its front matter.
     [params.treenav]
-        # Collapse a section's children on its own page.
-        collapse = false
+        # Hide a section's children by default; set false to expand it.
+        collapse = true
         # Collapse sibling categories when one is expanded, like Docusaurus's
         # autoCollapseCategories. Set false to keep every opened branch open.
         autoCollapse = true
