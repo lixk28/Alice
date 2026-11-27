@@ -1,0 +1,229 @@
+/* Page tree navigation. */
+
+a.tree-nav-title {
+    display: block;
+    margin: 0 0 .55em;
+    padding: .1em .2em .45em;
+    color: navy;
+    font-family: var(--sans-font);
+    font-size: var(--font-size-small);
+    font-weight: 600;
+    border-bottom: 1px solid gainsboro;
+    box-shadow: none !important;
+}
+
+a.tree-nav-title:hover,
+a.tree-nav-title.tree-nav-current {
+    color: navy;
+    border-bottom-color: navy;
+    box-shadow: none !important;
+}
+
+nav.tree-nav ul.tree-nav-list {
+    margin: 0;
+    padding: 0;
+    list-style: none !important;
+}
+
+nav.tree-nav ul.tree-nav-list ul.tree-nav-list {
+    margin-left: .45em;
+    padding-left: .55em;
+    border-left: 1px solid gainsboro;
+}
+
+nav.tree-nav li.tree-nav-item {
+    /* Rows must touch so the hover background has no dead gaps; the link
+       padding below carries the visual spacing instead. */
+    position: relative;
+    margin: 0;
+}
+
+nav.tree-nav .tree-nav-heading {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    transition: background-color var(--transition-duration-fast) ease;
+}
+
+nav.tree-nav .tree-nav-heading:hover {
+    background-color: lavender;
+}
+
+nav.tree-nav .tree-nav-section-link {
+    flex: 1;
+    min-width: 0;
+    color: slategray;
+    font-weight: 600;
+}
+
+nav.tree-nav .tree-nav-section-link:hover {
+    color: var(--link-active-color);
+}
+
+/* Only the ancestors of the current page carry the navy text mark; a branch
+   that merely stays expanded keeps its normal color. */
+nav.tree-nav .tree-nav-active > .tree-nav-heading > .tree-nav-section-link {
+    color: navy;
+}
+
+/* A node page is a special leaf page: the link's aria-current draws the
+   current-page highlight, and this fills the rest of the row behind the
+   chevron. */
+nav.tree-nav .tree-nav-heading.tree-nav-current {
+    background-color: lavender;
+    border-radius: 0;
+}
+
+nav.tree-nav .tree-nav-heading.tree-nav-current > .tree-nav-section-link:hover {
+    color: navy;
+}
+
+/* Keep the checkbox focusable but visually hidden; the label is the button.
+   Anchor it to the item so toggles inside collapsed branches stay inside the
+   sticky aside's scroll area instead of extending it. */
+nav.tree-nav .tree-nav-toggle-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+nav.tree-nav .tree-nav-toggle {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 1.6em;
+    height: 1.6em;
+    margin-left: .1em;
+    border-radius: .2em;
+    color: slategray;
+    cursor: pointer;
+    transition: color var(--transition-duration-fast) ease,
+                background-color var(--transition-duration-fast) ease;
+}
+
+nav.tree-nav .tree-nav-toggle:hover {
+    color: navy;
+    /* One step darker than the lavender row hover, so the icon highlight
+       stacks visibly on an already highlighted (current) row. */
+    background-color: thistle;
+}
+
+nav.tree-nav .tree-nav-toggle-icon {
+    width: 1em;
+    height: 1em;
+    transition: transform var(--transition-duration-normal) ease;
+}
+
+nav.tree-nav .tree-nav-toggle-input:checked ~ .tree-nav-heading .tree-nav-toggle {
+    color: navy;
+}
+
+nav.tree-nav .tree-nav-toggle-input:checked ~ .tree-nav-heading .tree-nav-toggle-icon {
+    transform: rotate(90deg);
+}
+
+/* No-JS fallback; treeNav.js replaces this with a measured height animation. */
+nav.tree-nav .tree-nav-children {
+    display: none;
+}
+
+nav.tree-nav .tree-nav-toggle-input:checked ~ .tree-nav-children {
+    display: block;
+}
+
+nav.tree-nav .tree-nav-toggle-input:focus-visible ~ .tree-nav-heading .tree-nav-toggle {
+    outline: 2px solid var(--link-color);
+    outline-offset: 1px;
+}
+
+/* The script restores the remembered branch state before the first paint;
+   only the chevron rotation needs its CSS transition suppressed. */
+html.tree-nav-restoring nav.tree-nav .tree-nav-toggle-icon {
+    transition: none;
+}
+
+nav.tree-nav a {
+    display: block;
+    /* .12em padding + the old .05em item margin, so removing the gap keeps
+       the previous row pitch while the rows themselves touch. */
+    padding: .145em .35em;
+    border-radius: .2em;
+    color: dimgray;
+    box-shadow: none !important;
+    line-height: 1.35;
+    transition: color var(--transition-duration-fast) ease,
+                background-color var(--transition-duration-fast) ease;
+}
+
+nav.tree-nav a:hover {
+    color: var(--link-active-color);
+    background-color: lavender;
+    border-radius: 0;
+    box-shadow: none !important;
+}
+
+nav.tree-nav .tree-nav-active > a {
+    color: navy;
+    font-weight: 600;
+}
+
+nav.tree-nav a[aria-current="page"] {
+    color: navy;
+    background-color: lavender;
+    border-radius: 0;
+    box-shadow: inset .15em 0 0 navy !important;
+    padding-left: .55em;
+}
+
+/* the same tree, collapsed above the article on smaller screens */
+details.tree-nav-mobile {
+    display: none;
+    margin: .8em 1em 1em;
+    padding: .2em .6em .4em;
+    border: 1px solid gainsboro;
+    border-radius: .3em;
+    background-color: transparent;
+    font-family: var(--sans-font);
+    font-size: var(--font-size-small);
+}
+
+summary.tree-nav-mobile-summary {
+    padding: .15em 0;
+    color: slategray;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+summary.tree-nav-mobile-summary:hover {
+    color: navy;
+}
+
+summary.tree-nav-mobile-summary::marker {
+    color: slategray;
+}
+
+details.tree-nav-mobile nav.tree-nav {
+    margin-top: .3em;
+}
+
+@media screen and (max-width: 1080px) {
+    /* the page tree folds into the <details> block inside the article */
+    details.tree-nav-mobile {
+        display: block;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    nav.tree-nav .tree-nav-toggle-icon {
+        transition: none;
+    }
+}

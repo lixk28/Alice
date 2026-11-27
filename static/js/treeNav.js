@@ -4,16 +4,16 @@
 // state to the new one so the old branch collapses while the new one expands.
 // Set params.docs.autoCollapse = false to keep every opened branch open.
 (() => {
-	const STORAGE_KEY = "alice-docs-nav-state";
-	const TRANSITION_KEY = "alice-docs-nav-transition";
-	const TOGGLE_SELECTOR = ".docs-nav-toggle-input";
-	const TITLE_SELECTOR = ".docs-nav-section-link";
+	const STORAGE_KEY = "alice-tree-nav-state";
+	const TRANSITION_KEY = "alice-tree-nav-transition";
+	const TOGGLE_SELECTOR = ".tree-nav-toggle-input";
+	const TITLE_SELECTOR = ".tree-nav-section-link";
 	const EASING = "ease-in-out";
 
-	const navs = document.querySelectorAll("nav.docs-nav");
+	const navs = document.querySelectorAll("nav.tree-nav");
 	const toggles = document.querySelectorAll(TOGGLE_SELECTOR);
 	if (!navs.length || !toggles.length) return;
-	const autoCollapse = navs[0].dataset.docsNavAutoCollapse !== "false";
+	const autoCollapse = navs[0].dataset.treeNavAutoCollapse !== "false";
 	const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
 	const readState = () => {
@@ -43,7 +43,7 @@
 		writeState(saved);
 	};
 
-	const boxFor = (input) => input.closest("li")?.querySelector(":scope > .docs-nav-children");
+	const boxFor = (input) => input.closest("li")?.querySelector(":scope > .tree-nav-children");
 
 	const siblingToggles = (input) => {
 		const item = input.closest("li");
@@ -51,16 +51,16 @@
 		if (!list) return [];
 		return [...list.children]
 			.filter((sibling) => sibling !== item)
-			.map((sibling) => sibling.querySelector(":scope > .docs-nav-toggle-input"))
+			.map((sibling) => sibling.querySelector(":scope > .tree-nav-toggle-input"))
 			.filter(Boolean);
 	};
 
 	const normalizePath = (path) => path.replace(/\/+$/, "") || "/";
 
 	const cancelAnimation = (box) => {
-		if (box?._docsNavCleanup) {
-			box._docsNavCleanup();
-			box._docsNavCleanup = null;
+		if (box?._treeNavCleanup) {
+			box._treeNavCleanup();
+			box._treeNavCleanup = null;
 		}
 	};
 
@@ -128,10 +128,10 @@
 		const cleanup = () => {
 			box.removeEventListener("transitionend", onEnd);
 			clearTimeout(timer);
-			box._docsNavCleanup = null;
+			box._treeNavCleanup = null;
 		};
 		const finish = () => {
-			if (!box._docsNavCleanup) return;
+			if (!box._treeNavCleanup) return;
 			cleanup();
 			applyBoxState(box, expanded);
 		};
@@ -139,7 +139,7 @@
 			if (event.target === box && event.propertyName === "height") finish();
 		};
 		const timer = setTimeout(finish, duration + 50);
-		box._docsNavCleanup = cleanup;
+		box._treeNavCleanup = cleanup;
 		box.addEventListener("transitionend", onEnd);
 	};
 
@@ -168,7 +168,7 @@
 	}
 
 	const saved = readState();
-	document.documentElement.classList.add("docs-nav-restoring");
+	document.documentElement.classList.add("tree-nav-restoring");
 
 	// The settled state of this page: remembered branches plus the active path.
 	const nextStates = new Map();
@@ -177,12 +177,12 @@
 		nextStates.set(input, value);
 	});
 	toggles.forEach((input) => {
-		if (input.hasAttribute("data-docs-nav-active")) nextStates.set(input, true);
+		if (input.hasAttribute("data-tree-nav-active")) nextStates.set(input, true);
 	});
 	// Expanding an active category closes its siblings, like Docusaurus.
 	if (autoCollapse) {
 		toggles.forEach((input) => {
-			if (!nextStates.get(input) || !input.hasAttribute("data-docs-nav-active")) return;
+			if (!nextStates.get(input) || !input.hasAttribute("data-tree-nav-active")) return;
 			siblingToggles(input).forEach((sibling) => nextStates.set(sibling, false));
 		});
 	}
@@ -197,7 +197,7 @@
 		toggles.forEach((input) => setBoxState(boxFor(input), input.checked));
 
 		requestAnimationFrame(() => {
-			document.documentElement.classList.remove("docs-nav-restoring");
+			document.documentElement.classList.remove("tree-nav-restoring");
 			toggles.forEach((input) => {
 				const next = nextStates.get(input);
 				if (input.checked === next) return;
@@ -213,7 +213,7 @@
 		});
 		persist();
 		requestAnimationFrame(() => {
-			document.documentElement.classList.remove("docs-nav-restoring");
+			document.documentElement.classList.remove("tree-nav-restoring");
 		});
 	}
 
@@ -228,7 +228,7 @@
 			if (samePage) {
 				// The current section page's title toggles instead of navigating.
 				if (!link.matches(TITLE_SELECTOR)) return;
-				const input = link.closest("li")?.querySelector(":scope > .docs-nav-toggle-input");
+				const input = link.closest("li")?.querySelector(":scope > .tree-nav-toggle-input");
 				if (!input) return;
 				event.preventDefault();
 				input.click();

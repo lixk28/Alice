@@ -14,7 +14,7 @@ docs-page{{ if not $showNav }} docs-no-nav{{ end }}
 {{- with .Params.toc -}}{{- if isset . "show" -}}{{- $showToc = .show -}}{{- end -}}{{- end -}}
 <main class="docs{{ if not $showNav }} docs-no-nav{{ end }}">
 	{{- if $showNav -}}
-		{{ partial "docs/tree-toc.html" (dict "page" . "variant" "desktop") }}
+		{{ partial "tree-nav.html" (dict "page" . "variant" "desktop") }}
 	{{- end }}
 	<article>
 		<div class="post-preamble docs-preamble">
@@ -24,8 +24,8 @@ docs-page{{ if not $showNav }} docs-no-nav{{ end }}
 			{{- end -}}
 		</div>
 		{{- if $showNav -}}
-			{{ partial "docs/tree-toc.html" (dict "page" . "variant" "mobile") }}
-			<script src="{{ "js/docsNav.js" | relURL }}"></script>
+			{{ partial "tree-nav.html" (dict "page" . "variant" "mobile") }}
+			<script src="{{ "js/treeNav.js" | relURL }}"></script>
 		{{- end -}}
 		{{- with .Content -}}
 		<div class="post-content">

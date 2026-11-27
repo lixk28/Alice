@@ -11,7 +11,7 @@ only; the caller renders the HTML. Call it with a section Page.
 */ -}}
 {{- $nodes := slice -}}
 {{- range .Pages.ByWeight -}}
-    {{- $children := partial "docs/tree.html" . -}}
+    {{- $children := partial "tree.html" . -}}
     {{- $nodes = $nodes | append (dict "page" . "children" $children) -}}
 {{- end -}}
 {{- return $nodes -}}
