@@ -179,6 +179,10 @@ themesDir = "../.."
         # Title above the page tree and in the mobile <details>. Empty uses
         # the docs section's own title.
         title = ""
+        # Collapse the sibling categories when one of them is expanded, like
+        # Docusaurus's autoCollapseCategories. Set false to keep every opened
+        # branch open.
+        autoCollapse = true
 
     # Carousel shortcode defaults ({{< carousel >}} + {{< slide >}}).
     # Every key is a fallback; a shortcode argument still wins.

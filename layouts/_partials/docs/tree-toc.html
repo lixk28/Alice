@@ -1,5 +1,5 @@
 {{- /*
-Render recursive docs tree data (returned by docs/tree.html) as nav HTML.
+Render recursive page tree data (returned by docs/tree.html) as nav HTML.
 The named template recurses over the nested data; it does not read .Pages.
 */ -}}
 {{- define "alice-docs-tree" -}}
@@ -19,8 +19,8 @@ The named template recurses over the nested data; it does not read .Pages.
             id="{{ $id }}"
             aria-label="Toggle {{ $page.LinkTitle | default $page.Title }} section"
             aria-controls="{{ $id }}-children"
-            {{ if or $isCurrent $isAncestor }}checked{{ end }}>
-        <div class="docs-nav-heading">
+            {{ if or $isCurrent $isAncestor }}checked data-docs-nav-active{{ end }}>
+        <div class="docs-nav-heading{{ if $isCurrent }} docs-nav-current{{ end }}">
             <a class="docs-nav-section-link" href="{{ $page.RelPermalink }}"{{ if $isCurrent }} aria-current="page"{{ end }}>{{ $page.LinkTitle | default $page.Title }}</a>
             <label class="docs-nav-toggle" for="{{ $id }}">
                 {{ partial "icon.html" (dict "path" "svg/ui-oval/chevron-right.svg" "class" "docs-nav-toggle-icon") }}
@@ -38,7 +38,7 @@ The named template recurses over the nested data; it does not read .Pages.
 {{- end -}}
 
 {{- /*
-Docs navigation. Renders the sticky desktop aside or the mobile <details>
+Page tree navigation. Renders the sticky desktop aside or the mobile <details>
 wrapper around the same data tree.
 
 Context: dict with "page" (the current Page) and "variant" ("desktop" or
@@ -48,6 +48,8 @@ Context: dict with "page" (the current Page) and "variant" ("desktop" or
 {{- $variant := .variant | default "desktop" -}}
 {{- $root := $page.FirstSection -}}
 {{- $docs := site.Params.docs | default dict -}}
+{{- $autoCollapse := true -}}
+{{- if ne $docs.autoCollapse nil -}}{{- $autoCollapse = $docs.autoCollapse -}}{{- end -}}
 {{- $title := "" -}}
 {{- with $docs.title -}}{{- $title = . -}}{{- end -}}
 {{- if not $title -}}{{- $title = $root.LinkTitle | default $root.Title | default "Documentation" -}}{{- end -}}
@@ -55,7 +57,7 @@ Context: dict with "page" (the current Page) and "variant" ("desktop" or
 {{- if eq $variant "mobile" -}}
 <details class="docs-nav-mobile">
     <summary class="docs-nav-mobile-summary">{{ $title }}</summary>
-    <nav class="docs-nav" aria-label="{{ $title }}">
+    <nav class="docs-nav" aria-label="{{ $title }}" data-docs-nav-auto-collapse="{{ $autoCollapse }}">
         {{ template "alice-docs-tree" (dict "nodes" $tree "current" $page "idPrefix" "mobile") }}
     </nav>
 </details>
@@ -63,7 +65,7 @@ Context: dict with "page" (the current Page) and "variant" ("desktop" or
 {{- $isRoot := eq $root.RelPermalink $page.RelPermalink -}}
 <aside id="docnav" aria-label="{{ $title }}">
     <a class="docs-nav-title{{ if $isRoot }} docs-nav-current{{ end }}" href="{{ $root.RelPermalink }}"{{ if $isRoot }} aria-current="page"{{ end }}>{{ $title }}</a>
-    <nav class="docs-nav" aria-label="{{ $title }}">
+    <nav class="docs-nav" aria-label="{{ $title }}" data-docs-nav-auto-collapse="{{ $autoCollapse }}">
         {{ template "alice-docs-tree" (dict "nodes" $tree "current" $page "idPrefix" "desktop") }}
     </nav>
 </aside>

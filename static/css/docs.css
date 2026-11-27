@@ -24,14 +24,14 @@ main.docs > article {
     padding-bottom: 1em;
 }
 
-/* left docs page tree */
+/* left page tree */
 main.docs aside#docnav {
     align-self: start;
     position: sticky;
     top: var(--header-height);
     max-height: calc(100vh - var(--header-height));
     width: 100%;
-    padding: 1em 0 1em 1em;
+    padding: 1em;
     overflow-y: auto;
     font-family: var(--sans-font);
     font-size: var(--font-size-small);
@@ -69,7 +69,10 @@ nav.docs-nav ul.docs-nav-list ul.docs-nav-list {
 }
 
 nav.docs-nav li.docs-nav-item {
-    margin: .05em 0;
+    /* Rows must touch so the hover background has no dead gaps; the link
+       padding below carries the visual spacing instead. */
+    position: relative;
+    margin: 0;
 }
 
 nav.docs-nav .docs-nav-heading {
@@ -94,18 +97,31 @@ nav.docs-nav .docs-nav-section-link:hover {
     color: var(--link-active-color);
 }
 
-nav.docs-nav .docs-nav-active > .docs-nav-heading {
-    background-color: lavender;
-    border-radius: 0;
-}
-
+/* Only the ancestors of the current page carry the navy text mark; a branch
+   that merely stays expanded keeps its normal color. */
 nav.docs-nav .docs-nav-active > .docs-nav-heading > .docs-nav-section-link {
     color: navy;
 }
 
-/* Keep the checkbox focusable but visually hidden; the label is the button. */
+/* A node page is a special leaf page: the link's aria-current draws the
+   current-page highlight, and this fills the rest of the row behind the
+   chevron. */
+nav.docs-nav .docs-nav-heading.docs-nav-current {
+    background-color: lavender;
+    border-radius: 0;
+}
+
+nav.docs-nav .docs-nav-heading.docs-nav-current > .docs-nav-section-link:hover {
+    color: navy;
+}
+
+/* Keep the checkbox focusable but visually hidden; the label is the button.
+   Anchor it to the item so toggles inside collapsed branches stay inside the
+   sticky aside's scroll area instead of extending it. */
 nav.docs-nav .docs-nav-toggle-input {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 1px;
     height: 1px;
     margin: -1px;
@@ -127,11 +143,15 @@ nav.docs-nav .docs-nav-toggle {
     border-radius: .2em;
     color: slategray;
     cursor: pointer;
+    transition: color var(--transition-duration-fast) ease,
+                background-color var(--transition-duration-fast) ease;
 }
 
 nav.docs-nav .docs-nav-toggle:hover {
     color: navy;
-    background-color: lavender;
+    /* One step darker than the lavender row hover, so the icon highlight
+       stacks visibly on an already highlighted (current) row. */
+    background-color: thistle;
 }
 
 nav.docs-nav .docs-nav-toggle-icon {
@@ -148,26 +168,13 @@ nav.docs-nav .docs-nav-toggle-input:checked ~ .docs-nav-heading .docs-nav-toggle
     transform: rotate(90deg);
 }
 
+/* No-JS fallback; docsNav.js replaces this with a measured height animation. */
 nav.docs-nav .docs-nav-children {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows var(--transition-duration-normal) ease;
-}
-
-nav.docs-nav .docs-nav-children > ul {
-    min-height: 0;
-    overflow: hidden;
-    visibility: hidden;
-    transition: visibility 0s linear var(--transition-duration-normal);
+    display: none;
 }
 
 nav.docs-nav .docs-nav-toggle-input:checked ~ .docs-nav-children {
-    grid-template-rows: 1fr;
-}
-
-nav.docs-nav .docs-nav-toggle-input:checked ~ .docs-nav-children > ul {
-    visibility: visible;
-    transition: visibility 0s;
+    display: block;
 }
 
 nav.docs-nav .docs-nav-toggle-input:focus-visible ~ .docs-nav-heading .docs-nav-toggle {
@@ -175,9 +182,17 @@ nav.docs-nav .docs-nav-toggle-input:focus-visible ~ .docs-nav-heading .docs-nav-
     outline-offset: 1px;
 }
 
+/* The script restores the remembered branch state before the first paint;
+   only the chevron rotation needs its CSS transition suppressed. */
+html.docs-nav-restoring nav.docs-nav .docs-nav-toggle-icon {
+    transition: none;
+}
+
 nav.docs-nav a {
     display: block;
-    padding: .12em .35em;
+    /* .12em padding + the old .05em item margin, so removing the gap keeps
+       the previous row pitch while the rows themselves touch. */
+    padding: .145em .35em;
     border-radius: .2em;
     color: dimgray;
     box-shadow: none !important;
@@ -235,6 +250,19 @@ summary.docs-nav-mobile-summary::marker {
 
 details.docs-nav-mobile nav.docs-nav {
     margin-top: .3em;
+}
+
+@media screen and (max-width: 1080px) {
+    /* the page tree folds into the <details> block inside the article */
+    details.docs-nav-mobile {
+        display: block;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    nav.docs-nav .docs-nav-toggle-icon {
+        transition: none;
+    }
 }
 
 /* right snaketoc: reuse toc.css, but fill the grid column */
@@ -316,10 +344,6 @@ main.docs span.sidenote-content {
     main.docs aside#docnav {
         display: none;
     }
-
-    details.docs-nav-mobile {
-        display: block;
-    }
 }
 
 @media screen and (max-width: 720px) {
@@ -338,13 +362,5 @@ main.docs span.sidenote-content {
 
     main.docs aside#sidetoc {
         display: none;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    nav.docs-nav .docs-nav-children,
-    nav.docs-nav .docs-nav-children > ul,
-    nav.docs-nav .docs-nav-toggle-icon {
-        transition: none;
     }
 }

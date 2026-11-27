@@ -25,6 +25,7 @@ docs-page{{ if not $showNav }} docs-no-nav{{ end }}
 		</div>
 		{{- if $showNav -}}
 			{{ partial "docs/tree-toc.html" (dict "page" . "variant" "mobile") }}
+			<script src="{{ "js/docsNav.js" | relURL }}"></script>
 		{{- end -}}
 		{{- with .Content -}}
 		<div class="post-content">
